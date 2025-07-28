@@ -93,7 +93,7 @@ export function ComponentController() {
       navigator.mediaDevices.getUserMedia({
         audio: true,
       }).then((s) => {
-        const recorder = new MediaRecorder(s);
+        const recorder = new MediaRecorder(s, { mimeType: 'audio/webm' });
         audioStream.current = recorder;
         audioStream.current.start();
         storeDispatch(setIsRecording(true));
