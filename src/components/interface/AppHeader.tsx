@@ -33,10 +33,10 @@ import { useStorageEngine } from '../../storage/storageEngineHooks';
 import { PREFIX } from '../../utils/Prefix';
 import { getNewParticipant } from '../../utils/nextParticipant';
 import { RecordingAudioWaveform } from './RecordingAudioWaveform';
+import { studyComponentToIndividualComponent } from '../../utils/handleComponentInheritance';
 
 export function AppHeader({ studyNavigatorEnabled, dataCollectionEnabled }: { studyNavigatorEnabled: boolean; dataCollectionEnabled: boolean }) {
   const studyConfig = useStoreSelector((state) => state.config);
-  const metadata = useStoreSelector((state) => state.metadata);
 
   const answers = useStoreSelector((state) => state.answers);
   const flatSequence = useFlatSequence();
@@ -45,6 +45,7 @@ export function AppHeader({ studyNavigatorEnabled, dataCollectionEnabled }: { st
   const { storageEngine } = useStorageEngine();
 
   const currentComponent = useCurrentComponent();
+  const componentConfig = useMemo(() => studyComponentToIndividualComponent(studyConfig.components[currentComponent] || {}, studyConfig), [currentComponent, studyConfig]);
 
   const currentStep = useCurrentStep();
 
@@ -69,7 +70,8 @@ export function AppHeader({ studyNavigatorEnabled, dataCollectionEnabled }: { st
   const [menuOpened, setMenuOpened] = useState(false);
 
   const logoPath = studyConfig?.uiConfig.logoPath;
-  const withProgressBar = studyConfig?.uiConfig.withProgressBar;
+  const withProgressBar = useMemo(() => componentConfig.withProgressBar ?? studyConfig.uiConfig.withProgressBar, [componentConfig, studyConfig]);
+  const showTitle = useMemo(() => componentConfig.showTitle ?? studyConfig.uiConfig.showTitle ?? true, [componentConfig, studyConfig]);
 
   const studyId = useStudyId();
   const studyHref = useHref(`/${studyId}`);
@@ -93,14 +95,16 @@ export function AppHeader({ studyNavigatorEnabled, dataCollectionEnabled }: { st
           <Flex align="center">
             <Image w={40} src={`${PREFIX}${logoPath}`} alt="Study Logo" />
             <Space w="md" />
-            <Title
-              ref={titleRef}
-              order={4}
-              style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-              title={isTruncated ? studyConfig?.studyMetadata.title : undefined}
-            >
-              {studyConfig?.studyMetadata.title}
-            </Title>
+            {showTitle ? (
+              <Title
+                ref={titleRef}
+                order={4}
+                style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                title={isTruncated ? studyConfig?.studyMetadata.title : undefined}
+              >
+                {studyConfig?.studyMetadata.title}
+              </Title>
+            ) : null }
           </Flex>
         </Grid.Col>
 
@@ -152,10 +156,10 @@ export function AppHeader({ studyNavigatorEnabled, dataCollectionEnabled }: { st
                 <Menu.Item
                   component="a"
                   href={
-                      studyConfig !== null
-                        ? `mailto:${studyConfig.uiConfig.contactEmail}`
-                        : undefined
-                    }
+                        studyConfig !== null
+                          ? `mailto:${studyConfig.uiConfig.contactEmail}`
+                          : undefined
+                      }
                   leftSection={<IconMail size={14} />}
                 >
                   Contact
@@ -163,7 +167,7 @@ export function AppHeader({ studyNavigatorEnabled, dataCollectionEnabled }: { st
                 {studyNavigatorEnabled && (
                   <Menu.Item
                     leftSection={<IconUserPlus size={14} />}
-                    onClick={() => getNewParticipant(storageEngine, studyConfig, metadata, studyHref)}
+                    onClick={() => getNewParticipant(storageEngine, studyHref)}
                   >
                     Next Participant
                   </Menu.Item>

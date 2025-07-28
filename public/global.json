@@ -1,28 +1,30 @@
 {
-  "$schema": "https://raw.githubusercontent.com/revisit-studies/study/v2.1.1/src/parser/GlobalConfigSchema.json",
+  "$schema": "https://raw.githubusercontent.com/revisit-studies/study/dev/src/parser/GlobalConfigSchema.json",
   "configsList": [
     "tutorial",
     "example-brush-interactions",
-    "example-cleveland",
     "example-mvnv",
     "example-VLAT-full-randomized",
     "example-VLAT-mini-randomized",
     "demo-html",
     "demo-html-input",
     "demo-survey",
+    "demo-drawing",
     "demo-training",
     "demo-html-trrack",
-    "demo-click-accuracy-test",
     "demo-image",
     "demo-upset",
     "demo-vega",
     "demo-video-slider",
     "demo-video",
+    "demo-dynamic",
     "library-beauvis",
+    "library-calvi",
     "library-color-blindness",
     "library-demographics",
     "library-mic-check",
     "library-mini-vlat",
+    "library-nasa-tlx",
     "library-previs",
     "library-sus",
     "library-vlat",
@@ -51,6 +53,9 @@
     "demo-video-slider": {
       "path": "demo-video-slider/config.json"
     },
+    "demo-drawing": {
+      "path": "demo-drawing/config.json"
+    },
     "demo-html": {
       "path": "demo-html/config.json"
     },
@@ -69,6 +74,9 @@
     "demo-video": {
       "path": "demo-video/config.json"
     },
+    "demo-dynamic": {
+      "path": "demo-dynamic/config.json"
+    },
     "example-VLAT-full-randomized": {
       "path": "example-VLAT-full-randomized/config.json"
     },
@@ -77,9 +85,6 @@
     },
     "demo-html-trrack": {
       "path": "demo-html-trrack/config.json"
-    },
-    "demo-click-accuracy-test": {
-      "path": "demo-click-accuracy-test/config.json"
     },
     "demo-image": {
       "path": "demo-image/config.json"
@@ -96,6 +101,10 @@
       "path": "library-beauvis/config.json",
       "test": true
     },
+    "library-calvi": {
+      "path": "library-calvi/config.json",
+      "test": true
+    },
     "library-color-blindness": {
       "path": "library-color-blindness/config.json",
       "test": true
@@ -110,6 +119,10 @@
     },
     "library-mini-vlat": {
       "path": "library-mini-vlat/config.json",
+      "test": true
+    },
+    "library-nasa-tlx": {
+      "path": "library-nasa-tlx/config.json",
       "test": true
     },
     "library-previs": {

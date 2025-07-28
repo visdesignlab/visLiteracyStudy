@@ -71,7 +71,7 @@ export function ComponentController() {
   }, [setAlertModal, storageEngine, storeDispatch]);
 
   useEffect(() => {
-    if (!studyConfig || !studyConfig.uiConfig.recordStudyAudio || !storageEngine || storageEngine.getEngine() !== 'firebase' || (status && status.endTime > 0) || isAnalysis) {
+    if (!studyConfig || !studyConfig.uiConfig.recordAudio || !storageEngine || (status && status.endTime > 0) || isAnalysis) {
       return;
     }
 
@@ -140,8 +140,14 @@ export function ComponentController() {
     if (typeof toReturn === 'object') {
       const funcParams = answers[currentIdentifier]?.parameters;
       const funcCorrectAnswer = answers[currentIdentifier]?.correctAnswer;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return { ...toReturn, parameters: funcParams || (toReturn as any).parameters || undefined, correctAnswer: funcCorrectAnswer || (toReturn as any).correctAnswer || undefined };
+
+      return {
+        ...toReturn,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        parameters: funcParams || (toReturn as any).parameters || {},
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        correctAnswer: funcCorrectAnswer || (toReturn as any).correctAnswer || undefined,
+      };
     }
     return toReturn as unknown as IndividualComponent;
   }, [answers, currentComponent, currentIdentifier, stepConfig, studyConfig]);
@@ -177,10 +183,9 @@ export function ComponentController() {
       </Center>
     );
   }
-
-  const instruction = (currentConfig.instruction || '');
-  const { instructionLocation } = currentConfig;
-  const instructionInSideBar = studyConfig.uiConfig.sidebar && (instructionLocation === 'sidebar' || instructionLocation === undefined);
+  const instruction = currentConfig?.instruction || '';
+  const instructionLocation = currentConfig.instructionLocation ?? studyConfig.uiConfig.instructionLocation ?? 'sidebar';
+  const instructionInSideBar = instructionLocation === 'sidebar';
 
   return (
     <>

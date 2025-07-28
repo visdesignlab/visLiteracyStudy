@@ -1,7 +1,8 @@
-import { AppShell } from '@mantine/core';
+import { AppShell, Button } from '@mantine/core';
 import { Outlet } from 'react-router';
 import { useEffect, useMemo, useRef } from 'react';
 import debounce from 'lodash.debounce';
+import { IconArrowLeft } from '@tabler/icons-react';
 import { AppAside } from './interface/AppAside';
 import { AppHeader } from './interface/AppHeader';
 import { AppNavBar } from './interface/AppNavBar';
@@ -10,15 +11,23 @@ import { AlertModal } from './interface/AlertModal';
 import { EventType } from '../store/types';
 import { useStudyConfig } from '../store/hooks/useStudyConfig';
 import { WindowEventsContext } from '../store/hooks/useWindowEvents';
-import { useStoreSelector } from '../store/store';
+import { useStoreSelector, useStoreDispatch, useStoreActions } from '../store/store';
 import { AnalysisFooter } from './interface/AnalysisFooter';
 import { useIsAnalysis } from '../store/hooks/useIsAnalysis';
+import { studyComponentToIndividualComponent } from '../utils/handleComponentInheritance';
+import { useCurrentComponent } from '../routes/utils';
+import { ResolutionWarning } from './interface/ResolutionWarning';
 
 export function StepRenderer() {
   const windowEvents = useRef<EventType[]>([]);
+  const dispatch = useStoreDispatch();
+  const { toggleStudyBrowser } = useStoreActions();
 
   const studyConfig = useStudyConfig();
-  const windowEventDebounceTime = studyConfig.uiConfig.windowEventDebounceTime ?? 100;
+  const currentComponent = useCurrentComponent();
+  const componentConfig = useMemo(() => studyComponentToIndividualComponent(studyConfig.components[currentComponent] || {}, studyConfig), [currentComponent, studyConfig]);
+
+  const windowEventDebounceTime = useMemo(() => componentConfig.windowEventDebounceTime ?? studyConfig.uiConfig.windowEventDebounceTime ?? 100, [componentConfig, studyConfig]);
 
   const showStudyBrowser = useStoreSelector((state) => state.showStudyBrowser);
   const analysisHasAudio = useStoreSelector((state) => state.analysisHasAudio);
@@ -99,33 +108,49 @@ export function StepRenderer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const sidebarWidth = studyConfig.uiConfig.sidebarWidth ?? 300;
-
   const { studyNavigatorEnabled, dataCollectionEnabled } = useMemo(() => modes, [modes]);
 
-  const asideOpen = useMemo(() => studyNavigatorEnabled && showStudyBrowser, [studyNavigatorEnabled, showStudyBrowser]);
-
+  // No default value for withSidebar since it's a required field in uiConfig
+  const sidebarOpen = useMemo(() => componentConfig.withSidebar ?? studyConfig.uiConfig.withSidebar, [componentConfig, studyConfig]);
+  const sidebarWidth = useMemo(() => componentConfig?.sidebarWidth ?? studyConfig.uiConfig.sidebarWidth ?? 300, [componentConfig, studyConfig]);
+  const showTitleBar = useMemo(() => componentConfig.showTitleBar ?? studyConfig.uiConfig.showTitleBar ?? true, [componentConfig, studyConfig]);
   const isAnalysis = useIsAnalysis();
+
+  const asideOpen = useMemo(() => studyNavigatorEnabled && showStudyBrowser, [studyNavigatorEnabled, showStudyBrowser]);
 
   return (
     <WindowEventsContext.Provider value={windowEvents}>
       <AppShell
         padding="md"
-        header={{ height: 70 }}
-        navbar={{ width: sidebarWidth, breakpoint: 'xs', collapsed: { desktop: !studyConfig.uiConfig.sidebar, mobile: !studyConfig.uiConfig.sidebar } }}
+        header={{ height: showTitleBar ? 70 : 0 }}
+        navbar={{ width: sidebarWidth, breakpoint: 'xs', collapsed: { desktop: !sidebarOpen, mobile: !sidebarOpen } }}
         aside={{ width: 360, breakpoint: 'xs', collapsed: { desktop: !asideOpen, mobile: !asideOpen } }}
         footer={{ height: (isAnalysis ? 75 : 0) + (analysisHasAudio ? 50 : 0) }}
       >
         <AppNavBar />
         <AppAside />
-        <AppHeader studyNavigatorEnabled={studyNavigatorEnabled} dataCollectionEnabled={dataCollectionEnabled} />
+        {showTitleBar && (
+          <AppHeader studyNavigatorEnabled={studyNavigatorEnabled} dataCollectionEnabled={dataCollectionEnabled} />
+        )}
+        <ResolutionWarning />
         <HelpModal />
         <AlertModal />
         <AppShell.Main>
+          {!showTitleBar && !showStudyBrowser && studyNavigatorEnabled && (
+            <Button
+              variant="transparent"
+              leftSection={<IconArrowLeft size={14} />}
+              onClick={() => dispatch(toggleStudyBrowser())}
+              size="xs"
+              style={{ position: 'fixed', top: '10px', right: '10px' }}
+            >
+              Study Browser
+            </Button>
+          )}
           <Outlet />
         </AppShell.Main>
         {isAnalysis && (
-        <AnalysisFooter />
+          <AnalysisFooter />
         )}
       </AppShell>
     </WindowEventsContext.Provider>
