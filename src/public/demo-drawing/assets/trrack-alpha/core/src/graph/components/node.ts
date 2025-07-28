@@ -92,15 +92,15 @@ export type Nodes<State, Event extends string> = Record<
 >;
 
 export function isStateNode<State, Event extends string>(
-    node: ProvenanceNode<State, Event>
+  node: ProvenanceNode<State, Event>,
 ): node is StateNode<State, Event> {
-    return 'parent' in node;
+  return 'parent' in node;
 }
 
 export function isRootNode<State, Event extends string>(
-    node: ProvenanceNode<State, Event>
+  node: ProvenanceNode<State, Event>,
 ): node is RootNode<State> {
-    return !isStateNode(node);
+  return !isStateNode(node);
 }
 
 export function createRootNode<State>(args: {
@@ -109,67 +109,69 @@ export function createRootNode<State>(args: {
     initialArtifact?: unknown;
     label?: string;
 }): RootNode<State> {
-    const { label = undefined, state, initialArtifact, initialMetadata } = args;
+  const {
+    label = undefined, state, initialArtifact, initialMetadata,
+  } = args;
 
-    const commonMetadata: NodeMetadata = {
-        annotation: [],
-        bookmark: [],
-    };
+  const commonMetadata: NodeMetadata = {
+    annotation: [],
+    bookmark: [],
+  };
 
-    const meta = Object.keys(initialMetadata || {}).reduce<NodeMetadata>(
-        (acc: NodeMetadata, key) => {
-            acc[key] = [];
-            if (initialMetadata && initialMetadata[key]) {
-                acc[key].push({
-                    type: key,
-                    id: ID.get(),
-                    val: initialMetadata[key],
-                    createdOn: Date.now(),
-                });
-            }
-            return acc;
-        },
-        commonMetadata
-    );
+  const meta = Object.keys(initialMetadata || {}).reduce<NodeMetadata>(
+    (acc: NodeMetadata, key) => {
+      acc[key] = [];
+      if (initialMetadata && initialMetadata[key]) {
+        acc[key].push({
+          type: key,
+          id: ID.get(),
+          val: initialMetadata[key],
+          createdOn: Date.now(),
+        });
+      }
+      return acc;
+    },
+    commonMetadata,
+  );
 
-    const artifacts = initialArtifact
-        ? [
-              {
-                  id: ID.get(),
-                  createdOn: Date.now(),
-                  val: initialArtifact,
-              },
-          ]
-        : [];
-
-    return {
+  const artifacts = initialArtifact
+    ? [
+      {
         id: ID.get(),
-        label: label || 'Root',
-        event: 'Root',
-        children: [],
-        level: 0,
         createdOn: Date.now(),
-        meta,
-        artifacts,
-        state: {
-            type: 'checkpoint',
-            val: state,
-        },
-    };
+        val: initialArtifact,
+      },
+    ]
+    : [];
+
+  return {
+    id: ID.get(),
+    label: label || 'Root',
+    event: 'Root',
+    children: [],
+    level: 0,
+    createdOn: Date.now(),
+    meta,
+    artifacts,
+    state: {
+      type: 'checkpoint',
+      val: state,
+    },
+  };
 }
 
 export function createStateNode<State, Event extends string>({
-    parent,
-    state,
-    label,
-    sideEffects = {
-        do: [],
-        undo: [],
-    },
-    initialMetadata,
-    isEphemeral = false,
-    initialArtifact,
-    event,
+  parent,
+  state,
+  label,
+  sideEffects = {
+    do: [],
+    undo: [],
+  },
+  initialMetadata,
+  isEphemeral = false,
+  initialArtifact,
+  event,
 }: {
     parent: ProvenanceNode<State, Event>;
     state: StateLike<State>;
@@ -180,49 +182,49 @@ export function createStateNode<State, Event extends string>({
     isEphemeral?: boolean;
     event: Event;
 }): StateNode<State, Event> {
-    const commonMetadata: NodeMetadata = {
-        annotation: [],
-        bookmark: [],
-    };
+  const commonMetadata: NodeMetadata = {
+    annotation: [],
+    bookmark: [],
+  };
 
-    const meta = Object.keys(initialMetadata || {}).reduce<NodeMetadata>(
-        (acc: NodeMetadata, key) => {
-            acc[key] = [];
-            if (initialMetadata && initialMetadata[key]) {
-                acc[key].push({
-                    type: key,
-                    id: ID.get(),
-                    val: initialMetadata[key],
-                    createdOn: Date.now(),
-                });
-            }
-            return acc;
-        },
-        commonMetadata
-    );
+  const meta = Object.keys(initialMetadata || {}).reduce<NodeMetadata>(
+    (acc: NodeMetadata, key) => {
+      acc[key] = [];
+      if (initialMetadata && initialMetadata[key]) {
+        acc[key].push({
+          type: key,
+          id: ID.get(),
+          val: initialMetadata[key],
+          createdOn: Date.now(),
+        });
+      }
+      return acc;
+    },
+    commonMetadata,
+  );
 
-    const artifacts = initialArtifact
-        ? [
-              {
-                  id: ID.get(),
-                  createdOn: Date.now(),
-                  val: initialArtifact,
-              },
-          ]
-        : [];
-
-    return {
+  const artifacts = initialArtifact
+    ? [
+      {
         id: ID.get(),
-        label,
-        event,
-        isEphemeral,
-        children: [],
-        parent: parent.id,
         createdOn: Date.now(),
-        meta,
-        artifacts,
-        sideEffects,
-        state,
-        level: parent.level + 1,
-    };
+        val: initialArtifact,
+      },
+    ]
+    : [];
+
+  return {
+    id: ID.get(),
+    label,
+    event,
+    isEphemeral,
+    children: [],
+    parent: parent.id,
+    createdOn: Date.now(),
+    meta,
+    artifacts,
+    sideEffects,
+    state,
+    level: parent.level + 1,
+  };
 }

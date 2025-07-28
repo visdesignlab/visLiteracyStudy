@@ -18,7 +18,6 @@ export type StateChangeFunction<State, Payload> = (
     payload: Payload
 ) => ReturnType<ProduceWrappedStateChangeFunction<State>>;
 
-
 export type Label = string;
 export type LabelGenerator<Args> = (args: Args) => Label;
 
