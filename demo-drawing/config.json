@@ -1,0 +1,100 @@
+{
+  "$schema": "https://raw.githubusercontent.com/revisit-studies/study/dev/src/parser/StudyConfigSchema.json",
+  "studyMetadata": {
+    "title": "Drawing example",
+    "version": "pilot",
+    "authors": ["The reVISit Team"],
+    "date": "2023-04-14",
+    "description": "A simple demo of using stimuli in an HTML file that renders a D3 visualization. Data is collected via a numeric response field.",
+    "organizations": ["University of Utah"]
+  },
+  "uiConfig": {
+    "contactEmail": "contact@revisit.dev",
+    "helpTextPath": "demo-html/assets/help.md",
+    "logoPath": "revisitAssets/revisitLogoSquare.svg",
+    "withProgressBar": true,
+    "autoDownloadStudy": false,
+    "withSidebar": true,
+    "windowEventDebounceTime": 200
+  },
+  "components": {
+    "drawingTree": {
+      "type": "react-component",
+      "nextButtonLocation": "sidebar",
+      "meta": {
+        "difficulty": "hard"
+      },
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "instruction": "Below is part of a computer directory showing the names and sizes (in megabytes) of files and subdirectories in a folder. \n\n <br/> ![demo](assets/drawingTasks/treeTask.png) \n\n <br/> Sketch a visualization that shows both the structure and the size of the directory. \n\n <br/> While doing so, please talk aloud to explain your though process or any challenges you face.",
+      "path": "demo-drawing/assets/Canvas.tsx",
+      "response": []
+    },
+    "drawingTraining": {
+      "type": "react-component",
+      "nextButtonLocation": "sidebar",
+      "meta": {
+        "difficulty": "hard"
+      },
+      "path": "demo-drawing/assets/Canvas.tsx",
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "instruction": "Something something training",
+      "response": []
+    },
+    "drawingNetwork": {
+      "type": "react-component",
+      "nextButtonLocation": "sidebar",
+      "meta": {
+        "difficulty": "hard"
+      },
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "instruction": "Below is a list of authors, how many papers each author has published, and how many papers author pairs have published together. ![demo](assets/drawingTasks/networkTask.png) \n\n <br/> Sketch a visualization which shows each author and their paper counts, as well as the collabortion and collaboration counts between authors. \n\n <br/> While doing so, please talk aloud to explain your though process or any challenges you face.",
+      "path": "demo-drawing/assets/Canvas.tsx",
+      "response": []
+    },
+    "drawingBpm": {
+      "type": "react-component",
+      "nextButtonLocation": "sidebar",
+      "meta": {
+        "difficulty": "hard"
+      },
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "instruction": "Below is a small table showing individuals heart beats per minute at three points in time. \n\n <br/> ![demo](assets/drawingTasks/bpmTask.png) \n\n <br/> Sketch a visualization representing this data. \n\n <br/> While doing so, please talk aloud to explain your though process or any challenges you face.",
+      "path": "demo-drawing/assets/Canvas.tsx",
+      "response": []
+    },
+    "drawingRanking": {
+      "type": "react-component",
+      "nextButtonLocation": "sidebar",
+      "meta": {
+        "difficulty": "hard"
+      },
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "instruction": "Below is a table showing the rankings of bundesliga football teams across the first seven weeks of the season. \n\n <br/> ![demo](assets/drawingTasks/rankingTask.png) \n\n <br/> Sketch a visualization showing the teams rankings over time. \n\n <br/> While doing so, please talk aloud to explain your though process or any challenges you face.",
+      "path": "demo-drawing/assets/Canvas.tsx",
+      "response": []
+    },
+    "drawing100m": {
+      "type": "react-component",
+      "nextButtonLocation": "sidebar",
+      "meta": {
+        "difficulty": "hard"
+      },
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "instruction": "Below is a small table showing the 100m sprint times and long jump distance of five athletes. \n\n <br/> ![demo](assets/drawingTasks/100mTask.png) \n\n <br/> Sketch a visualization representing this data. \n\n <br/> While doing so, please talk aloud to explain your though process or any challenges you face.",
+      "path": "demo-drawing/assets/Canvas.tsx",
+      "response": []
+    }
+  },
+  "sequence": {
+    "order": "fixed",
+    "components": [{
+      "id": "critiquePart",
+      "components": [],
+      "order": "fixed"
+    }, "drawingTraining", {
+      "id": "drawingPart",
+      "components": ["drawingTree", "drawingNetwork", "drawingBpm", "drawingRanking", "drawing100m"],
+      "order": "fixed"
+    }]
+  }
+}
