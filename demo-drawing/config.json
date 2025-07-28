@@ -91,6 +91,9 @@
     "critiqueUntimelyDeath": {
       "type": "image",
       "withProgressBar": true,
+      "style": {
+        "maxWidth": "80%"
+      },
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
       "instruction": "Please critique the following visualization out loud. Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement",
@@ -235,7 +238,7 @@
     }
   },
   "sequence": {
-    "order": "random",
+    "order": "fixed",
     "components": [
       "introduction",
       "consent",
