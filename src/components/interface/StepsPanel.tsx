@@ -51,7 +51,6 @@ function findTaskIndexInSequence(sequence: Sequence, step: string, startIndex: n
 
 function countInterruptionsRecursively(configSequence: ComponentBlockWithOrderPath, participantSequence: Sequence) {
   let count = 0;
-
   // Loop through the participant sequence and count the interruptions that are defined in the configSequence
   participantSequence.components.forEach((component) => {
     if (typeof component === 'string' && configSequence.interruptions?.flatMap((i) => i.components).includes(component)) {

@@ -52,6 +52,27 @@
         }
       ]
     },
+    "critiqueIntro": {
+      "type": "markdown",
+      "recordAudio": false,
+      "path": "demo-drawing/assets/critiqueIntro.md",
+      "response": [
+      ]
+    },
+    "vlatIntro": {
+      "type": "markdown",
+      "recordAudio": false,
+      "path": "demo-drawing/assets/vlatIntro.md",
+      "response": [
+      ]
+    },
+    "drawingIntro": {
+      "type": "markdown",
+      "recordAudio": false,
+      "path": "demo-drawing/assets/drawingIntro.md",
+      "response": [
+      ]
+    },
     "critiqueCalvi1": {
       "type": "image",
       "nextButtonLocation": "sidebar",
@@ -132,7 +153,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is part of a computer directory showing the names and sizes (in megabytes) of files and subdirectories in a folder. \n\n <br/> ![demo](assets/drawingTasks/treeTask.png) \n\n <br/> Sketch a visualization that shows both the structure and the size of the directory. \n\n <br/> While doing so, please talk aloud to explain your though process or any challenges you face.",
+      "instructionPath": "demo-drawing/assets/drawingTasks/treeInstructions.md",
       "path": "demo-drawing/assets/Canvas.tsx",
       "response": [
         {
@@ -151,14 +172,14 @@
       "nextButtonLocation": "sidebar",
       "path": "demo-drawing/assets/Canvas.tsx",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Something something training",
+      "instruction": "To the right, there is a drawing interface with a few options. In the header, you can change between a pencil and an eraser, change the size of your pencil, and change the color of your pencil. Below the options is a blank canvas for you to draw on. \n\n <br/> Feel free to practice using the drawing interface now, and when you feel comfortable, click the next button to begin the drawing tasks.",
       "response": [
         {
           "id": "drawing100m",
           "type": "radio",
           "location": "sidebar",
           "required": true,
-          "prompt": "Have you finished drawing your visualization?",
+          "prompt": "Are you ready to begin?",
           "options": ["Yes", "No"],
           "requiredValue": "Yes"
         }
@@ -168,7 +189,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a list of authors, how many papers each author has published, and how many papers author pairs have published together. ![demo](assets/drawingTasks/networkTask.png) \n\n <br/> Sketch a visualization which shows each author and their paper counts, as well as the collabortion and collaboration counts between authors. \n\n <br/> While doing so, please talk aloud to explain your though process or any challenges you face.",
+      "instruction": "Below is a list of authors, how many papers each author has published, and how many papers author pairs have published together. \n\n <br/> ![demo](assets/drawingTasks/networkTask.png) \n\n <br/> Sketch a visualization which shows each author and their paper counts, as well as the collabortion and collaboration counts between authors. \n\n <br/> While doing so, please talk aloud to explain your thought process or any challenges you face.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "response": [
         {
@@ -186,7 +207,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a small table showing individuals heart beats per minute at three points in time. \n\n <br/> ![demo](assets/drawingTasks/bpmTask.png) \n\n <br/> Sketch a visualization representing this data. \n\n <br/> While doing so, please talk aloud to explain your though process or any challenges you face.",
+      "instructionPath": "demo-drawing/assets/drawingTasks/bpmInstructions.md",
       "path": "demo-drawing/assets/Canvas.tsx",
       "response": [
         {
@@ -204,7 +225,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a table showing the rankings of bundesliga football teams across the first seven weeks of the season. \n\n <br/> ![demo](assets/drawingTasks/rankingTask.png) \n\n <br/> Sketch a visualization showing the teams rankings over time. \n\n <br/> While doing so, please talk aloud to explain your though process or any challenges you face.",
+      "instruction": "Below is a table showing the rankings of bundesliga football teams across the first seven weeks of the season. \n\n <br/> ![demo](assets/drawingTasks/rankingTask.png) \n\n <br/> Sketch a visualization showing the teams rankings over time. \n\n <br/> While doing so, please talk aloud to explain your thought process or any challenges you face.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "response": [
         {
@@ -222,7 +243,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a small table showing the 100m sprint times and long jump distance of five athletes. \n\n <br/> ![demo](assets/drawingTasks/100mTask.png) \n\n <br/> Sketch a visualization representing this data. \n\n <br/> While doing so, please talk aloud to explain your though process or any challenges you face.",
+      "instruction": "Below is a small table showing the 100m sprint times and long jump distance of five athletes. \n\n <br/> ![demo](assets/drawingTasks/100mTask.png) \n\n <br/> Sketch a visualization representing this data. \n\n <br/> While doing so, please talk aloud to explain your thought process or any challenges you face.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "response": [
         {
@@ -233,6 +254,43 @@
           "prompt": "Have you finished drawing your visualization?",
           "options": ["Yes", "No"],
           "requiredValue": "Yes"
+        }
+      ]
+    },
+    "postStudy": {
+      "type": "questionnaire",
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "response": [
+        {
+          "id": "problems",
+          "type": "longText",
+          "required": true,
+          "prompt": "Did you experience any problems with our tool?"
+        },
+        {
+          "id": "otherIssues",
+          "type": "longText",
+          "required": true,
+          "prompt": "Any other issues or anything you would like to tell us?"
+        },
+        {
+          "id": "enjoyDrawing",
+          "type": "longText",
+          "required": true,
+          "prompt": "Please provide any comments you had about your experience drawing visualizations?"
+        },
+        {
+          "id": "enjoyThinkingAloud",
+          "type": "longText",
+          "required": true,
+          "prompt": "Please provide any comments you had about thinking-aloud during this study?"
+        },
+        {
+          "id": "howDraw",
+          "type": "checkbox",
+          "required": true,
+          "prompt": "How did you draw your visualizations?",
+          "options": ["Drawing tool (e.g. Apple Pencil)", "Finger", "Mouse or trackpad"]
         }
       ]
     }
@@ -246,26 +304,43 @@
       {
         "id": "critiquePart",
         "components": [
-          "critiqueCalvi1",
-          "critiqueCalvi2",
-          "critiqueUntimelyDeath",
-          "critiqueWealth"
+          "critiqueIntro",
+          {
+            "components": [
+              "critiqueCalvi1",
+              "critiqueCalvi2",
+              "critiqueUntimelyDeath",
+              "critiqueWealth"
+            ],
+            "order": "random"
+          }
         ],
-        "order": "random"
+        "order": "fixed"
       },
-      "drawingTraining",
       {
         "id": "drawingPart",
         "components": [
-          "drawingTree",
-          "drawingNetwork",
-          "drawingBpm",
-          "drawingRanking",
-          "drawing100m"
+          "drawingIntro",
+          "drawingTraining",
+          {
+            "components": [
+              "drawingTree",
+              "drawingNetwork",
+              "drawingBpm",
+              "drawingRanking",
+              "drawing100m"
+            ],
+            "order": "random"
+          }
         ],
-        "order": "random"
+        "order": "fixed"
       },
-      "$mini-vlat.se.full"
+      {
+        "components": ["vlatIntro", "$mini-vlat.se.full"],
+        "order": "fixed",
+        "id": "vlatPart"
+      },
+      "postStudy"
     ]
   }
 }
