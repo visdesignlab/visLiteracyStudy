@@ -714,13 +714,14 @@ export abstract class StorageEngine {
     let debounceTimeout: NodeJS.Timeout | null = null;
 
     const listener = async (data: BlobEvent) => {
-      if (debounceTimeout) {
+      console.log(data.data);
+
+      if (debounceTimeout || data.data.size === 0) {
         return;
       }
 
       debounceTimeout = setTimeout(async () => {
-        console.log(data.data);
-        await this._pushToStorage(`audio/${this.currentParticipantId}`, taskName, new Blob([data.data], { type: 'audio/webm; codecs=opus' }));
+        await this._pushToStorage(`audio/${this.currentParticipantId}`, taskName, data.data);
         await this._cacheStorageObject(`audio/${this.currentParticipantId}`, taskName);
       }, 500);
     };

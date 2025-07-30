@@ -83,6 +83,7 @@ export function ComponentController() {
       audioStream.current.stream.getTracks().forEach((track) => { track.stop(); audioStream.current?.stream.removeTrack(track); });
       audioStream.current.stream.getAudioTracks().forEach((track) => { track.stop(); audioStream.current?.stream.removeTrack(track); });
       audioStream.current.stop();
+
       audioStream.current = null;
     }
 
@@ -93,7 +94,7 @@ export function ComponentController() {
       navigator.mediaDevices.getUserMedia({
         audio: true,
       }).then((s) => {
-        const recorder = MediaRecorder.isTypeSupported('audio/mp4') ? new MediaRecorder(s, { mimeType: 'audio/mp4' }) : new MediaRecorder(s, { mimeType: 'audio/webm' });
+        const recorder = new MediaRecorder(s);
         audioStream.current = recorder;
         audioStream.current.start();
         storeDispatch(setIsRecording(true));
