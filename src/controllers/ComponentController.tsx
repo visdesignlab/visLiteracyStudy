@@ -3,10 +3,6 @@ import {
 } from 'react';
 import { useSearchParams } from 'react-router';
 import { Center, Loader } from '@mantine/core';
-import OpusMediaRecorder from 'opus-media-recorder';
-import EncoderWorker from 'opus-media-recorder/encoderWorker.umd.js';
-import OggOpusEncoderWasm from 'opus-media-recorder/OggOpusEncoder.wasm?url';
-import WebMOpusEncoderWasm from 'opus-media-recorder/WebMOpusEncoder.wasm?url';
 import { ResponseBlock } from '../components/response/ResponseBlock';
 import { IframeController } from './IframeController';
 import { ImageController } from './ImageController';
