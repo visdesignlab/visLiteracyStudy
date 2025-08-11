@@ -17,9 +17,9 @@ export function AudioTest({ setAnswer }: StimulusParams<undefined>) {
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorder.start();
 
-      const audioContext = new AudioContext();
-      const audioStreamSource = audioContext.createMediaStreamSource(stream);
-      const analyser = audioContext.createAnalyser();
+      const _audioContext = new AudioContext();
+      const audioStreamSource = _audioContext.createMediaStreamSource(stream);
+      const analyser = _audioContext.createAnalyser();
 
       analyser.minDecibels = -45;
       audioStreamSource.connect(analyser);

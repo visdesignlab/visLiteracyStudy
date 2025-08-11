@@ -72,6 +72,7 @@
     "uuid": "^11.0.5",
     "vega": "^5.32.0",
     "vega-lite": "^5.23.0",
+    "vite-plugin-commonjs": "^0.10.4",
     "wavesurfer-react": "^3.0.4",
     "wavesurfer.js": "^7.8.16",
     "yaml": "^2.8.0"

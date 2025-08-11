@@ -17,14 +17,14 @@
     "withSidebar": true,
     "windowEventDebounceTime": 200,
     "participantNameField": "introduction.prolificId",
-    "recordAudio": true
+    "recordAudio": false
   },
   "importedLibraries": ["mic-check", "mini-vlat"],
   "components": {
     "introduction": {
       "type": "markdown",
       "recordAudio": false,
-      "path": "example-brush-interactions/assets/introduction.md",
+      "path": "demo-drawing/assets/introduction.md",
       "response": [
         {
           "id": "prolificId",
@@ -39,7 +39,7 @@
     "consent": {
       "type": "markdown",
       "recordAudio": false,
-      "path": "example-brush-interactions/assets/consent.md",
+      "path": "demo-drawing/assets/consent.md",
       "nextButtonText": "Agree",
       "response": [
         {
@@ -77,7 +77,7 @@
       "type": "image",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Please critique the following visualization out loud. Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement",
+      "instruction": "Please critique the following visualization by thinking aloud. Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
       "path": "demo-drawing/assets/critiqueTasks/T40.jpg",
       "response": [
         {
@@ -95,7 +95,7 @@
       "type": "image",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Please critique the following visualization out loud. Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement",
+      "instruction": "Please critique the following visualization by thinking aloud. Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
       "path": "demo-drawing/assets/critiqueTasks/T20.jpg",
       "response": [
         {
@@ -117,8 +117,30 @@
       },
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Please critique the following visualization out loud. Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement",
+      "instruction": "Please critique the following visualization by thinking aloud. Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
       "path": "demo-drawing/assets/critiqueTasks/untimelyDeath.png",
+      "response": [
+        {
+          "id": "drawing100m",
+          "type": "radio",
+          "location": "sidebar",
+          "required": true,
+          "prompt": "Have you finished critiquing the visualization?",
+          "options": ["Yes", "No"],
+          "requiredValue": "Yes"
+        }
+      ]
+    },
+    "critiqueSciArticles": {
+      "type": "image",
+      "withProgressBar": true,
+      "style": {
+        "maxWidth": "80%"
+      },
+      "nextButtonLocation": "sidebar",
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "instruction": "Please critique the following visualization by thinking aloud. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
+      "path": "demo-drawing/assets/critiqueTasks/sciArticles.png",
       "response": [
         {
           "id": "drawing100m",
@@ -135,7 +157,7 @@
       "type": "video",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Please critique the following visualization out loud. Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement",
+      "instruction": "Please critique the following visualization by thinking aloud. Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
       "path": "demo-drawing/assets/critiqueTasks/nytWealthyFams.mov",
       "response": [
         {
@@ -172,7 +194,7 @@
       "nextButtonLocation": "sidebar",
       "path": "demo-drawing/assets/Canvas.tsx",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "To the right, there is a drawing interface with a few options. In the header, you can change between a pencil and an eraser, change the size of your pencil, and change the color of your pencil. Below the options is a blank canvas for you to draw on. \n\n <br/> Feel free to practice using the drawing interface now, and when you feel comfortable, click the next button to begin the drawing tasks.",
+      "instruction": "To the right, there is a drawing interface with a few options. \n\n At the top of the canvas, you can change between a pencil and an eraser, change the size of your pencil, and change the color of your pencil. Below the options is a blank canvas for you to draw on. \n\n <br/> Feel free to practice using the drawing interface now, and when you feel comfortable, click the next button to begin the drawing tasks.",
       "response": [
         {
           "id": "drawing100m",
@@ -212,6 +234,24 @@
       "response": [
         {
           "id": "drawing100m",
+          "type": "radio",
+          "location": "sidebar",
+          "required": true,
+          "prompt": "Have you finished drawing your visualization?",
+          "options": ["Yes", "No"],
+          "requiredValue": "Yes"
+        }
+      ]
+    },
+    "drawingRainfall": {
+      "type": "react-component",
+      "nextButtonLocation": "sidebar",
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "instruction": "Below is a table showing rainfall in inches compared to the historical average from that month for various states. \n\n <br/> ![demo](assets/drawingTasks/rainfallTask.png) \n\n <br/> Sketch a visualization showing the change in rainfall from an average year for each state. \n\n <br/> While doing so, please talk aloud to explain your thought process or any challenges you face.",
+      "path": "demo-drawing/assets/Canvas.tsx",
+      "response": [
+        {
+          "id": "rainfallDone",
           "type": "radio",
           "location": "sidebar",
           "required": true,
@@ -307,10 +347,9 @@
           "critiqueIntro",
           {
             "components": [
-              "critiqueCalvi1",
               "critiqueCalvi2",
               "critiqueUntimelyDeath",
-              "critiqueWealth"
+              "critiqueSciArticles"
             ],
             "order": "random"
           }
@@ -328,7 +367,8 @@
               "drawingNetwork",
               "drawingBpm",
               "drawingRanking",
-              "drawing100m"
+              "drawing100m",
+              "drawingRainfall"
             ],
             "order": "random"
           }

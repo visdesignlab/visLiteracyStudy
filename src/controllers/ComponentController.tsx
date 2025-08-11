@@ -3,6 +3,10 @@ import {
 } from 'react';
 import { useSearchParams } from 'react-router';
 import { Center, Loader } from '@mantine/core';
+import OpusMediaRecorder from 'opus-media-recorder';
+import EncoderWorker from 'opus-media-recorder/encoderWorker.umd.js';
+import OggOpusEncoderWasm from 'opus-media-recorder/OggOpusEncoder.wasm?url';
+import WebMOpusEncoderWasm from 'opus-media-recorder/WebMOpusEncoder.wasm?url';
 import { ResponseBlock } from '../components/response/ResponseBlock';
 import { IframeController } from './IframeController';
 import { ImageController } from './ImageController';
@@ -15,6 +19,8 @@ import { ReactMarkdownWrapper } from '../components/ReactMarkdownWrapper';
 import { IndividualComponent } from '../parser/types';
 import { useDisableBrowserBack } from '../utils/useDisableBrowserBack';
 import { useStorageEngine } from '../storage/storageEngineHooks';
+// You should use file-loader in webpack.config.js.
+// See webpack example link in the above section for more detail.
 import {
   useStoreActions, useStoreDispatch, useStoreSelector,
 } from '../store/store';
@@ -27,6 +33,21 @@ import { VegaController, VegaProvState } from './VegaController';
 import { useIsAnalysis } from '../store/hooks/useIsAnalysis';
 import { VideoController } from './VideoController';
 import { studyComponentToIndividualComponent } from '../utils/handleComponentInheritance';
+
+// Choose desired format like audio/webm. Default is audio/ogg
+// (window as any).global = window;
+// const options = { mimeType: 'audio/ogg' };
+// // Web worker and .wasm configuration. Note: This is NOT a part of W3C standard.
+// const workerOptions = {
+//   encoderWorkerFactory() {
+//     // UMD should be used if you don't use a web worker bundler for this.
+//     return new Worker(EncoderWorker);
+//   },
+//   OggOpusEncoderWasmPath: OggOpusEncoderWasm,
+//   WebMOpusEncoderWasmPath: WebMOpusEncoderWasm,
+// };
+
+// window.MediaRecorder = OpusMediaRecorder;
 
 // current active stimuli presented to the user
 export function ComponentController() {
@@ -95,6 +116,8 @@ export function ComponentController() {
         audio: true,
       }).then((s) => {
         const recorder = new MediaRecorder(s);
+
+        console.log(recorder);
         audioStream.current = recorder;
         audioStream.current.start();
         storeDispatch(setIsRecording(true));
