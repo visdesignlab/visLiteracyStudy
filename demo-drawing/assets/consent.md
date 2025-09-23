@@ -12,7 +12,7 @@ You are being asked to participate in a research study. Before you agree, howeve
 Visual representations of data (visualizations) are increasingly common in everyday life. The purpose of this study is to learn more about how people interpret and understand visualizations, especially correlation values.
 
 ## Tasks
-The study contains 3 sets of tasks, shown to you in a random order. One set will ask you to critique data visualizations which are presented. Another set will ask you to sketch data visualizations on your device, given a small amount of data. The last task will ask you quiz-like multiple choice questions which can be answered from a presented data visualization. It will take approximately 30-40 minutes to finish this study.
+The study contains 3 sets of tasks, shown to you in a random order. One set will ask you to critique data visualizations which are presented. Another set will ask you to sketch data visualizations on your device, given a small amount of data. The last task will ask you quiz-like multiple choice questions which can be answered from a presented data visualization. It will take approximately 40-50 minutes to finish this study. For many of these tasks we will request that you think-aloud while completing the task, and we will record and save your audio.
 
 ## Risks to study participants
 Each participant in this study is assigned a random ID for analyses. As such, your participation will remain anonymous and your responses will not be used to identify you.
