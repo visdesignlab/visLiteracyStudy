@@ -727,7 +727,14 @@ export abstract class StorageEngine {
     };
 
     audioStream.addEventListener('dataavailable', listener);
-    audioStream.requestData();
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    // When stopping recording:
+    if (isSafari) {
+      audioStream.stop(); // This will trigger ondataavailable with the full recording
+    } else {
+      // For Chrome/Firefox, you can use requestData or chunked data
+      audioStream.requestData();
+    }
 
     // Don't clean up the listener. The stream will be destroyed.
   }
