@@ -19,6 +19,7 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { StimulusParams } from '../../../store/types';
 import { Registry } from './trrack-alpha/core/src/registry/reg';
 import { initializeTrrack } from './trrack-alpha/core/src/provenance/trrack';
+import { useStoredAnswer } from '../../../store/hooks/useStoredAnswer';
 
 const COLORS = [
   DEFAULT_THEME.colors.red[5],
@@ -39,7 +40,7 @@ export type KonvaState = {
   penSize: string;
 };
 
-export default function Canvas({ provenanceState, setAnswer } : StimulusParams<{task: string}, KonvaState>) {
+export default function Canvas({ parameters, provenanceState, setAnswer, answers } : StimulusParams<{responseId: string}, KonvaState>) {
   const [tool, setTool] = useState('pen');
   const [penSize, setPenSize] = useState<string>('5');
   const [lines, setLines] = useState<Lines>([]);
@@ -47,6 +48,7 @@ export default function Canvas({ provenanceState, setAnswer } : StimulusParams<{
 
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const isDrawing = useRef(false);
+
 
   const [ref, { width }] = useResizeObserver();
 
@@ -82,6 +84,23 @@ export default function Canvas({ provenanceState, setAnswer } : StimulusParams<{
         penSize: '5',
       },
     });
+
+    if (parameters.responseId) {
+      console.log(parameters.responseId, answers);
+      const answer = Object.keys(answers).find((a) => a.startsWith(parameters.responseId)) || '';
+      console.log(answers[answer].provenanceGraph.stimulus);
+
+      if(answers[answer].provenanceGraph.stimulus) {
+        trrackInst.importObject(structuredClone(answers[answer].provenanceGraph.stimulus));
+      }
+
+      const state = trrackInst.getState(trrackInst.current);
+
+      setLines(state.lines || []);
+      setTool(state.tool || 'pen');
+      setPenSize(state.penSize || '5');
+      onColorChange(state.color || DEFAULT_THEME.colors.red[5]);
+    }
 
     return {
       actions: {

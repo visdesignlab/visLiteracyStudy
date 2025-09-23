@@ -73,6 +73,23 @@
       "response": [
       ]
     },
+    "critiqueFollowup": {
+      "type": "image",
+      "nextButtonLocation": "sidebar",
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "path": "demo-drawing/assets/critiqueTasks/T40.jpg",
+      "response": [
+        {
+          "id": "response",
+          "type": "radio",
+          "location": "sidebar",
+          "required": true,
+          "prompt": "Have you finished critiquing the visualization?",
+          "options": ["Yes", "No"],
+          "requiredValue": "Yes"
+        }
+      ]
+    },
     "critiqueCalvi1": {
       "type": "image",
       "nextButtonLocation": "sidebar",
@@ -95,7 +112,7 @@
       "type": "image",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Please critique the following visualization by thinking aloud. Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
+      "instruction": "Please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
       "path": "demo-drawing/assets/critiqueTasks/T20.jpg",
       "response": [
         {
@@ -117,7 +134,7 @@
       },
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Please critique the following visualization by thinking aloud. Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
+      "instruction": "Please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
       "path": "demo-drawing/assets/critiqueTasks/untimelyDeath.png",
       "response": [
         {
@@ -139,7 +156,7 @@
       },
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Please critique the following visualization by thinking aloud. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
+      "instruction": "Please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
       "path": "demo-drawing/assets/critiqueTasks/sciArticles.png",
       "response": [
         {
@@ -148,7 +165,7 @@
           "location": "sidebar",
           "required": true,
           "prompt": "Have you finished critiquing the visualization?",
-          "options": ["Yes", "No"],
+          "options": ["Yes"],
           "requiredValue": "Yes"
         }
       ]
@@ -168,6 +185,127 @@
           "prompt": "Have you finished critiquing the visualization?",
           "options": ["Yes", "No"],
           "requiredValue": "Yes"
+        }
+      ]
+    },
+    "drawingFollowUpTree": {
+      "type": "react-component",
+      "nextButtonLocation": "sidebar",
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "instruction": "Please briefly discuss the visualization you just drew by <b>speaking out loud</b>. Is there anything you would change with your drawing? ",
+      "path": "demo-drawing/assets/Canvas.tsx",
+      "parameters": {
+        "responseId": "drawingTree"
+      },
+      "response": [
+        {
+          "id": "drawing100m",
+          "type": "likert",
+          "location": "sidebar",
+          "required": true,
+          "prompt": "Rate your sketch",
+          "numItems": 7
+        }
+      ]
+    },
+    "drawingFollowUpBpm": {
+      "type": "react-component",
+      "nextButtonLocation": "sidebar",
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "instruction": "Please briefly discuss the visualization you just drew by <b>speaking out loud</b>. Is there anything you would change with your drawing? ",
+      "path": "demo-drawing/assets/Canvas.tsx",
+      "parameters": {
+        "responseId": "drawingBpm"
+      },
+      "response": [
+        {
+          "id": "drawing100m",
+          "type": "likert",
+          "location": "sidebar",
+          "required": true,
+          "prompt": "Rate your sketch",
+          "numItems": 7
+        }
+      ]
+    },
+    "drawingFollowUp100M": {
+      "type": "react-component",
+      "nextButtonLocation": "sidebar",
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "instruction": "Please briefly discuss the visualization you just drew by <b>speaking out loud</b>. Is there anything you would change with your drawing? ",
+      "path": "demo-drawing/assets/Canvas.tsx",
+      "parameters": {
+        "responseId": "drawing100m"
+      },
+      "response": [
+        {
+          "id": "drawing100m",
+          "type": "likert",
+          "location": "sidebar",
+          "required": true,
+          "prompt": "Rate your sketch",
+          "numItems": 7
+        }
+      ]
+    },
+    "drawingFollowUpRanking": {
+      "type": "react-component",
+      "nextButtonLocation": "sidebar",
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "instruction": "Please briefly discuss the visualization you just drew by <b>speaking out loud</b>. Is there anything you would change with your drawing? ",
+      "path": "demo-drawing/assets/Canvas.tsx",
+      "parameters": {
+        "responseId": "drawingRanking"
+      },
+      "response": [
+        {
+          "id": "drawing100m",
+          "type": "likert",
+          "location": "sidebar",
+          "required": true,
+          "prompt": "Rate your sketch",
+          "numItems": 7
+        }
+      ]
+    },
+    "drawingFollowUpNetwork": {
+      "type": "react-component",
+      "nextButtonLocation": "sidebar",
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "instruction": "Please briefly discuss the visualization you just drew by <b>speaking out loud</b>. Is there anything you would change with your drawing? ",
+      "path": "demo-drawing/assets/Canvas.tsx",
+      "parameters": {
+        "responseId": "drawingNetwork"
+      },
+      "response": [
+        {
+          "id": "drawing100m",
+          "type": "likert",
+          "location": "sidebar",
+          "required": true,
+          "prompt": "Rate your sketch",
+          "numItems": 7
+        }
+      ]
+    },
+
+    "drawingFollowUpRainfall": {
+      "type": "react-component",
+      "nextButtonLocation": "sidebar",
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "instruction": "Please briefly discuss the visualization you just drew by <b>speaking out loud</b>. Is there anything you would change with your drawing? ",
+      "path": "demo-drawing/assets/Canvas.tsx",
+      "parameters": {
+        "responseId": "drawingRainfall"
+      },
+      "response": [
+        {
+          "id": "drawing100m",
+          "type": "likert",
+          "location": "sidebar",
+          "required": true,
+          "prompt": "Rate your sketch",
+          "numItems": 7
         }
       ]
     },
@@ -211,7 +349,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a list of authors, how many papers each author has published, and how many papers author pairs have published together. \n\n <br/> ![demo](assets/drawingTasks/networkTask.png) \n\n <br/> Sketch a visualization which shows each author and their paper counts, as well as the collabortion and collaboration counts between authors. \n\n <br/> While doing so, please talk aloud to explain your thought process or any challenges you face.",
+      "instruction": "Below is a list of authors, how many papers each author has published, and how many papers author pairs have published together. \n\n <br/> ![demo](assets/drawingTasks/networkTask.png) \n\n <br/> Sketch a visualization which shows each author and their paper counts, as well as the collabortion and collaboration counts between authors. \n\n <br/> While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "response": [
         {
@@ -247,7 +385,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a table showing rainfall in inches compared to the historical average from that month for various states. \n\n <br/> ![demo](assets/drawingTasks/rainfallTask.png) \n\n <br/> Sketch a visualization showing the change in rainfall from an average year for each state. \n\n <br/> While doing so, please talk aloud to explain your thought process or any challenges you face.",
+      "instruction": "Below is a table showing rainfall in inches compared to the historical average from that month for various states. \n\n <br/> ![demo](assets/drawingTasks/rainfallTask.png) \n\n <br/> Sketch a visualization showing the change in rainfall from an average year for each state. \n\n <br/> While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "response": [
         {
@@ -265,7 +403,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a table showing the rankings of bundesliga football teams across the first seven weeks of the season. \n\n <br/> ![demo](assets/drawingTasks/rankingTask.png) \n\n <br/> Sketch a visualization showing the teams rankings over time. \n\n <br/> While doing so, please talk aloud to explain your thought process or any challenges you face.",
+      "instruction": "Below is a table showing the rankings of bundesliga football teams across the first seven weeks of the season. \n\n <br/> ![demo](assets/drawingTasks/rankingTask.png) \n\n <br/> Sketch a visualization showing the teams rankings over time. \n\n <br/> While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "response": [
         {
@@ -283,7 +421,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a small table showing the 100m sprint times and long jump distance of five athletes. \n\n <br/> ![demo](assets/drawingTasks/100mTask.png) \n\n <br/> Sketch a visualization representing this data. \n\n <br/> While doing so, please talk aloud to explain your thought process or any challenges you face.",
+      "instruction": "Below is a small table showing the 100m sprint times and long jump distance of five athletes. \n\n <br/> ![demo](assets/drawingTasks/100mTask.png) \n\n <br/> Sketch a visualization representing this data. \n\n <br/> While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "response": [
         {
@@ -363,14 +501,33 @@
           "drawingTraining",
           {
             "components": [
-              "drawingTree",
-              "drawingNetwork",
-              "drawingBpm",
-              "drawingRanking",
-              "drawing100m",
-              "drawingRainfall"
+              {
+                "id": "drawingTree",
+                "order": "fixed",
+                "components": ["drawingTree", "drawingFollowUpTree"]
+              },
+              {
+                "id": "drawing100m",
+                "order": "fixed",
+                "components": ["drawing100m", "drawingFollowUp100M"]
+              },
+              {
+                "id": "drawingRanking",
+                "order": "fixed",
+                "components": ["drawingRanking", "drawingFollowUpRanking"]
+              },
+              {
+                "id": "drawingNetwork",
+                "order": "fixed",
+                "components": ["drawingNetwork", "drawingFollowUpNetwork"]
+              },
+              {
+                "id": "drawingRainfall",
+                "order": "fixed",
+                "components": ["drawingRainfall", "drawingFollowUpRainfall"]
+              }
             ],
-            "order": "random"
+            "order": "fixed"
           }
         ],
         "order": "fixed"
