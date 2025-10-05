@@ -72,6 +72,7 @@ export interface Trrack<State, Event extends string> {
         toggle(node?: NodeId): void;
     };
     undo(): Promise<void>;
+    getLastNNonEphemeralNode(n: number): NodeId;
     redo(to?: 'latest' | 'oldest'): Promise<void>;
     currentChange(
         listener: CurrentChangeHandler,

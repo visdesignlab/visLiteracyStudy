@@ -59,6 +59,9 @@
             "description": "Whether to force the video to play until the end. Defaults to true.",
             "type": "boolean"
           },
+          "forceTouchScreen": {
+            "type": "boolean"
+          },
           "helpTextPath": {
             "description": "The path to the help text file. This is displayed when a participant clicks help. Markdown is supported. If present, will override the help text path set in the uiConfig.",
             "type": "string"
@@ -178,6 +181,9 @@
             ],
             "type": "string"
           },
+          "showTimer": {
+            "type": "boolean"
+          },
           "showTitle": {
             "description": "Controls whether the title should be hidden in the study. If present, will override the title setting in the uiConfig.",
             "type": "boolean"
@@ -196,6 +202,12 @@
             },
             "description": "The style of the image. This is an object with css properties as keys and css values as values.",
             "type": "object"
+          },
+          "timeoutMessage": {
+            "type": "string"
+          },
+          "timeoutStartLimit": {
+            "type": "number"
           },
           "trainingAttempts": {
             "description": "The number of training attempts allowed for the component. If present, will override the training attempts setting in the uiConfig.",
@@ -674,6 +686,9 @@
           "description": "Whether to prepend questions with their index (+ 1). This should only be used when all questions are in the same location, e.g. all are in the side bar. If present, will override the enumeration of questions setting in the uiConfig.",
           "type": "boolean"
         },
+        "forceTouchScreen": {
+          "type": "boolean"
+        },
         "helpTextPath": {
           "description": "The path to the help text file. This is displayed when a participant clicks help. Markdown is supported. If present, will override the help text path set in the uiConfig.",
           "type": "string"
@@ -753,6 +768,9 @@
           ],
           "type": "string"
         },
+        "showTimer": {
+          "type": "boolean"
+        },
         "showTitle": {
           "description": "Controls whether the title should be hidden in the study. If present, will override the title setting in the uiConfig.",
           "type": "boolean"
@@ -771,6 +789,12 @@
           },
           "description": "The style of the image. This is an object with css properties as keys and css values as values.",
           "type": "object"
+        },
+        "timeoutMessage": {
+          "type": "string"
+        },
+        "timeoutStartLimit": {
+          "type": "number"
         },
         "trainingAttempts": {
           "description": "The number of training attempts allowed for the component. If present, will override the training attempts setting in the uiConfig.",
@@ -931,6 +955,9 @@
           "description": "Whether to force the video to play until the end. Defaults to true.",
           "type": "boolean"
         },
+        "forceTouchScreen": {
+          "type": "boolean"
+        },
         "helpTextPath": {
           "description": "The path to the help text file. This is displayed when a participant clicks help. Markdown is supported. If present, will override the help text path set in the uiConfig.",
           "type": "string"
@@ -1050,6 +1077,9 @@
           ],
           "type": "string"
         },
+        "showTimer": {
+          "type": "boolean"
+        },
         "showTitle": {
           "description": "Controls whether the title should be hidden in the study. If present, will override the title setting in the uiConfig.",
           "type": "boolean"
@@ -1068,6 +1098,12 @@
           },
           "description": "The style of the image. This is an object with css properties as keys and css values as values.",
           "type": "object"
+        },
+        "timeoutMessage": {
+          "type": "string"
+        },
+        "timeoutStartLimit": {
+          "type": "number"
         },
         "trainingAttempts": {
           "description": "The number of training attempts allowed for the component. If present, will override the training attempts setting in the uiConfig.",
@@ -1280,6 +1316,9 @@
           "description": "Whether to prepend questions with their index (+ 1). This should only be used when all questions are in the same location, e.g. all are in the side bar. If present, will override the enumeration of questions setting in the uiConfig.",
           "type": "boolean"
         },
+        "forceTouchScreen": {
+          "type": "boolean"
+        },
         "helpTextPath": {
           "description": "The path to the help text file. This is displayed when a participant clicks help. Markdown is supported. If present, will override the help text path set in the uiConfig.",
           "type": "string"
@@ -1359,6 +1398,9 @@
           ],
           "type": "string"
         },
+        "showTimer": {
+          "type": "boolean"
+        },
         "showTitle": {
           "description": "Controls whether the title should be hidden in the study. If present, will override the title setting in the uiConfig.",
           "type": "boolean"
@@ -1369,6 +1411,12 @@
         },
         "sidebarWidth": {
           "description": "The width of the left sidebar. If present, will override the sidebar width setting in the uiConfig.",
+          "type": "number"
+        },
+        "timeoutMessage": {
+          "type": "string"
+        },
+        "timeoutStartLimit": {
           "type": "number"
         },
         "trainingAttempts": {
@@ -1618,6 +1666,9 @@
           "description": "Whether to prepend questions with their index (+ 1). This should only be used when all questions are in the same location, e.g. all are in the side bar. If present, will override the enumeration of questions setting in the uiConfig.",
           "type": "boolean"
         },
+        "forceTouchScreen": {
+          "type": "boolean"
+        },
         "helpTextPath": {
           "description": "The path to the help text file. This is displayed when a participant clicks help. Markdown is supported. If present, will override the help text path set in the uiConfig.",
           "type": "string"
@@ -1693,6 +1744,9 @@
           ],
           "type": "string"
         },
+        "showTimer": {
+          "type": "boolean"
+        },
         "showTitle": {
           "description": "Controls whether the title should be hidden in the study. If present, will override the title setting in the uiConfig.",
           "type": "boolean"
@@ -1703,6 +1757,12 @@
         },
         "sidebarWidth": {
           "description": "The width of the left sidebar. If present, will override the sidebar width setting in the uiConfig.",
+          "type": "number"
+        },
+        "timeoutMessage": {
+          "type": "string"
+        },
+        "timeoutStartLimit": {
           "type": "number"
         },
         "trainingAttempts": {
@@ -1881,6 +1941,9 @@
           "description": "Whether to prepend questions with their index (+ 1). This should only be used when all questions are in the same location, e.g. all are in the side bar. If present, will override the enumeration of questions setting in the uiConfig.",
           "type": "boolean"
         },
+        "forceTouchScreen": {
+          "type": "boolean"
+        },
         "helpTextPath": {
           "description": "The path to the help text file. This is displayed when a participant clicks help. Markdown is supported. If present, will override the help text path set in the uiConfig.",
           "type": "string"
@@ -1965,6 +2028,9 @@
           ],
           "type": "string"
         },
+        "showTimer": {
+          "type": "boolean"
+        },
         "showTitle": {
           "description": "Controls whether the title should be hidden in the study. If present, will override the title setting in the uiConfig.",
           "type": "boolean"
@@ -1975,6 +2041,12 @@
         },
         "sidebarWidth": {
           "description": "The width of the left sidebar. If present, will override the sidebar width setting in the uiConfig.",
+          "type": "number"
+        },
+        "timeoutMessage": {
+          "type": "string"
+        },
+        "timeoutStartLimit": {
           "type": "number"
         },
         "trainingAttempts": {
@@ -2670,6 +2742,9 @@
           "description": "Whether to prepend questions with their index (+ 1). This should only be used when all questions are in the same location, e.g. all are in the side bar. If present, will override the enumeration of questions setting in the uiConfig.",
           "type": "boolean"
         },
+        "forceTouchScreen": {
+          "type": "boolean"
+        },
         "helpTextPath": {
           "description": "The path to the help text file. This is displayed when a participant clicks help. Markdown is supported. If present, will override the help text path set in the uiConfig.",
           "type": "string"
@@ -2745,6 +2820,9 @@
           ],
           "type": "string"
         },
+        "showTimer": {
+          "type": "boolean"
+        },
         "showTitle": {
           "description": "Controls whether the title should be hidden in the study. If present, will override the title setting in the uiConfig.",
           "type": "boolean"
@@ -2755,6 +2833,12 @@
         },
         "sidebarWidth": {
           "description": "The width of the left sidebar. If present, will override the sidebar width setting in the uiConfig.",
+          "type": "number"
+        },
+        "timeoutMessage": {
+          "type": "string"
+        },
+        "timeoutStartLimit": {
           "type": "number"
         },
         "trainingAttempts": {
@@ -2810,6 +2894,9 @@
         },
         "enumerateQuestions": {
           "description": "Whether to prepend questions with their index (+ 1). This should only be used when all questions are in the same location, e.g. all are in the side bar. If present, will override the enumeration of questions setting in the uiConfig.",
+          "type": "boolean"
+        },
+        "forceTouchScreen": {
           "type": "boolean"
         },
         "helpTextPath": {
@@ -2891,6 +2978,9 @@
           ],
           "type": "string"
         },
+        "showTimer": {
+          "type": "boolean"
+        },
         "showTitle": {
           "description": "Controls whether the title should be hidden in the study. If present, will override the title setting in the uiConfig.",
           "type": "boolean"
@@ -2901,6 +2991,12 @@
         },
         "sidebarWidth": {
           "description": "The width of the left sidebar. If present, will override the sidebar width setting in the uiConfig.",
+          "type": "number"
+        },
+        "timeoutMessage": {
+          "type": "string"
+        },
+        "timeoutStartLimit": {
           "type": "number"
         },
         "trainingAttempts": {
@@ -2960,6 +3056,9 @@
         },
         "forceCompletion": {
           "description": "Whether to force the video to play until the end. Defaults to true.",
+          "type": "boolean"
+        },
+        "forceTouchScreen": {
           "type": "boolean"
         },
         "helpTextPath": {
@@ -3041,6 +3140,9 @@
           ],
           "type": "string"
         },
+        "showTimer": {
+          "type": "boolean"
+        },
         "showTitle": {
           "description": "Controls whether the title should be hidden in the study. If present, will override the title setting in the uiConfig.",
           "type": "boolean"
@@ -3051,6 +3153,12 @@
         },
         "sidebarWidth": {
           "description": "The width of the left sidebar. If present, will override the sidebar width setting in the uiConfig.",
+          "type": "number"
+        },
+        "timeoutMessage": {
+          "type": "string"
+        },
+        "timeoutStartLimit": {
           "type": "number"
         },
         "trainingAttempts": {
@@ -3106,6 +3214,9 @@
         },
         "enumerateQuestions": {
           "description": "Whether to prepend questions with their index (+ 1). This should only be used when all questions are in the same location, e.g. all are in the side bar. If present, will override the enumeration of questions setting in the uiConfig.",
+          "type": "boolean"
+        },
+        "forceTouchScreen": {
           "type": "boolean"
         },
         "helpTextPath": {
@@ -3192,6 +3303,9 @@
           ],
           "type": "string"
         },
+        "showTimer": {
+          "type": "boolean"
+        },
         "showTitle": {
           "description": "Controls whether the title should be hidden in the study. If present, will override the title setting in the uiConfig.",
           "type": "boolean"
@@ -3202,6 +3316,12 @@
         },
         "sidebarWidth": {
           "description": "The width of the left sidebar. If present, will override the sidebar width setting in the uiConfig.",
+          "type": "number"
+        },
+        "timeoutMessage": {
+          "type": "string"
+        },
+        "timeoutStartLimit": {
           "type": "number"
         },
         "trainingAttempts": {

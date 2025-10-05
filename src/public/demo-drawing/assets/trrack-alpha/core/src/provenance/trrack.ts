@@ -380,6 +380,30 @@ export function initializeTrrack<State = any, Event extends string = string>({
       }
       return Promise.resolve(console.warn('Already at root!'));
     },
+    getLastNNonEphemeralNode(n: number) {
+      const { current, root } = graph;
+      let temp = n;
+
+      if (isStateNode(current)) {
+        let parent = graph.backend.nodes[current.parent];
+
+        while (temp > 0) {
+          while (isStateNode(parent) && parent.isEphemeral) {
+            parent = graph.backend.nodes[parent.parent];
+          }
+
+          if (isStateNode(parent)) {
+            parent = graph.backend.nodes[parent.parent];
+            temp -= 1;
+          } else {
+            temp = 0;
+          }
+        }
+
+        return parent.id;
+      }
+      return root.id;
+    },
     redo(to: 'latest' | 'oldest' = 'latest') {
       const { current } = graph;
       if (current.children.length > 0) {

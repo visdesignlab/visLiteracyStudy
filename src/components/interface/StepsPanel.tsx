@@ -53,14 +53,12 @@ function countInterruptionsRecursively(configSequence: ComponentBlockWithOrderPa
   let count = 0;
   // Loop through the participant sequence and count the interruptions that are defined in the configSequence
 
-  console.log(participantSequence, configSequence)
   participantSequence.components.forEach((component) => {
     if (typeof component === 'string' && configSequence?.interruptions?.flatMap((i) => i.components).includes(component)) {
       count += 1;
     } else if (typeof component !== 'string') {
       // If the component is a sequence, find the corresponding sequence in the configSequence and count the interruptions
       const configSubSequence = configSequence.components.find((c) => typeof c !== 'string' && c.orderPath === component.orderPath) as ComponentBlockWithOrderPath;
-      console.log(configSubSequence, configSequence, component)
       count += countInterruptionsRecursively(configSubSequence, component);
     }
   });

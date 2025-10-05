@@ -19,7 +19,6 @@ Below is part of a computer directory showing the names and sizes (in megabytes)
     - Graph.doc (3MB)
     - Graph-video.doc (210 MB)
 
+While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. 
 
-Sketch a visualization that shows both the structure and the size of the directory. 
- 
-While doing so, please talk aloud to explain your thought process or any challenges you face.
+We suggest spending around 7 minutes on this task.

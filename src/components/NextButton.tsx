@@ -1,4 +1,6 @@
-import { Alert, Button, Group } from '@mantine/core';
+import {
+  Alert, Button, Group, Text,
+} from '@mantine/core';
 import {
   JSX, useEffect, useMemo, useState,
 } from 'react';
@@ -16,6 +18,14 @@ type Props = {
   location?: ResponseBlockLocation;
   checkAnswer: JSX.Element | null;
 };
+
+function formatTime(number: n): string | JSX.Element {
+  const seconds = Math.floor(number / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+
+  return `${hours > 0 ? `${hours}:` : ''}${minutes % 60 > 9 ? minutes % 60 : `0${minutes % 60}`}:${seconds % 60 > 9 ? seconds % 60 : `0${seconds % 60}`}`;
+}
 
 export function NextButton({
   label = 'Next',
@@ -60,9 +70,11 @@ export function NextButton({
 
   const nextOnEnter = useMemo(() => configInUse?.nextOnEnter ?? studyConfig.uiConfig.nextOnEnter, [configInUse, studyConfig]);
 
+  const isTabletSatisified = useMemo(() => (configInUse?.forceTouchScreen ? navigator.maxTouchPoints > 0 : true), [configInUse?.forceTouchScreen]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Enter' && !disabled && !isNextDisabled && buttonTimerSatisfied) {
+      if (event.key === 'Enter' && !disabled && !isNextDisabled && buttonTimerSatisfied && isTabletSatisified) {
         goToNextStep();
       }
     };
@@ -74,14 +86,24 @@ export function NextButton({
       };
     }
     return () => {};
-  }, [disabled, isNextDisabled, buttonTimerSatisfied, goToNextStep, nextOnEnter]);
+  }, [disabled, isNextDisabled, buttonTimerSatisfied, goToNextStep, nextOnEnter, isTabletSatisified]);
 
-  const nextButtonDisabled = useMemo(() => disabled || isNextDisabled || !buttonTimerSatisfied, [disabled, isNextDisabled, buttonTimerSatisfied]);
+  const nextButtonDisabled = useMemo(() => !isTabletSatisified || disabled || isNextDisabled || !buttonTimerSatisfied, [isTabletSatisified, disabled, isNextDisabled, buttonTimerSatisfied]);
   const previousButtonText = useMemo(() => configInUse?.previousButtonText ?? studyConfig.uiConfig.previousButtonText ?? 'Previous', [configInUse, studyConfig]);
 
   return (
     <>
       <Group justify="right" gap="xs">
+        {!isTabletSatisified ? (
+          <Alert mt="md" title="Tablet required" color="blue" icon={<IconInfoCircle />}>
+            This study requires you be on a tablet or have a touchscreen monitor. Please switch to a device with a touchscreen to continue.
+          </Alert>
+        ) : null }
+        {configInUse?.showTimer && timer && (
+        <Text c="dimmed">
+          {formatTime(timer)}
+        </Text>
+        )}
         {configInUse?.previousButton && (
           <PreviousButton
             label={previousButtonText}
@@ -109,15 +131,14 @@ export function NextButton({
               seconds.
             </Alert>
           )}
-          {nextButtonDisableTime && timer && (nextButtonDisableTime - timer) < 10000 && (
+          {nextButtonDisableTime && timer && (nextButtonDisableTime - timer) < (configInUse?.timeoutStartLimit ?? 10000) && (
             (nextButtonDisableTime - timer) > 0
               ? (
                 <Alert mt="md" title="Next button disables soon" color="yellow" icon={<IconAlertTriangle />}>
-                  The next button disables in
-                  {' '}
-                  {Math.ceil((nextButtonDisableTime - timer) / 1000)}
-                  {' '}
-                  seconds.
+                  {
+                    configInUse?.timeoutMessage ?? `The next button disables in ${Math.ceil((nextButtonDisableTime - timer) / 1000)} seconds.`
+                  }
+
                 </Alert>
               ) : !studyConfig.uiConfig.timeoutReject && (
                 <Alert mt="md" title="Next button disabled" color="red" icon={<IconAlertTriangle />}>

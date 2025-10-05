@@ -122,6 +122,7 @@ export interface UIConfig {
   previousButtonText?: string;
   /** Whether to redirect a timed out participant to a rejection page. This only works for components where the `nextButtonDisableTime` field is set. */
   timeoutReject?: boolean;
+
   /** Controls whether the component should provide feedback to the participant, such as in a training trial. Defaults to false. */
   provideFeedback?: boolean;
   /** The number of training attempts allowed for the component. The next button will be disabled until either the correct answer is given or the number of attempts is reached. When the number of attempts is reached, if the answer is incorrect still, the correct value will be shown to the participant. The default value is 2. Providing a value of -1 will allow infinite attempts and the participant must enter the correct answer to continue, and reVISit will not show the correct answer to the user.  */
@@ -645,7 +646,7 @@ export interface BaseIndividualComponent {
   showTitleBar?: boolean;
   /** The instruction of the component. This is used to identify and provide additional information for the component in the admin panel. */
   instruction?: string;
-
+  forceTouchScreen?: boolean;
   instructionPath?: string;
   /** The location of the instructions. If present, will override the instruction location setting in the uiConfig. */
   instructionLocation?: ConfigResponseBlockLocation;
@@ -661,6 +662,11 @@ export interface BaseIndividualComponent {
   nextButtonEnableTime?: number;
   /** The time in milliseconds to wait before the next button is disabled. If present, will override the next button disable time setting in the uiConfig. */
   nextButtonDisableTime?: number;
+
+  showTimer?: boolean;
+  timeoutMessage?: string;
+  timeoutStartLimit?: number;
+
   /** Whether to show the previous button. If present, will override the previous button setting in the uiConfig. */
   previousButton?: boolean;
   /** The text that is displayed on the previous button. If present, will override the previous button text setting in the uiConfig. */

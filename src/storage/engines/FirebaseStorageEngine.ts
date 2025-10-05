@@ -97,6 +97,7 @@ export class FirebaseStorageEngine extends CloudStorageEngine {
   }
 
   protected async _pushToStorage<T extends StorageObjectType>(prefix: string, type: T, objectToUpload: StorageObject<T>) {
+    console.log('pushing', prefix, type, objectToUpload);
     const storageRef = ref(
       this.storage,
       `${this.collectionPrefix}${this.studyId}/${prefix}_${type}`,
@@ -124,6 +125,7 @@ export class FirebaseStorageEngine extends CloudStorageEngine {
   }
 
   protected async _cacheStorageObject<T extends StorageObjectType>(prefix: string, type: T) {
+    console.log('caching', prefix, type);
     const storageRef = ref(
       this.storage,
       `${this.collectionPrefix}${this.studyId}/${prefix}_${type}`,

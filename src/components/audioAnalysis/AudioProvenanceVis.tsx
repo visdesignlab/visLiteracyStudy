@@ -174,11 +174,9 @@ export function AudioProvenanceVis({ setTimeString }: { setTimeString: (time: st
   }, [identifier, playTime, setTimeString, startTime, totalAudioLength]);
 
   useEffect(() => {
-    if (!analysisHasAudio) {
-      // eslint-disable-next-line no-unsafe-optional-chaining
-      const length = answers[identifier]?.endTime - answers[identifier]?.startTime;
-      setTotalAudioLength(length > -1 ? length / 1000 : 0);
-    }
+    // eslint-disable-next-line no-unsafe-optional-chaining
+    const length = answers[identifier]?.endTime - answers[identifier]?.startTime;
+    setTotalAudioLength(length > -1 ? length / 1000 : 0);
   }, [analysisHasAudio, answers, identifier]);
 
   const isAnalysis = useIsAnalysis();
@@ -197,7 +195,8 @@ export function AudioProvenanceVis({ setTimeString }: { setTimeString: (time: st
           setWaveSurferLoading(false);
           storeDispatch(setAnalysisHasAudio(true));
 
-          setTotalAudioLength(waveSurfer.getDuration());
+          console.log(waveSurfer.getDuration());
+
           setWaveSurferWidth(waveSurfer.getWidth());
           waveSurfer.seekTo(0);
           waveSurfer.on('redrawcomplete', () => setWaveSurferWidth(waveSurfer.getWidth()));

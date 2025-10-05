@@ -3,8 +3,13 @@ import {
   SegmentedControl,
   ColorSwatch,
   Stack,
+  ActionIcon,
+  Tooltip,
+  Button,
 } from '@mantine/core';
 import {
+  IconArrowBackUp,
+  IconArrowForwardUp,
   IconCircleFilled, IconEraser, IconPencil,
 } from '@tabler/icons-react';
 import {
@@ -16,10 +21,10 @@ import {
 import throttle from 'lodash.throttle';
 import { useResizeObserver } from '@mantine/hooks';
 import { KonvaEventObject } from 'konva/lib/Node';
+import { isRootNode, isStateNode, StateNode } from '@trrack/core';
 import { StimulusParams } from '../../../store/types';
 import { Registry } from './trrack-alpha/core/src/registry/reg';
 import { initializeTrrack } from './trrack-alpha/core/src/provenance/trrack';
-import { useStoredAnswer } from '../../../store/hooks/useStoredAnswer';
 
 const COLORS = [
   DEFAULT_THEME.colors.red[5],
@@ -40,7 +45,9 @@ export type KonvaState = {
   penSize: string;
 };
 
-export default function Canvas({ parameters, provenanceState, setAnswer, answers } : StimulusParams<{responseId: string}, KonvaState>) {
+export default function Canvas({
+  parameters, provenanceState, setAnswer, answers,
+} : StimulusParams<{responseId: string}, KonvaState>) {
   const [tool, setTool] = useState('pen');
   const [penSize, setPenSize] = useState<string>('5');
   const [lines, setLines] = useState<Lines>([]);
@@ -48,7 +55,7 @@ export default function Canvas({ parameters, provenanceState, setAnswer, answers
 
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const isDrawing = useRef(false);
-
+  const [undoStack, setUndoStack] = useState<string[]>([]);
 
   const [ref, { width }] = useResizeObserver();
 
@@ -75,6 +82,21 @@ export default function Canvas({ parameters, provenanceState, setAnswer, answers
       return state;
     });
 
+    const clear = reg.register('clear', (state: KonvaState, _lines) => {
+      state.lines = [];
+      return state;
+    });
+
+    const undo = reg.register('undo', (state: KonvaState, _lines) => {
+      state.lines = _lines;
+      return state;
+    });
+
+    const redo = reg.register('redo', (state: KonvaState, _lines) => {
+      state.lines = _lines;
+      return state;
+    });
+
     const trrackInst = initializeTrrack<KonvaState>({
       registry: reg,
       initialState: {
@@ -86,11 +108,9 @@ export default function Canvas({ parameters, provenanceState, setAnswer, answers
     });
 
     if (parameters.responseId) {
-      console.log(parameters.responseId, answers);
       const answer = Object.keys(answers).find((a) => a.startsWith(parameters.responseId)) || '';
-      console.log(answers[answer].provenanceGraph.stimulus);
 
-      if(answers[answer].provenanceGraph.stimulus) {
+      if (answers[answer].provenanceGraph.stimulus) {
         trrackInst.importObject(structuredClone(answers[answer].provenanceGraph.stimulus));
       }
 
@@ -106,6 +126,9 @@ export default function Canvas({ parameters, provenanceState, setAnswer, answers
       actions: {
         draw,
         drawEnd,
+        undo,
+        clear,
+        redo,
       },
       trrack: trrackInst,
     };
@@ -145,6 +168,10 @@ export default function Canvas({ parameters, provenanceState, setAnswer, answers
     lines.splice(lines.length - 1, 1, lastLine);
     setLines(lines.concat());
 
+    if (undoStack) {
+      setUndoStack([]);
+    }
+
     debouncedApply(lines.concat());
   };
 
@@ -158,6 +185,8 @@ export default function Canvas({ parameters, provenanceState, setAnswer, answers
       answers: {},
     });
   };
+
+  // console.log(undoStack, trrack.graph);
 
   return (
     <Box
@@ -190,6 +219,47 @@ export default function Canvas({ parameters, provenanceState, setAnswer, answers
           <Group gap={6}>
             {COLORS.map((c) => <ColorSwatch onClick={() => onColorChange(c)} key={c} color={c} style={{ cursor: 'pointer', outlineOffset: '1px', outline: c === color ? '2px solid black' : 'none' }} />)}
           </Group>
+
+          <Button onClick={() => {
+            trrack.apply('clear', actions.clear([]), { isEphemeral: false, makeCheckpoint: false });
+            setLines([]);
+          }}
+          >
+            Clear all
+          </Button>
+          <Tooltip label="Undo">
+            <ActionIcon
+              variant="light"
+              disabled={isRootNode(trrack.graph.backend.nodes[trrack.getLastNNonEphemeralNode(undoStack.length)])}
+              onClick={() => {
+                const ephemeralNode = trrack.getLastNNonEphemeralNode(undoStack.length + 1);
+                const currentNode = trrack.current.id;
+                if (isStateNode(trrack.current)) {
+                  const prevState = trrack.getState(trrack.graph.backend.nodes[ephemeralNode]);
+                  trrack.apply('undo', actions.undo(structuredClone(prevState.lines)), { isEphemeral: true, makeCheckpoint: false });
+                  setLines(prevState.lines);
+                  setUndoStack([...undoStack, currentNode]);
+                }
+              }}
+            >
+              <IconArrowBackUp />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Redo">
+            <ActionIcon
+              variant="light"
+              disabled={undoStack.length === 0}
+              onClick={() => {
+                const newState = trrack.getState(trrack.graph.backend.nodes[undoStack[undoStack.length - 1]]);
+                trrack.apply('redo', actions.undo(structuredClone(newState.lines)), { isEphemeral: true, makeCheckpoint: false });
+                setLines(newState.lines);
+                setUndoStack(undoStack.slice(0, -1));
+              }}
+            >
+
+              <IconArrowForwardUp />
+            </ActionIcon>
+          </Tooltip>
 
         </Group>
 
