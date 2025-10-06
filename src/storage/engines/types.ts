@@ -714,8 +714,6 @@ export abstract class StorageEngine {
     let debounceTimeout: NodeJS.Timeout | null = null;
 
     const listener = async (data: BlobEvent) => {
-      console.log(data.data);
-
       if (debounceTimeout || data.data.size === 0) {
         return;
       }
