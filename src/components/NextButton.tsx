@@ -19,8 +19,8 @@ type Props = {
   checkAnswer: JSX.Element | null;
 };
 
-function formatTime(number: n): string | JSX.Element {
-  const seconds = Math.floor(number / 1000);
+function formatTime(n: number): string | JSX.Element {
+  const seconds = Math.floor(n / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
 
