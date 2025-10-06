@@ -17,7 +17,7 @@
     "withSidebar": true,
     "windowEventDebounceTime": 200,
     "participantNameField": "introduction.prolificId",
-    "studyEndMsg": "Thank you for completing the study. You may click this link and return to Prolific: [https://app.prolific.com/submissions/complete?cc=CE96X7ST&PROLIFIC_ID={PARTICIPANT_ID}](https://app.prolific.com/submissions/complete?cc=CE96X7ST&PROLIFIC_ID={PARTICIPANT_ID})",
+    "studyEndMsg": "Thank you for completing the study. You may click this link and return to Prolific: [https://app.prolific.com/submissions/complete?cc=C1NU6U6J&PROLIFIC_ID={PARTICIPANT_ID}](https://app.prolific.com/submissions/complete?cc=C1NU6U6J&PROLIFIC_ID={PARTICIPANT_ID})",
     "urlParticipantIdParam": "PROLIFIC_PID",
     "recordAudio": true,
     "showTitleBar": false,
