@@ -97,7 +97,7 @@
       "type": "image",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Please critique the following visualization by thinking aloud. Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
+      "instruction": "First, please speak out loud about what you are thinking as you look at the chart and make sense of it. \n\n </br> Next, Please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
       "path": "demo-drawing/assets/critiqueTasks/T40.jpg",
       "response": [
         {
@@ -115,7 +115,7 @@
       "type": "image",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
+      "instruction": "First, please <b>speak out loud</b> about what you are thinking as you look at the chart and make sense of it. \n\n </br> Next, please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
       "path": "demo-drawing/assets/critiqueTasks/T20.jpg",
       "response": [
         {
@@ -137,7 +137,7 @@
       },
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
+      "instruction": "First, please speak out loud about what you are thinking as you look at the chart and make sense of it. \n\n </br> Next, Please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
       "path": "demo-drawing/assets/critiqueTasks/untimelyDeath.png",
       "response": [
         {
@@ -159,7 +159,7 @@
       },
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
+      "instruction": "First, please speak out loud about what you are thinking as you look at the chart and make sense of it. \n\n </br> Next, Please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
       "path": "demo-drawing/assets/critiqueTasks/sciArticles.png",
       "response": [
         {
@@ -177,7 +177,7 @@
       "type": "video",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Please critique the following visualization by thinking aloud. Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
+      "instruction": "First, please speak out loud about what you are thinking as you look at the chart and make sense of it. \n\n </br> Next, Please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
       "path": "demo-drawing/assets/critiqueTasks/nytWealthyFams.mov",
       "response": [
         {
