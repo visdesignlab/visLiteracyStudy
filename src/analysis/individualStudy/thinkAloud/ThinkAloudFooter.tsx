@@ -359,7 +359,7 @@ export function ThinkAloudFooter({
               selectedTags={partTags ? partTags.taskTags[currentTrial] || [] : []}
             />
           </Stack>
-          <Button mt="lg" variant="light" component="a" href={isReplay ? `/analysis/stats/${studyId}/tagging?participantId=${participantId}&currentTrial=${currentTrial}` : `/${studyId}/${encryptIndex(participant ? +participant.answers[currentTrial].trialOrder.split('_')[0] : 0)}?participantId=${participantId}&currentTrial=${currentTrial}`} target="_blank">
+          <Button mt="lg" variant="light" component="a" href={isReplay ? `/analysis/stats/${studyId}/tagging?participantId=${participantId}&currentTrial=${currentTrial}` : `/${studyId}/${encryptIndex(participant ? +(participant.answers[currentTrial]?.trialOrder.split('_')[0] || 0) : 0)}?participantId=${participantId}&currentTrial=${currentTrial}`} target="_blank">
             {isReplay ? 'Open Audio Analysis' : 'Open Replay'}
           </Button>
         </Group>

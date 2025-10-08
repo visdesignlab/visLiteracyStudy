@@ -296,11 +296,9 @@ export function AudioProvenanceVis({
   }, [taskName, playTime, setTimeString, startTime, totalAudioLength]);
 
   useEffect(() => {
-    if (!analysisHasAudio) {
-      // eslint-disable-next-line no-unsafe-optional-chaining
-      const length = answers[taskName]?.endTime - answers[taskName]?.startTime;
-      setTotalAudioLength(length > -1 ? length / 1000 : 0);
-    }
+    // eslint-disable-next-line no-unsafe-optional-chaining
+    const length = answers[taskName]?.endTime - answers[taskName]?.startTime;
+    setTotalAudioLength(length > -1 ? length / 1000 : 0);
   }, [analysisHasAudio, answers, taskName]);
 
   const isAnalysis = useIsAnalysis();
@@ -333,11 +331,10 @@ export function AudioProvenanceVis({
           setWaveSurferLoading(false);
           // setAnalysisHasAudio(true);
 
-          console.log(waveSurfer.getDuration());
-
           setWaveSurferWidth(waveSurfer.getWidth());
           setAnalysisHasAudio(true);
           waveSurfer.setPlaybackRate(speed);
+          waveSurfer.setOptions({ duration: totalAudioLength });
           waveSurfer.seekTo(0);
           waveSurfer.on('redrawcomplete', () => setWaveSurferWidth(waveSurfer.getWidth()));
         } catch (error: unknown) {
