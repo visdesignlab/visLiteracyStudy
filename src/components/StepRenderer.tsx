@@ -17,21 +17,34 @@ import { useIsAnalysis } from '../store/hooks/useIsAnalysis';
 import { studyComponentToIndividualComponent } from '../utils/handleComponentInheritance';
 import { useCurrentComponent } from '../routes/utils';
 import { ResolutionWarning } from './interface/ResolutionWarning';
+import { useFetchStylesheet } from '../utils/fetchStylesheet';
+import { ScreenRecordingContext, useScreenRecording } from '../store/hooks/useScreenRecording';
+import { ScreenRecordingRejection } from './interface/ScreenRecordingRejection';
 
 export function StepRenderer() {
   const windowEvents = useRef<EventType[]>([]);
   const dispatch = useStoreDispatch();
   const { toggleStudyBrowser } = useStoreActions();
 
+  const isAnalysis = useIsAnalysis();
   const studyConfig = useStudyConfig();
   const currentComponent = useCurrentComponent();
+
   const componentConfig = useMemo(() => studyComponentToIndividualComponent(studyConfig.components[currentComponent] || {}, studyConfig), [currentComponent, studyConfig]);
 
   const windowEventDebounceTime = useMemo(() => componentConfig.windowEventDebounceTime ?? studyConfig.uiConfig.windowEventDebounceTime ?? 100, [componentConfig, studyConfig]);
 
+  useFetchStylesheet(studyConfig?.uiConfig.stylesheetPath);
+
   const showStudyBrowser = useStoreSelector((state) => state.showStudyBrowser);
-  const analysisHasAudio = useStoreSelector((state) => state.analysisHasAudio);
   const modes = useStoreSelector((state) => state.modes);
+
+  const screenRecording = useScreenRecording();
+
+  const { isRejected: isScreenRecordingUserRejected } = screenRecording;
+
+  const analysisHasScreenRecording = useStoreSelector((state) => state.analysisHasScreenRecording);
+  const analysisCanPlayScreenRecording = useStoreSelector((state) => state.analysisCanPlayScreenRecording);
 
   // Attach event listeners
   useEffect(() => {
@@ -111,32 +124,33 @@ export function StepRenderer() {
   const { studyNavigatorEnabled, dataCollectionEnabled } = useMemo(() => modes, [modes]);
 
   // No default value for withSidebar since it's a required field in uiConfig
-  const sidebarOpen = useMemo(() => componentConfig.withSidebar ?? studyConfig.uiConfig.withSidebar, [componentConfig, studyConfig]);
+  const sidebarOpen = useMemo(() => ((analysisHasScreenRecording && analysisCanPlayScreenRecording) ? false : (componentConfig.withSidebar ?? studyConfig.uiConfig.withSidebar)), [componentConfig, studyConfig, analysisHasScreenRecording, analysisCanPlayScreenRecording]);
   const sidebarWidth = useMemo(() => componentConfig?.sidebarWidth ?? studyConfig.uiConfig.sidebarWidth ?? 300, [componentConfig, studyConfig]);
   const showTitleBar = useMemo(() => componentConfig.showTitleBar ?? studyConfig.uiConfig.showTitleBar ?? true, [componentConfig, studyConfig]);
-  const isAnalysis = useIsAnalysis();
 
   const asideOpen = useMemo(() => studyNavigatorEnabled && showStudyBrowser, [studyNavigatorEnabled, showStudyBrowser]);
 
   return (
     <WindowEventsContext.Provider value={windowEvents}>
-      <AppShell
-        padding="md"
-        header={{ height: showTitleBar ? 70 : 0 }}
-        navbar={{ width: sidebarWidth, breakpoint: 'xs', collapsed: { desktop: !sidebarOpen, mobile: !sidebarOpen } }}
-        aside={{ width: 360, breakpoint: 'xs', collapsed: { desktop: !asideOpen, mobile: !asideOpen } }}
-        footer={{ height: (isAnalysis ? 75 : 0) + (analysisHasAudio ? 50 : 0) }}
-      >
-        <AppNavBar />
-        <AppAside />
-        {showTitleBar && (
+      <ScreenRecordingContext.Provider value={screenRecording}>
+        <AppShell
+          padding="md"
+          header={{ height: showTitleBar ? 70 : 0 }}
+          navbar={{ width: sidebarWidth, breakpoint: 'xs', collapsed: { desktop: !sidebarOpen, mobile: !sidebarOpen } }}
+          aside={{ width: 360, breakpoint: 'xs', collapsed: { desktop: !asideOpen, mobile: !asideOpen } }}
+          footer={{ height: isAnalysis ? 200 : 0 }}
+        >
+          <AppNavBar />
+          <AppAside />
+          {showTitleBar && (
           <AppHeader studyNavigatorEnabled={studyNavigatorEnabled} dataCollectionEnabled={dataCollectionEnabled} />
-        )}
-        <ResolutionWarning />
-        <HelpModal />
-        <AlertModal />
-        <AppShell.Main>
-          {!showTitleBar && !showStudyBrowser && studyNavigatorEnabled && (
+          )}
+          <ResolutionWarning />
+          {isScreenRecordingUserRejected && <ScreenRecordingRejection />}
+          <HelpModal />
+          <AlertModal />
+          <AppShell.Main className="main" style={{ display: 'flex', flexDirection: 'column' }}>
+            {!showTitleBar && !showStudyBrowser && studyNavigatorEnabled && (
             <Button
               variant="transparent"
               leftSection={<IconArrowLeft size={14} />}
@@ -146,13 +160,14 @@ export function StepRenderer() {
             >
               Study Browser
             </Button>
-          )}
-          <Outlet />
-        </AppShell.Main>
-        {isAnalysis && (
+            )}
+            <Outlet />
+          </AppShell.Main>
+          {isAnalysis && (
           <AnalysisFooter />
-        )}
-      </AppShell>
+          )}
+        </AppShell>
+      </ScreenRecordingContext.Provider>
     </WindowEventsContext.Provider>
   );
 }

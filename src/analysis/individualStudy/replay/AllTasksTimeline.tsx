@@ -1,4 +1,4 @@
-import { JSX, useCallback, useMemo } from 'react';
+import { JSX, useMemo } from 'react';
 import * as d3 from 'd3';
 import {
   Center, Stack, Tooltip, Text,
@@ -6,10 +6,8 @@ import {
 import { ParticipantData } from '../../../storage/types';
 import { SingleTaskLabelLines } from './SingleTaskLabelLines';
 import { SingleTask } from './SingleTask';
-import { encryptIndex } from '../../../utils/encryptDecryptIndex';
-import { StudyConfig } from '../../../parser/types';
-import { PREFIX } from '../../../utils/Prefix';
-import { getSequenceFlatMap } from '../../../utils/getSequenceFlatMap';
+import { StoredAnswer, StudyConfig } from '../../../parser/types';
+import { componentAnswersAreCorrect } from '../../../utils/correctAnswer';
 
 const LABEL_GAP = 25;
 const CHARACTER_SIZE = 8;
@@ -18,21 +16,20 @@ const margin = {
   left: 20, top: 20, right: 20, bottom: 20,
 };
 
+const sortedTaskNames = (a: [string, StoredAnswer], b: [string, StoredAnswer]) => {
+  const splitA = a[1].trialOrder.split('_');
+  const splitB = b[1].trialOrder.split('_');
+  return splitA[0] === splitB[0] ? +splitA[1] - +splitB[1] : +splitA[0] - +splitB[0];
+};
+
 export function AllTasksTimeline({
-  participantData, width, selectedTask, studyId, studyConfig, maxLength,
-} : {participantData: ParticipantData, width: number, studyId: string, selectedTask?: string | null, studyConfig: StudyConfig | undefined, maxLength: number | undefined}) {
-  const clickTask = useCallback((task: string) => {
-    const split = task.split('_');
-    const index = +split[split.length - 1];
-
-    window.open(`${PREFIX}${studyId}/${encryptIndex(index)}?participantId=${participantData.participantId}`, '_blank');
-  }, [participantData.participantId, studyId]);
-
+  participantData, width, studyId, studyConfig, maxLength,
+} : {participantData: ParticipantData, width: number, studyId: string, studyConfig: StudyConfig | undefined, maxLength: number | undefined}) {
   const percentComplete = useMemo(() => {
     const incompleteEntries = Object.entries(participantData.answers || {}).filter((e) => e[1].startTime === 0);
 
-    return (Object.entries(participantData.answers).length - incompleteEntries.length) / (getSequenceFlatMap(participantData.sequence).length - 1);
-  }, [participantData.answers, participantData.sequence]);
+    return (Object.entries(participantData.answers).length - incompleteEntries.length) / (Object.entries(participantData.answers).length);
+  }, [participantData.answers]);
 
   const xScale = useMemo(() => {
     const allStartTimes = Object.values(participantData.answers || {}).filter((answer) => answer.startTime).map((answer) => [answer.startTime, answer.endTime]).flat();
@@ -72,15 +69,14 @@ export function AllTasksTimeline({
       }
     });
 
-    return _maxHeight * LABEL_GAP + margin.top + margin.bottom;
+    return (_maxHeight + 1) * LABEL_GAP + margin.top + margin.bottom;
   }, [participantData.answers, xScale]);
 
   // Creating labels for the tasks
   const tasks: {line: JSX.Element, label: JSX.Element}[] = useMemo(() => {
     let currentHeight = 0;
 
-    // Think thisll fail with dynamic blocks
-    const incompleteEntries = Object.entries(participantData.answers || {}).filter((e) => e[1].startTime === 0).sort((a, b) => getSequenceFlatMap(participantData.sequence).indexOf(a[0]) - getSequenceFlatMap(participantData.sequence).indexOf(b[0]));
+    const incompleteEntries = Object.entries(participantData.answers || {}).filter((e) => e[1].startTime === 0).sort(sortedTaskNames);
 
     const sortedEntries = Object.entries(participantData.answers || {}).filter((answer) => !!(answer[1].startTime)).sort((a, b) => a[1].startTime - b[1].startTime);
 
@@ -109,22 +105,8 @@ export function AllTasksTimeline({
 
       const component = studyConfig?.components[joinExceptLast];
 
-      let isCorrect = true;
-      let hasCorrect = false;
-
-      if (component && component.correctAnswer) {
-        component.correctAnswer.forEach((a) => {
-          const { id, answer: componentCorrectAnswer } = a;
-
-          if (!component || !component.correctAnswer || answer.answer[id] !== componentCorrectAnswer) {
-            isCorrect = false;
-          }
-        });
-
-        hasCorrect = true;
-      } else {
-        hasCorrect = false;
-      }
+      const isCorrect = componentAnswersAreCorrect(answer.answer, answer.correctAnswer);
+      const hasCorrect = !!((component && component.correctAnswer) || answer.correctAnswer.length > 0);
 
       return {
         line: <SingleTaskLabelLines key={name} labelHeight={currentHeight * LABEL_GAP} height={maxHeight} xScale={scale} scaleStart={scaleStart} />,
@@ -148,14 +130,14 @@ export function AllTasksTimeline({
             )}
           >
             <g>
-              <SingleTask incomplete={answer.startTime === 0} isCorrect={isCorrect} hasCorrect={hasCorrect} key={name} labelHeight={currentHeight * LABEL_GAP} isSelected={selectedTask === name} setSelectedTask={clickTask} height={maxHeight} name={name} xScale={scale} scaleStart={scaleStart} scaleEnd={scaleEnd} />
+              <SingleTask incomplete={answer.startTime === 0} isCorrect={isCorrect} hasCorrect={hasCorrect} key={name} labelHeight={currentHeight * LABEL_GAP} height={maxHeight} name={name} xScale={scale} scaleStart={scaleStart} scaleEnd={scaleEnd} trialOrder={answer.trialOrder} participantId={participantData.participantId} studyId={studyId} />
             </g>
           </Tooltip>),
       };
     });
 
     return allElements;
-  }, [participantData.answers, participantData.sequence, incompleteXScale, xScale, studyConfig?.components, maxHeight, selectedTask, clickTask]);
+  }, [participantData.answers, participantData.participantId, incompleteXScale, xScale, studyConfig?.components, maxHeight, studyId]);
 
   // Find entries of someone browsing away. Show them
   const browsedAway = useMemo(() => {

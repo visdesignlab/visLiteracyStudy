@@ -53,6 +53,7 @@ export function NextButton({
       clearInterval(interval);
     };
   }, []);
+
   useEffect(() => {
     if (timer && nextButtonDisableTime && timer >= nextButtonDisableTime && studyConfig.uiConfig.timeoutReject) {
       navigate('./../__timedOut');

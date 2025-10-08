@@ -51,8 +51,7 @@ export function AppNavBar() {
   const instructionInSideBar = instructionLocation === 'sidebar';
 
   return trialHasSideBar && currentConfig ? (
-    <AppShell.Navbar bg="gray.1" display="block" style={{ zIndex: 0, overflowY: 'scroll' }}>
-      {/* <LoadingOverlay visible={loading} /> */}
+    <AppShell.Navbar className="sidebar" bg="gray.1" display="block" style={{ zIndex: 0, overflowY: 'scroll' }}>
       {instructionInSideBar && instruction !== '' && (
         <AppShell.Section
           bg="gray.3"

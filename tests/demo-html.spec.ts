@@ -1,10 +1,17 @@
 import { expect, test } from '@playwright/test';
 
-test('html demo works as intended with previous button', async ({ page }) => {
+test('html demo works as intended with previous button', async ({ browser }) => {
+  const page = await browser.newPage();
+  await page.setViewportSize({
+    width: 1200,
+    height: 800,
+  });
+
   await page.goto('/');
 
   // Click on html-demo
   await page.getByLabel('Demo Studies').locator('div').filter({ hasText: 'HTML as a Stimulus' })
+    .nth(0)
     .getByText('Go to Study')
     .click();
 

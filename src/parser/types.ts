@@ -65,6 +65,58 @@ export interface StudyMetadata {
 export type ResponseBlockLocation = 'sidebar' | 'aboveStimulus' | 'belowStimulus' | 'stimulus';
 export type ConfigResponseBlockLocation = Exclude<ResponseBlockLocation, 'stimulus'>;
 
+export type Styles = {
+  /** Sizing */
+  height?: string;
+  width?: string;
+  minHeight?: string;
+  minWidth?: string;
+  maxHeight?: string;
+  maxWidth?: string;
+
+  /** Positioning */
+  position?: 'static' | 'relative' | 'absolute' | 'fixed' | 'sticky';
+  top?: string;
+  bottom?: string;
+  left?: string;
+  right?: string;
+
+  /** Spacing */
+  margin?: string;
+  padding?: string;
+
+  /** Border */
+  border?: string;
+  borderRadius?: string;
+
+  /** Background */
+  background?: string;
+  backgroundColor?: string;
+  backgroundImage?: string;
+  backgroundPosition?: string;
+  backgroundSize?: string;
+
+  /** Filter */
+  filter?: string;
+
+  /** Typography */
+  color?: string;
+  font?: string;
+  fontFamily?: string;
+  fontSize?: string;
+  fontStyle?: 'normal' | 'italic' | 'oblique';
+  fontWeight?: string | number;
+  textAlign?: 'start' | 'center' | 'end' | 'justify' | 'left' | 'right' | 'match-parent';
+  textDecoration?: 'none' | 'underline' | 'overline' | 'line-through' | 'underline-overline';
+  textTransform?: 'capitalize' | 'lowercase' | 'none' | 'uppercase';
+  letterSpacing?: string;
+  wordSpacing?: string;
+  lineHeight?: string | number;
+
+  /** Transform */
+  transform?: string;
+};
+
 /**
  * The UIConfig is used to configure the UI of the app.
  * This includes the logo, contact email, and whether to show a progress bar.
@@ -131,6 +183,10 @@ export interface UIConfig {
   allowFailedTraining?: boolean;
   /** Whether or not we want to utilize think-aloud features. If true, will record audio on all components unless deactivated on individual components. Defaults to false. */
   recordAudio?: boolean;
+  /** Whether or not we want to utilize screen recording feature. If true, will record audio on all components unless deactivated on individual components. This must be set to true if you want to record audio on any component in your study. Defaults to false. It's also required that the library component, $screen-recording.co.screenRecordingPermission, be included in the study at some point before any component that you want to record the screen on to ensure permissions are granted and screen capture has started. */
+  recordScreen?: boolean;
+  /** Desired fps for recording screen. If possible, this value will be used, but if it's not possible, the user agent will use the closest possible match. */
+  recordScreenFPS?: number;
   /** Whether to prepend questions with their index (+ 1). This should only be used when all questions are in the same location, e.g. all are in the side bar. */
   enumerateQuestions?: boolean;
   /** Whether to show the response dividers. Defaults to false. */
@@ -153,6 +209,8 @@ export interface UIConfig {
   minWidthSize?: number;
   /** The minimum screen height size for the study */
   minHeightSize?: number;
+  /** The path to the external stylesheet file. */
+  stylesheetPath?: string;
 }
 
 /**
@@ -171,7 +229,7 @@ export interface NumberOption {
  * The label is the text that is displayed to the user, and the value is the value that is stored in the data file.
  */
 export interface StringOption {
-  /** The label displayed to participants. */
+  /** The label displayed to participants. Markdown is supported. */
   label: string;
   /** The value stored in the participant's data. */
   value: string;
@@ -205,6 +263,10 @@ export interface BaseResponse {
   withDivider?: boolean;
   /** Renders the response with an option for "I don't know". This counts as a completed answer for the validation. */
   withDontKnow?: boolean;
+  /** The path to the external stylesheet file. */
+  stylesheetPath?: string;
+  /**  You can set styles here, using React CSSProperties, for example: `{"width": 100}` or `{"width": "50%"}` */
+  style?: Styles;
 }
 
 /**
@@ -291,7 +353,9 @@ export interface LongTextResponse extends BaseResponse {
   "type": "likert",
   "leftLabel": "Not Enjoyable",
   "rightLabel": "Very Enjoyable",
-  "numItems": 5
+  "numItems": 5,
+  "start": 1,
+  "spacing": 1
 }
 ```
  */
@@ -299,6 +363,10 @@ export interface LikertResponse extends BaseResponse {
   type: 'likert';
   /** The number of options to render. */
   numItems: number;
+  /** The starting value of the likert scale. Defaults to 1. */
+  start?: number;
+  /** The spacing between the options. Defaults to 1. */
+  spacing?: number;
   /** The left label of the likert scale. E.g Strongly Disagree */
   leftLabel?: string;
   /** The right label of the likert scale. E.g Strongly Agree */
@@ -426,10 +494,14 @@ export interface SliderResponse extends BaseResponse {
   snap?: boolean;
   /** The step value of the slider. If not provided (and snap not enabled), the step value is calculated as the range of the slider divided by 100. */
   step?: number;
+  /** The spacing between the ticks. If not provided, the spacing is calculated as the range of the slider divided by power of 10. */
+  spacing?: number;
   /** Whether to render the slider with a bar to the left. Defaults to true. */
   withBar?: boolean;
   /** Whether to render the slider with a NASA-tlx style. Defaults to false. */
   tlxStyle?: boolean;
+  /** Whether to render the slider with a SMEQ style. Defaults to false. */
+  smeqStyle?: boolean;
 }
 
 /**
@@ -492,6 +564,48 @@ export interface CheckboxResponse extends BaseResponse {
   horizontal?: boolean;
   /** Whether to render the checkboxes with an "other" option. */
   withOther?: boolean;
+}
+
+/**
+ * The RankingResponse interface is used to define the properties of a ranking widget response.
+ * RankingResponses render as a ranking widget with user specified options.
+ *
+ * There are three types of ranking widgets:
+ * Ranking Sublist: The participant is asked to rank a subset of items from a larger list.
+ * Ranking Categorical: The participant is asked to rank items within categories: HIGH, MEDIUM, and LOW.
+ * Ranking Pairwise: The participant is asked to rank items by comparing them in pairs.
+ *
+ ```js
+{
+  "id": "ranking-sublist",
+  "type": "ranking-sublist",
+  "prompt": "Rank your top 2 favorite fruits from the list below",
+  "location": "belowStimulus",
+  "options": ["Apple", "Banana", "Orange", "Strawberry", "Grapes"],
+  "numItems": 2
+},
+{
+  "id": "ranking-categorical",
+  "type": "ranking-categorical",
+  "prompt": "Sort these hobbies into the categories of HIGH, MEDIUM, and LOW based on your level of interest.",
+  "location": "belowStimulus",
+  "options": ["Drawing", "Singing", "Hiking", "Dancing", "Photography"]
+},
+{
+  "id": "ranking-pairwise",
+  "type": "ranking-pairwise",
+  "prompt": "Which meal would you prefer",
+  "location": "belowStimulus",
+  "options": ["Pizza", "Sushi", "Burger", "Pasta", "Salad", "Tacos"]
+}
+```
+*/
+export interface RankingResponse extends BaseResponse {
+  type: 'ranking-sublist' | 'ranking-categorical' | 'ranking-pairwise';
+  /** The options that are displayed as ranking options, provided as an array of objects, with label and value fields. */
+  options: (StringOption | string)[];
+  /** The number of items to rank. Applies only to sublist and categorical ranking widgets. */
+  numItems?: number;
 }
 
 /**
@@ -573,7 +687,7 @@ export interface TextOnlyResponse extends Omit<BaseResponse, 'secondaryText' | '
   withDontKnow?: undefined;
 }
 
-export type Response = NumericalResponse | ShortTextResponse | LongTextResponse | LikertResponse | DropdownResponse | SliderResponse | RadioResponse | CheckboxResponse | ReactiveResponse | MatrixResponse | ButtonsResponse | TextOnlyResponse;
+export type Response = NumericalResponse | ShortTextResponse | LongTextResponse | LikertResponse | DropdownResponse | SliderResponse | RadioResponse | CheckboxResponse | RankingResponse | ReactiveResponse | MatrixResponse | ButtonsResponse | TextOnlyResponse;
 
 /**
  * The Answer interface is used to define the properties of an answer. Answers are used to define the correct answer for a task. These are generally used in training tasks or if skip logic is required based on the answer.
@@ -679,6 +793,8 @@ export interface BaseIndividualComponent {
   allowFailedTraining?: boolean;
   /** Whether or not we want to utilize think-aloud features. If present, will override the record audio setting in the uiConfig. */
   recordAudio?: boolean;
+  /** Whether or not we want to utilize screen recording feature. If present, will override the record screen setting in the uiConfig. If true, the uiConfig must have recordScreen set to true or the screen will not be captured. It's also required that the library component, $screen-recording.co.screenRecordingPermission, be included in the study at some point before this component to ensure permissions are granted and screen capture has started. */
+  recordScreen?: boolean;
   /** Whether to prepend questions with their index (+ 1). This should only be used when all questions are in the same location, e.g. all are in the side bar. If present, will override the enumeration of questions setting in the uiConfig. */
   enumerateQuestions?: boolean;
   /** Whether to show the response dividers. If present, will override the response dividers setting in the uiConfig. */
@@ -687,6 +803,10 @@ export interface BaseIndividualComponent {
   windowEventDebounceTime?: number;
   /** The order of the responses. Defaults to 'fixed'. */
   responseOrder?: 'fixed' | 'random';
+  /** The path to the external stylesheet file. */
+  stylesheetPath?: string;
+  /**  You can set styles here, using React CSSProperties, for example: `{"width": 100}` or `{"width": "50%"}` */
+  style?: Styles;
 }
 
 /**
@@ -746,8 +866,8 @@ export default function CoolComponent({ parameters, setAnswer }: StimulusParams<
 ```
  *
  * For in depth examples, see the following studies, and their associated codebases.
- * https://revisit.dev/study/demo-click-accuracy-test (https://github.com/revisit-studies/study/tree/v2.1.1/src/public/demo-click-accuracy-test/assets)
- * https://revisit.dev/study/example-brush-interactions (https://github.com/revisit-studies/study/tree/v2.1.1/src/public/example-brush-interactions/assets)
+ * https://revisit.dev/study/demo-click-accuracy-test (https://github.com/revisit-studies/study/tree/v2.2.0/src/public/demo-click-accuracy-test/assets)
+ * https://revisit.dev/study/example-brush-interactions (https://github.com/revisit-studies/study/tree/v2.2.0/src/public/example-brush-interactions/assets)
  */
 export interface ReactComponent extends BaseIndividualComponent {
   type: 'react-component';
@@ -775,8 +895,6 @@ export interface ImageComponent extends BaseIndividualComponent {
   type: 'image';
   /** The path to the image. This could be a relative path from the public folder or a url to an external image. */
   path: string;
-  /** The style of the image. This is an object with css properties as keys and css values as values. */
-  style?: Record<string, string>;
 }
 
 /**
@@ -1441,7 +1559,7 @@ export type BaseComponents = Record<string, Partial<IndividualComponent>>;
 
 ```js
 {
-  "$schema": "https://raw.githubusercontent.com/revisit-studies/study/v2.1.1/src/parser/StudyConfigSchema.json",
+  "$schema": "https://raw.githubusercontent.com/revisit-studies/study/v2.2.0/src/parser/StudyConfigSchema.json",
   "studyMetadata": {
     ...
   },
@@ -1487,7 +1605,7 @@ export interface StudyConfig {
  *
  * ```js
  * {
- *   "$schema": "https://raw.githubusercontent.com/revisit-studies/study/v2.1.1/src/parser/LibraryConfigSchema.json",
+ *   "$schema": "https://raw.githubusercontent.com/revisit-studies/study/v2.2.0/src/parser/LibraryConfigSchema.json",
  *   "baseComponents": {
  *     // BaseComponents here are defined exactly as is in the StudyConfig
  *   },
@@ -1505,6 +1623,12 @@ export interface LibraryConfig {
   $schema: string;
   /** A description of the library. */
   description: string;
+  /** The components that are used in the study. They must be fully defined here with all properties. Some properties may be inherited from baseComponents. */
+  components: Record<string, IndividualComponent | InheritedComponent>
+  /** The order of the components in the study. This might include some randomness. */
+  sequences: Record<string, StudyConfig['sequence']>;
+  /** Additional description of the library. It accepts markdown formatting. */
+  additionalDescription?: string;
   /** The reference to the paper where the content of the library is based on. */
   reference?: string;
   /** The DOI of the paper where the content of the library is based on. */
@@ -1513,10 +1637,6 @@ export interface LibraryConfig {
   externalLink?: string;
   /** The base components that are used in the study. These components can be used to template other components. See [BaseComponents](../../type-aliases/BaseComponents) for more information. */
   baseComponents?: BaseComponents;
-  /** The components that are used in the study. They must be fully defined here with all properties. Some properties may be inherited from baseComponents. */
-  components: Record<string, IndividualComponent | InheritedComponent>
-  /** The order of the components in the study. This might include some randomness. */
-  sequences: Record<string, StudyConfig['sequence']>;
 }
 
 /**

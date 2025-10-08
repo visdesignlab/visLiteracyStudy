@@ -1,20 +1,13 @@
 /* eslint-disable react/no-unstable-nested-components */
-/* eslint-disable camelcase */
 import {
-  Text, Flex, Button, LoadingOverlay, Group, Space, Modal, TextInput,
-  Tooltip,
-  Container,
-  Badge,
-  RingProgress,
-  Stack,
+  Text, Flex, Group, Space, Tooltip, Badge, RingProgress, Stack,
 } from '@mantine/core';
-import React, {
-  JSX,
-  useCallback, useMemo, useState,
+import {
+  JSX, useCallback, useMemo, useState,
 } from 'react';
 import { useParams } from 'react-router';
 import {
-  MantineReactTable, MRT_Cell, MRT_ColumnDef, MRT_RowSelectionState, useMantineReactTable,
+  MantineReactTable, MRT_Cell as MrtCell, MRT_ColumnDef as MrtColumnDef, MRT_RowSelectionState as MrtRowSelectionState, useMantineReactTable,
 } from 'mantine-react-table';
 import {
   IconCheck, IconHourglassEmpty, IconX,
@@ -23,26 +16,21 @@ import {
 import {
   ParticipantData, StoredAnswer, StudyConfig,
 } from '../../../parser/types';
-import { useStorageEngine } from '../../../storage/storageEngineHooks';
-import { useAuth } from '../../../store/hooks/useAuth';
-import 'mantine-react-table/styles.css';
+import { ParticipantRejectModal } from '../ParticipantRejectModal';
 import { participantName } from '../../../utils/participantName';
 import { AllTasksTimeline } from '../replay/AllTasksTimeline';
-import { checkAnswerCorrect } from '../../../store/hooks/useNextStep';
 import { humanReadableDuration } from '../../../utils/humanReadableDuration';
 import { getSequenceFlatMap } from '../../../utils/getSequenceFlatMap';
+import { MetaCell } from './MetaCell';
+import { DownloadButtons } from '../../../components/downloader/DownloadButtons';
+import { componentAnswersAreCorrect } from '../../../utils/correctAnswer';
 
 function formatDate(date: Date): string | JSX.Element {
   if (date.valueOf() === 0 || Number.isNaN(date.valueOf())) {
     return <Text size="sm" c="dimmed">None</Text>;
   }
-  const month = date.getMonth() + 1; // Months are 0-based
-  const day = date.getDate();
-  const year = date.getFullYear();
-  const hour = date.getHours();
-  const minute = date.getMinutes().toString().padStart(2, '0');
 
-  return `${month}/${day}/${year} ${hour}:${minute}`;
+  return date.toLocaleDateString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 export function TableView({
@@ -56,38 +44,20 @@ export function TableView({
   refresh: () => Promise<Record<number, ParticipantData>>;
   width: number;
 }) {
-  const { storageEngine } = useStorageEngine();
   const { studyId } = useParams();
-  const { user } = useAuth();
-  const [checked, setChecked] = useState<MRT_RowSelectionState>({});
+  const [checked, setChecked] = useState<MrtRowSelectionState>({});
 
-  const rejectParticipant = useCallback(async (participantId: string, reason: string) => {
-    if (storageEngine && studyId) {
-      if (user.isAdmin) {
-        const finalReason = reason === '' ? 'Rejected by admin' : reason;
-        await storageEngine.rejectParticipant(participantId, finalReason, studyId);
-        await refresh();
-      } else {
-        console.warn('You are not authorized to perform this action.');
-      }
-    }
-  }, [refresh, storageEngine, studyId, user.isAdmin]);
+  const selectedParticipants = useMemo(() => Object.keys(checked).filter((v) => checked[v])
+    .map((participantId) => visibleParticipants.find((p) => p.participantId === participantId))
+    .filter((p) => p !== undefined) as ParticipantData[], [checked, visibleParticipants]);
 
-  const [loading, setLoading] = useState(false);
-  const [modalRejectParticipantsOpened, setModalRejectParticipantsOpened] = useState<boolean>(false);
-  const [rejectParticipantsMessage, setRejectParticipantsMessage] = useState<string>('');
-
-  const handleRejectParticipants = useCallback(async () => {
-    setLoading(true);
-    setModalRejectParticipantsOpened(false);
-    const promises = Object.keys(checked).filter((v) => checked[v]).map(async (participantId) => await rejectParticipant(participantId, rejectParticipantsMessage));
-    await Promise.all(promises);
-    setChecked({});
+  const handleRefresh = useCallback(async () => {
     await refresh();
-    setLoading(false);
-  }, [checked, refresh, rejectParticipant, rejectParticipantsMessage]);
+  }, [refresh]);
 
-  const columns = useMemo<MRT_ColumnDef<ParticipantData>[]>(() => [
+  const selectedData = useMemo(() => (selectedParticipants.length > 0 ? selectedParticipants : visibleParticipants), [selectedParticipants, visibleParticipants]);
+
+  const columns = useMemo<MrtColumnDef<ParticipantData>[]>(() => [
     {
       accessorFn: (row: ParticipantData) => {
         const incompleteEntries = Object.entries(row.answers || {}).filter((e) => e[1].startTime === 0);
@@ -96,15 +66,19 @@ export function TableView({
       },
       header: 'Status',
       size: 50,
-      Cell: ({ cell }: { cell: MRT_Cell<ParticipantData, {percent: number, completed: boolean, rejected: ParticipantData['rejected']}> }) => {
+      Cell: ({ cell }: { cell: MrtCell<ParticipantData, {percent: number, completed: boolean, rejected: ParticipantData['rejected']}> }) => {
         const cellValue = cell.getValue();
         return (
-          cellValue.completed ? <Group align="center" justify="center" w="100%"><Tooltip label="Completed"><IconCheck size={30} color="teal" style={{ marginBottom: -3 }} /></Tooltip></Group>
-            : cellValue.rejected ? (
-              <Stack align="center" justify="center" gap={4} w="100%">
-                <Tooltip label="Rejected"><IconX size={30} color="red" style={{ marginBottom: -3 }} /></Tooltip>
-                <Text size="xs" c="dimmed" ta="center">{cellValue.rejected.reason}</Text>
-              </Stack>
+          cellValue.rejected ? (
+            <Stack align="center" justify="center" gap={4} w="100%">
+              <Tooltip label="Rejected"><IconX size={30} color="red" style={{ marginBottom: -3 }} /></Tooltip>
+              <Text size="xs" c="dimmed" ta="center">{cellValue.rejected.reason}</Text>
+            </Stack>
+          )
+            : cellValue.completed ? (
+              <Group align="center" justify="center" w="100%">
+                <Tooltip label="Completed"><IconCheck size={30} color="teal" style={{ marginBottom: -3 }} /></Tooltip>
+              </Group>
             )
               : (
                 <Group align="center" justify="center" w="100%">
@@ -125,7 +99,7 @@ export function TableView({
     {
       accessorFn: (row: ParticipantData) => new Date(Math.max(...Object.values<StoredAnswer>(row.answers).filter((data) => data.endTime > 0).map((s) => s.endTime)) - Math.min(...Object.values<StoredAnswer>(row.answers).filter((data) => data.startTime > 0).map((s) => s.startTime))),
       header: 'Duration',
-      Cell: ({ cell }: {cell: MRT_Cell<ParticipantData, Date>}) => (
+      Cell: ({ cell }: {cell: MrtCell<ParticipantData, Date>}) => (
         !Number.isNaN(cell.getValue()) ? (
           <Badge
             variant="light"
@@ -149,9 +123,9 @@ export function TableView({
       header: 'Start Time',
     },
     {
-      accessorFn: (row: ParticipantData) => Object.values(row.answers).filter((answer) => answer.correctAnswer.length > 0 && answer.endTime > 0).map((answer) => checkAnswerCorrect(answer.answer, answer.correctAnswer)),
+      accessorFn: (row: ParticipantData) => Object.values(row.answers).filter((answer) => answer.correctAnswer.length > 0 && answer.endTime > 0).map((answer) => componentAnswersAreCorrect(answer.answer, answer.correctAnswer)),
       header: 'Correct Answers',
-      Cell: ({ cell }: {cell: MRT_Cell<ParticipantData, boolean[]>}) => (
+      Cell: ({ cell }: {cell: MrtCell<ParticipantData, boolean[]>}) => (
         <>
           <Badge
             variant="light"
@@ -175,6 +149,11 @@ export function TableView({
         </>
       ),
     },
+    {
+      accessorKey: 'metadata',
+      header: 'Metadata',
+      Cell: ({ cell }: {cell: MrtCell<ParticipantData, ParticipantData['metadata']>}) => <MetaCell metaData={cell.getValue()} />,
+    },
 
   ], [studyConfig]);
 
@@ -191,7 +170,7 @@ export function TableView({
     paginationDisplayMode: 'pages',
     enablePagination: false,
     enableRowVirtualization: true,
-    mantineTableContainerProps: { style: { maxHeight: '75vh' } },
+    mantinePaperProps: { style: { maxHeight: '100%', display: 'flex', flexDirection: 'column' } },
     layoutMode: 'grid',
     renderDetailPanel: ({ row }) => {
       const r = row.original;
@@ -207,54 +186,24 @@ export function TableView({
     enableDensityToggle: false,
     positionToolbarAlertBanner: 'none',
     renderTopToolbarCustomActions: () => (
-      <>
-        <Flex justify="space-between" mb={8} p={8}>
-          <Group>
-            <Button disabled={Object.keys(checked).length === 0 || !user.isAdmin} onClick={() => setModalRejectParticipantsOpened(true)} color="red">
-              Reject Participants (
-              {Object.keys(checked).length}
-              )
-            </Button>
-          </Group>
-        </Flex>
-        <Modal
-          opened={modalRejectParticipantsOpened}
-          onClose={() => setModalRejectParticipantsOpened(false)}
-          title={(
-            <Text>
-              Reject Participants (
-              {Object.keys(checked).length}
-              )
-            </Text>
-        )}
-        >
-          <TextInput
-            label="Please enter the reason for rejection."
-            onChange={(event) => setRejectParticipantsMessage(event.target.value)}
+      <Flex justify="space-between" mb={8} p={8}>
+        <Group>
+          <DownloadButtons
+            visibleParticipants={selectedData}
+            studyId={studyId || ''}
+            hasAudio={studyConfig?.uiConfig?.recordAudio}
           />
-          <Flex mt="sm" justify="right">
-            <Button mr={5} variant="subtle" color="dark" onClick={() => { setModalRejectParticipantsOpened(false); setRejectParticipantsMessage(''); }}>
-              Cancel
-            </Button>
-            <Button color="red" onClick={() => handleRejectParticipants()}>
-              Reject Participants
-            </Button>
-          </Flex>
-        </Modal>
-      </>
+          <ParticipantRejectModal selectedParticipants={selectedParticipants} refresh={handleRefresh} />
+        </Group>
+      </Flex>
     ),
   });
 
   return (
     visibleParticipants.length > 0 ? (
-      <>
-        <LoadingOverlay visible={loading} overlayProps={{ blur: 2 }} />
-        <Container fluid style={{ width: '100%', overflow: 'auto', height: '100%' }}>
-          <MantineReactTable
-            table={table}
-          />
-        </Container>
-      </>
+      <MantineReactTable
+        table={table}
+      />
 
     ) : (
       <>

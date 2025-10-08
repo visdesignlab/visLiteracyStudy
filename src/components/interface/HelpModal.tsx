@@ -15,6 +15,7 @@ export function HelpModal() {
   const storeDispatch = useStoreDispatch();
   const { toggleShowHelpText } = useStoreActions();
 
+  const [foundAsset, setFoundAsset] = useState(true);
   const [helpText, setHelpText] = useState('');
 
   const [loading, setLoading] = useState(true);
@@ -27,12 +28,15 @@ export function HelpModal() {
   useEffect(() => {
     async function fetchText() {
       if (!helpTextPath) {
+        setFoundAsset(false);
         setLoading(false);
         return;
       }
       const asset = await getStaticAssetByPath(`${PREFIX}${helpTextPath}`);
       if (asset !== undefined) {
         setHelpText(asset);
+      } else {
+        setFoundAsset(false);
       }
       setLoading(false);
     }
@@ -41,8 +45,8 @@ export function HelpModal() {
   }, [helpTextPath]);
 
   return (
-    <Modal size="70%" opened={showHelpText} withCloseButton={false} onClose={() => storeDispatch(toggleShowHelpText())}>
-      {loading || helpText
+    <Modal className="helpModal" size="70%" opened={showHelpText} withCloseButton={false} onClose={() => storeDispatch(toggleShowHelpText())}>
+      {loading || foundAsset
         ? <ReactMarkdownWrapper text={helpText} />
         : <ResourceNotFound path={config.uiConfig.helpTextPath} />}
     </Modal>
