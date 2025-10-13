@@ -419,7 +419,7 @@ export function AudioProvenanceVis({
               id="waveformDiv"
             >
 
-              <WaveSurfer backend="MediaElement" onMount={handleWSMount} plugins={[]} container="#waveformDiv" height={50} waveColor="#484848" progressColor="cornflowerblue" barHeight={0} cursorColor="rgba(0, 0, 0, 0)">
+              <WaveSurfer backend="WebAudio" onMount={handleWSMount} plugins={[]} container="#waveformDiv" height={50} waveColor="#484848" progressColor="cornflowerblue" barHeight={0} cursorColor="rgba(0, 0, 0, 0)">
                 <WaveForm id="waveform" height={50} />
               </WaveSurfer>
             </Box>

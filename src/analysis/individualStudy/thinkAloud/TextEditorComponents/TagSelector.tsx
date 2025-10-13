@@ -15,8 +15,8 @@ import { TagEditor } from './TagEditor';
 import { AddTagDropdown } from '../tiptapExtensions/AddTagDropdown';
 
 export function TagSelector({
-  tags, selectedTags, onSelectTags, disabled = false, taskTags, partTags, tagsEmptyText, createTagCallback, editTagCallback,
-} : {tags: Tag[], selectedTags: Tag[], onSelectTags: (t: Tag[]) => void, disabled?: boolean, taskTags?: Tag[], partTags?: Tag[], tagsEmptyText: string, editTagCallback: (oldTag: Tag, newTag: Tag) => void, createTagCallback: (t: Tag) => void}) {
+  tags, selectedTags, onSelectTags, disabled = false, taskTags, partTags, tagsEmptyText, createTagCallback, editTagCallback, width,
+} : {tags: Tag[], selectedTags: Tag[], onSelectTags: (t: Tag[]) => void, disabled?: boolean, taskTags?: Tag[], partTags?: Tag[], tagsEmptyText: string, editTagCallback: (oldTag: Tag, newTag: Tag) => void, createTagCallback: (t: Tag) => void, width: number}) {
   const combobox = useCombobox();
 
   const handleValueRemove = useCallback((val: string) => onSelectTags(selectedTags.filter((t: Tag) => t !== undefined && t.id !== val)), [onSelectTags, selectedTags]);
@@ -129,9 +129,9 @@ export function TagSelector({
   )), [editTagCallback, selectedTags, tags]);
 
   return (
-    <Combobox disabled={disabled} width={250} store={combobox} onOptionSubmit={handleValueSelect} withinPortal>
+    <Combobox disabled={disabled} width={width} store={combobox} onOptionSubmit={handleValueSelect} withinPortal>
       <Combobox.DropdownTarget>
-        <PillsInput style={{ width: '250px' }} pointer onClick={() => combobox.toggleDropdown()}>
+        <PillsInput style={{ width: `${width}px` }} pointer onClick={() => combobox.toggleDropdown()}>
           <Pill.Group>
             {selectedTags.length > 0 ? (
               values

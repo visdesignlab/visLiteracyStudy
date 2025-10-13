@@ -12,7 +12,7 @@ import {
 import * as d3 from 'd3';
 
 import {
-  IconArrowLeft, IconArrowRight, IconDeviceDesktopDown, IconInfoCircle, IconMusicDown, IconPlayerPauseFilled, IconPlayerPlayFilled,
+  IconArrowLeft, IconArrowRight, IconInfoCircle, IconPlayerPauseFilled, IconPlayerPlayFilled,
 } from '@tabler/icons-react';
 import { useAsync } from '../../../store/hooks/useAsync';
 import { useStorageEngine } from '../../../storage/storageEngineHooks';
@@ -28,7 +28,6 @@ import { getSequenceFlatMap } from '../../../utils/getSequenceFlatMap';
 import { encryptIndex } from '../../../utils/encryptDecryptIndex';
 import { PREFIX } from '../../../utils/Prefix';
 import { handleTaskAudio, handleTaskScreenRecording } from '../../../utils/handleDownloadAudio';
-import { ParticipantRejectModal } from '../ParticipantRejectModal';
 
 const margin = {
   left: 5, top: 0, right: 5, bottom: 0,
@@ -351,6 +350,7 @@ export function ThinkAloudFooter({
             <Stack gap="4">
               <Text size="sm" fw={500}>Participant Tags</Text>
               <TagSelector
+                width={200}
                 tags={allPartTags || []}
                 editTagCallback={editParticipantTagCallback}
                 createTagCallback={createParticipantTagCallback}
@@ -410,6 +410,7 @@ export function ThinkAloudFooter({
                 </Tooltip>
               </Group>
               <TagSelector
+                width={200}
                 tags={taskTags || []}
                 editTagCallback={editTaskTagCallback}
                 createTagCallback={createTaskTagCallback}
@@ -436,7 +437,7 @@ export function ThinkAloudFooter({
           <Button mt="lg" variant="light" component="a" href={isReplay ? `${PREFIX}analysis/stats/${studyId}/tagging?participantId=${participantId}&currentTrial=${currentTrial}` : `${PREFIX}${studyId}/${encryptIndex(participant ? +(participant.answers[currentTrial]?.trialOrder.split('_')[0] || 0) : 0)}?participantId=${participantId}&currentTrial=${currentTrial}`} target="_blank">
             {isReplay ? 'Open Transcript' : 'Open Replay'}
           </Button>
-          <Group mt="lg">
+          {/* <Group mt="lg">
             {audioUrl && (
             <Tooltip label="Download audio">
               <ActionIcon variant="light" size={30} onClick={handleDownloadAudio}>
@@ -452,7 +453,7 @@ export function ThinkAloudFooter({
             </Tooltip>
             )}
             <ParticipantRejectModal selectedParticipants={[]} />
-          </Group>
+          </Group> */}
         </Group>
       </Stack>
     </AppShell.Footer>
