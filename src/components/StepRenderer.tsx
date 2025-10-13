@@ -1,6 +1,9 @@
 import { AppShell, Button } from '@mantine/core';
 import { Outlet } from 'react-router';
-import { useEffect, useMemo, useRef } from 'react';
+import {
+  useEffect, useMemo, useRef,
+  useState,
+} from 'react';
 import debounce from 'lodash.debounce';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { AppAside } from './interface/AppAside';
@@ -130,6 +133,8 @@ export function StepRenderer() {
 
   const asideOpen = useMemo(() => studyNavigatorEnabled && showStudyBrowser, [studyNavigatorEnabled, showStudyBrowser]);
 
+  const [hasAudio, setHasAudio] = useState<boolean>();
+
   return (
     <WindowEventsContext.Provider value={windowEvents}>
       <ScreenRecordingContext.Provider value={screenRecording}>
@@ -138,7 +143,7 @@ export function StepRenderer() {
           header={{ height: showTitleBar ? 70 : 0 }}
           navbar={{ width: sidebarWidth, breakpoint: 'xs', collapsed: { desktop: !sidebarOpen, mobile: !sidebarOpen } }}
           aside={{ width: 360, breakpoint: 'xs', collapsed: { desktop: !asideOpen, mobile: !asideOpen } }}
-          footer={{ height: isAnalysis ? 200 : 0 }}
+          footer={{ height: isAnalysis ? 125 + (hasAudio ? 55 : 0) : 0 }}
         >
           <AppNavBar />
           <AppAside />
@@ -164,7 +169,7 @@ export function StepRenderer() {
             <Outlet />
           </AppShell.Main>
           {isAnalysis && (
-          <AnalysisFooter />
+          <AnalysisFooter setHasAudio={setHasAudio} />
           )}
         </AppShell>
       </ScreenRecordingContext.Provider>

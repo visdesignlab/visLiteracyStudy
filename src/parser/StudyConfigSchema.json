@@ -268,6 +268,10 @@
           "description": "The id of the response. This is used to identify the response in the data file.",
           "type": "string"
         },
+        "infoText": {
+          "description": "The description that is displayed when the participant hovers over the response. This does not accept markdown.",
+          "type": "string"
+        },
         "location": {
           "$ref": "#/definitions/ConfigResponseBlockLocation",
           "description": "Controls the response location. These might be the same for all responses, or differ across responses. Defaults to `belowStimulus`"
@@ -359,6 +363,10 @@
         },
         "id": {
           "description": "The id of the response. This is used to identify the response in the data file.",
+          "type": "string"
+        },
+        "infoText": {
+          "description": "The description that is displayed when the participant hovers over the response. This does not accept markdown.",
           "type": "string"
         },
         "location": {
@@ -586,6 +594,10 @@
         },
         "id": {
           "description": "The id of the response. This is used to identify the response in the data file.",
+          "type": "string"
+        },
+        "infoText": {
+          "description": "The description that is displayed when the participant hovers over the response. This does not accept markdown.",
           "type": "string"
         },
         "location": {
@@ -1209,6 +1221,10 @@
           "description": "The id of the response. This is used to identify the response in the data file.",
           "type": "string"
         },
+        "infoText": {
+          "description": "The description that is displayed when the participant hovers over the response. This does not accept markdown.",
+          "type": "string"
+        },
         "leftLabel": {
           "description": "The left label of the likert scale. E.g Strongly Disagree",
           "type": "string"
@@ -1295,6 +1311,10 @@
         },
         "id": {
           "description": "The id of the response. This is used to identify the response in the data file.",
+          "type": "string"
+        },
+        "infoText": {
+          "description": "The description that is displayed when the participant hovers over the response. This does not accept markdown.",
           "type": "string"
         },
         "location": {
@@ -1561,6 +1581,10 @@
           "description": "The id of the response. This is used to identify the response in the data file.",
           "type": "string"
         },
+        "infoText": {
+          "description": "The description that is displayed when the participant hovers over the response. This does not accept markdown.",
+          "type": "string"
+        },
         "location": {
           "$ref": "#/definitions/ConfigResponseBlockLocation",
           "description": "Controls the response location. These might be the same for all responses, or differ across responses. Defaults to `belowStimulus`"
@@ -1665,6 +1689,10 @@
         },
         "id": {
           "description": "The id of the response. This is used to identify the response in the data file.",
+          "type": "string"
+        },
+        "infoText": {
+          "description": "The description that is displayed when the participant hovers over the response. This does not accept markdown.",
           "type": "string"
         },
         "location": {
@@ -1911,6 +1939,10 @@
           "description": "The id of the response. This is used to identify the response in the data file.",
           "type": "string"
         },
+        "infoText": {
+          "description": "The description that is displayed when the participant hovers over the response. This does not accept markdown.",
+          "type": "string"
+        },
         "leftLabel": {
           "description": "The left label of the radio group. Used in Likert scales for example",
           "type": "string"
@@ -2039,6 +2071,10 @@
         },
         "id": {
           "description": "The id of the response. This is used to identify the response in the data file.",
+          "type": "string"
+        },
+        "infoText": {
+          "description": "The description that is displayed when the participant hovers over the response. This does not accept markdown.",
           "type": "string"
         },
         "location": {
@@ -2302,6 +2338,10 @@
           "description": "The id of the response. This is used to identify the response in the data file.",
           "type": "string"
         },
+        "infoText": {
+          "description": "The description that is displayed when the participant hovers over the response. This does not accept markdown.",
+          "type": "string"
+        },
         "location": {
           "$ref": "#/definitions/ConfigResponseBlockLocation",
           "description": "Controls the response location. These might be the same for all responses, or differ across responses. Defaults to `belowStimulus`"
@@ -2451,6 +2491,10 @@
           "description": "The id of the response. This is used to identify the response in the data file.",
           "type": "string"
         },
+        "infoText": {
+          "description": "The description that is displayed when the participant hovers over the response. This does not accept markdown.",
+          "type": "string"
+        },
         "location": {
           "$ref": "#/definitions/ConfigResponseBlockLocation",
           "description": "Controls the response location. These might be the same for all responses, or differ across responses. Defaults to `belowStimulus`"
@@ -2540,6 +2584,10 @@
         },
         "id": {
           "description": "The id of the response. This is used to identify the response in the data file.",
+          "type": "string"
+        },
+        "infoText": {
+          "description": "The description that is displayed when the participant hovers over the response. This does not accept markdown.",
           "type": "string"
         },
         "location": {
@@ -2924,6 +2972,10 @@
         },
         "id": {
           "description": "The id of the response. This is used to identify the response in the data file.",
+          "type": "string"
+        },
+        "infoText": {
+          "description": "The description that is displayed when the participant hovers over the response. This does not accept markdown.",
           "type": "string"
         },
         "location": {

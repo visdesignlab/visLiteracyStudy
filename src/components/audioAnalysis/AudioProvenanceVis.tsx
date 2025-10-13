@@ -1,5 +1,5 @@
 import {
-  Box, Group, Loader, Stack,
+  Box, Group, LoadingOverlay, Stack,
 } from '@mantine/core';
 import { useSearchParams, useNavigate } from 'react-router';
 import {
@@ -16,7 +16,7 @@ import { useStorageEngine } from '../../storage/storageEngineHooks';
 import { WithinTaskTimeline } from './WithinTaskTimeline';
 import { useIsAnalysis } from '../../store/hooks/useIsAnalysis';
 import { Timer } from './Timer';
-import { humanReadableDuration } from '../../utils/humanReadableDuration';
+import { youtubeReadableDuration } from '../../utils/humanReadableDuration';
 import { ResponseBlockLocation, StoredAnswer } from '../../parser/types';
 import { useEvent } from '../../store/hooks/useEvent';
 import { encryptIndex } from '../../utils/encryptDecryptIndex';
@@ -31,8 +31,8 @@ function safe<T>(p: Promise<T>): Promise<T | null> {
 }
 
 export function AudioProvenanceVis({
-  setTimeString, answers, setTime, taskName, context, saveProvenance, analysisIsPlaying, setAnalysisIsPlaying, speed, jumpedToAudioTime = 0,
-}: { setTimeString: (time: string) => void; answers: Record<string, StoredAnswer>, setTime?: (time: number) => void, taskName: string, context: 'audioAnalysis' | 'provenanceVis', saveProvenance?: ((state: unknown) => void), analysisIsPlaying: boolean, setAnalysisIsPlaying: (b: boolean) => void, speed: number, jumpedToAudioTime?: number }) {
+  setTimeString, answers, setTime, taskName, context, saveProvenance, analysisIsPlaying, setAnalysisIsPlaying, speed, jumpedToAudioTime = 0, setHasAudio, setSpeed, isMuted,
+}: { setTimeString: (time: string) => void; answers: Record<string, StoredAnswer>, setTime?: (time: number) => void, taskName: string, context: 'audioAnalysis' | 'provenanceVis', saveProvenance?: ((state: unknown) => void), analysisIsPlaying: boolean, setAnalysisIsPlaying: (b: boolean) => void, speed: number, jumpedToAudioTime?: number, setHasAudio: (b: boolean) => void, setSpeed: (n: number) => void, isMuted: boolean }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const participantId = useMemo(() => searchParams.get('participantId') || '', [searchParams]);
 
@@ -59,7 +59,12 @@ export function AudioProvenanceVis({
   const { storageEngine } = useStorageEngine();
 
   // wrap these in useMemo to avoid unnecessary re-renders
-  const [analysisHasAudio, setAnalysisHasAudio] = useState(true);
+  const [analysisHasAudio, _setAnalysisHasAudio] = useState(true);
+
+  const setAnalysisHasAudio = useCallback((b: boolean) => {
+    _setAnalysisHasAudio(b);
+    setHasAudio(b);
+  }, [setHasAudio]);
 
   const [ref, { width }] = useResizeObserver();
   const [waveSurferWidth, setWaveSurferWidth] = useState<number>(0);
@@ -181,6 +186,10 @@ export function AudioProvenanceVis({
         });
       }
 
+      if (e.key === 'currentSpeed') {
+        setSpeed(+e.newValue);
+      }
+
       if (e.key === 'analysisIsPlaying') {
         setAnalysisIsPlaying(e.newValue === 'true');
       }
@@ -191,15 +200,15 @@ export function AudioProvenanceVis({
         }
       }
 
-      if (e.key === 'currentTime') {
-        _setPlayTime(+e.newValue.split('_')[0], +e.newValue.split('_')[1]);
-      }
+      // if (e.key === 'currentTime') {
+      //   setWavesurferTime(+e.newValue.split('_')[0], +e.newValue.split('_')[1]);
+      // }
     };
 
     window.addEventListener('storage', listener);
 
     return () => window.removeEventListener('storage', listener);
-  }, [_setPlayTime, context, navigate, participantId, setAnalysisIsPlaying, setSearchParams, taskName]);
+  }, [_setPlayTime, context, navigate, participantId, setAnalysisIsPlaying, setSearchParams, setSpeed, setWavesurferTime, taskName]);
 
   useUpdateProvenance('aboveStimulus', playTime, answers[taskName]?.provenanceGraph.aboveStimulus, currentResponseNodes.aboveStimulus, _setCurrentResponseNodes, saveProvenance);
 
@@ -291,7 +300,7 @@ export function AudioProvenanceVis({
     if (totalAudioLength === 0) {
       setTimeString('');
     } else if (playTime !== 0) {
-      setTimeString(`${humanReadableDuration(playTime - startTime)} / ${humanReadableDuration(totalAudioLength * 1000)}`);
+      setTimeString(`${youtubeReadableDuration(playTime - startTime)}/${youtubeReadableDuration(totalAudioLength * 1000)}`);
     }
   }, [taskName, playTime, setTimeString, startTime, totalAudioLength]);
 
@@ -327,9 +336,14 @@ export function AudioProvenanceVis({
 
           const url = screenUrl ?? audioUrl ?? null;
 
-          await waveSurfer.load(url!);
+          if (!url) {
+            setAnalysisHasAudio(false);
+            setWaveSurferLoading(false);
+            wavesurfer.current?.empty();
+          }
+
+          await waveSurfer.load(url!, undefined, totalAudioLength);
           setWaveSurferLoading(false);
-          // setAnalysisHasAudio(true);
 
           setWaveSurferWidth(waveSurfer.getWidth());
           setAnalysisHasAudio(true);
@@ -338,11 +352,14 @@ export function AudioProvenanceVis({
           waveSurfer.seekTo(0);
           waveSurfer.on('redrawcomplete', () => setWaveSurferWidth(waveSurfer.getWidth()));
         } catch (error: unknown) {
-          // setAnalysisHasAudio(false);
+          setAnalysisHasAudio(false);
+          setWaveSurferLoading(false);
           throw new Error(error as string);
         }
       } else {
-        // setAnalysisHasAudio(false);
+        setAnalysisHasAudio(false);
+        setWaveSurferLoading(false);
+
         setTotalAudioLength(0);
       }
     },
@@ -364,6 +381,10 @@ export function AudioProvenanceVis({
     }
   }, [speed]);
 
+  useEffect(() => {
+    wavesurfer.current?.setMuted(isMuted);
+  }, [isMuted]);
+
   const xScale = useMemo(() => {
     if (!answers[taskName]?.startTime || !answers[taskName]?.endTime) {
       return null;
@@ -378,12 +399,15 @@ export function AudioProvenanceVis({
   }, [answers, taskName, totalAudioLength, width]);
 
   useEffect(() => {
+    setWaveSurferLoading(true);
     handleWSMount(wavesurfer.current);
-  }, [_setPlayTime, handleWSMount, participantId, wavesurfer]);
+  }, [_setPlayTime, handleWSMount, participantId, wavesurfer, taskName]);
 
   return (
     <Group wrap="nowrap" gap={10} mx={10}>
       <Stack ref={ref} style={{ width: '100%' }} gap={0}>
+        <LoadingOverlay visible={waveSurferLoading} overlayProps={{ blur: 5, backgroundOpacity: 0.35 }} />
+
         {participantId !== undefined && taskName
           ? (
             <Box
@@ -394,10 +418,10 @@ export function AudioProvenanceVis({
               display={analysisHasAudio ? 'block' : 'none'}
               id="waveformDiv"
             >
-              <WaveSurfer onMount={handleWSMount} plugins={[]} container="#waveformDiv" height={50} waveColor="#484848" progressColor="#e15759" barHeight={0} cursorColor="rgba(0, 0, 0, 0)">
+
+              <WaveSurfer backend="MediaElement" onMount={handleWSMount} plugins={[]} container="#waveformDiv" height={50} waveColor="#484848" progressColor="cornflowerblue" barHeight={0} cursorColor="rgba(0, 0, 0, 0)">
                 <WaveForm id="waveform" height={50} />
               </WaveSurfer>
-              {waveSurferLoading ? <Loader /> : null}
             </Box>
           ) : null}
 
@@ -416,7 +440,7 @@ export function AudioProvenanceVis({
         {xScale ? (
           <Timer
             duration={totalAudioLength * 1000}
-            initialTime={startTime + jumpedToAudioTime * 1000 + 1}
+            initialTime={jumpedToAudioTime ? startTime + jumpedToAudioTime * 1000 + 1 : replayTimestamp ? startTime + replayTimestamp : undefined}
             height={(analysisHasAudio ? 50 : 0) + 25}
             isPlaying={analysisIsPlaying}
             speed={speed}

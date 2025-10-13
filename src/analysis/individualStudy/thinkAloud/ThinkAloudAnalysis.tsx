@@ -74,6 +74,8 @@ export function ThinkAloudAnalysis({ visibleParticipants } : {visibleParticipant
   const { value: participant } = useAsync(getParticipantData, [participantId, storageEngine]);
   const { studyId } = useParams();
 
+  const [hasAudio, setHasAudio] = useState<boolean>();
+
   const [ref, { width }] = useResizeObserver();
 
   const [editedTranscript, _setEditedTranscript] = useState<EditedText[]>([]);
@@ -153,7 +155,7 @@ export function ThinkAloudAnalysis({ visibleParticipants } : {visibleParticipant
         annotation: '',
       })));
     }
-  }, [storageEngine, studyId, participantId, currentTrial, setEditedTranscript, setCurrentShownTranscription, onlineTranscriptList, transcriptStatus, editedTranscript, rawTranscript, rawTranscriptStatus]);
+  }, [auth.user.user?.email, currentTrial, onlineTranscriptList, participantId, rawTranscript, rawTranscriptStatus, setEditedTranscript, storageEngine, transcriptStatus]);
 
   const changeLine = useCallback((focusedLine: number) => {
     const currentLine = editedTranscript[focusedLine].transcriptMappingStart;
@@ -161,18 +163,24 @@ export function ThinkAloudAnalysis({ visibleParticipants } : {visibleParticipant
     setJumpedToLine(currentLine);
   }, [editedTranscript]);
 
+  // If we change task or participant, jump back to 0
+  useEffect(() => {
+    setJumpedToLine(0);
+  }, [participantId, currentTrial]);
+
   return (
     <Group wrap="nowrap" gap={25}>
       <Stack ref={ref} style={{ width: '100%' }} gap={10}>
 
-        {!participantId || !currentTrial ? <Center><Text c="dimmed" size="24">Select a Participant and Trial to Analyze</Text></Center> : (
+        {!participantId || !currentTrial ? <Center><Text c="dimmed" size="24">Select a Participant and Trial to Analyze</Text></Center>
+          : !hasAudio || (rawTranscriptStatus === 'success' && rawTranscript === null) ? <Center><Text c="dimmed" size="24">No transcripts found for this task</Text></Center> : (
 
-          <Stack>
-            <TextEditor onClickLine={changeLine} transcriptList={editedTranscript} setTranscriptList={setEditedTranscript} currentShownTranscription={currentShownTranscription} />
-          </Stack>
-        )}
+            <Stack>
+              <TextEditor onClickLine={changeLine} transcriptList={editedTranscript} setTranscriptList={setEditedTranscript} currentShownTranscription={currentShownTranscription} />
+            </Stack>
+          )}
 
-        <ThinkAloudFooter studyId={studyId || ''} jumpedToLine={jumpedToLine} editedTranscript={editedTranscript} currentTrial={currentTrial} isReplay={false} visibleParticipants={visibleParticipants.map((v) => v.participantId)} rawTranscript={rawTranscript} onTimeUpdate={onTimeUpdate} currentShownTranscription={currentShownTranscription} width={width} />
+        <ThinkAloudFooter setHasAudio={setHasAudio} studyId={studyId || ''} jumpedToLine={jumpedToLine} editedTranscript={editedTranscript} currentTrial={currentTrial} isReplay={false} visibleParticipants={visibleParticipants.map((v) => v.participantId)} rawTranscript={rawTranscript} onTimeUpdate={onTimeUpdate} currentShownTranscription={currentShownTranscription} width={width} />
       </Stack>
 
     </Group>
