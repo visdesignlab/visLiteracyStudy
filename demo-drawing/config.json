@@ -61,22 +61,19 @@
       "type": "markdown",
       "recordAudio": false,
       "path": "demo-drawing/assets/critiqueIntro.md",
-      "response": [
-      ]
+      "response": []
     },
     "vlatIntro": {
       "type": "markdown",
       "recordAudio": false,
       "path": "demo-drawing/assets/vlatIntro.md",
-      "response": [
-      ]
+      "response": []
     },
     "drawingIntro": {
       "type": "markdown",
       "recordAudio": false,
       "path": "demo-drawing/assets/drawingIntro.md",
-      "response": [
-      ]
+      "response": []
     },
     "critiqueFollowup": {
       "type": "image",
@@ -355,7 +352,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a list of authors, how many papers each author has published, and how many papers author pairs have published together. \n\n ![demo](assets/drawingTasks/networkTask.png) \n\n  Sketch a visualization which shows each author and their paper counts, as well as the collabortion and collaboration counts between authors. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending around 7 minutes on this task.",
+      "instruction": "Below is a list of authors, how many papers each author has published, and how many papers author pairs have published together. \n\n ![demo](demo-drawing/assets/drawingTasks/networkTask.png) \n\n  Sketch a visualization which shows each author and their paper counts, as well as the collabortion and collaboration counts between authors. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending around 7 minutes on this task.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "showTimer": true,
       "response": [
@@ -393,7 +390,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a table showing rainfall in inches compared to the historical average from that month for various states. \n\n ![demo](assets/drawingTasks/rainfallTask.png) \n\n Sketch a visualization showing the change in rainfall from an average year for each state. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending around 7 minutes on this task.",
+      "instruction": "Below is a table showing rainfall in inches compared to the historical average from that month for various states. \n\n ![demo](demo-drawing/assets/drawingTasks/rainfallTask.png) \n\n Sketch a visualization showing the change in rainfall from an average year for each state. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending around 7 minutes on this task.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "showTimer": true,
       "response": [
@@ -412,7 +409,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a table showing the rankings of bundesliga football teams across the first seven weeks of the season. \n\n ![demo](assets/drawingTasks/rankingTask.png) \n\n Sketch a visualization showing the teams rankings over time. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending around 7 minutes on this task.",
+      "instruction": "Below is a table showing the rankings of bundesliga football teams across the first seven weeks of the season. \n\n ![demo](demo-drawing/assets/drawingTasks/rankingTask.png) \n\n Sketch a visualization showing the teams rankings over time. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending around 7 minutes on this task.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "showTimer": true,
       "response": [
@@ -432,7 +429,7 @@
       "nextButtonLocation": "sidebar",
       "showTimer": true,
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a small table showing the 100m sprint times and long jump distance of five athletes. \n\n ![demo](assets/drawingTasks/100mTask.png) \n\n Sketch a visualization representing this data. \n\n  While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending around 7 minutes on this task.",
+      "instruction": "Below is a small table showing the 100m sprint times and long jump distance of five athletes. \n\n ![demo](demo-drawing/assets/drawingTasks/100mTask.png) \n\n Sketch a visualization representing this data. \n\n  While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending around 7 minutes on this task.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "response": [
         {
@@ -479,7 +476,11 @@
           "type": "checkbox",
           "required": true,
           "prompt": "How did you draw your visualizations?",
-          "options": ["Drawing tool (e.g. Apple Pencil)", "Finger", "Mouse or trackpad"]
+          "options": [
+            "Drawing tool (e.g. Apple Pencil)",
+            "Finger",
+            "Mouse or trackpad"
+          ]
         }
       ]
     }
