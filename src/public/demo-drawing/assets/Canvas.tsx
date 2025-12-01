@@ -21,7 +21,7 @@ import {
 import throttle from 'lodash.throttle';
 import { useResizeObserver } from '@mantine/hooks';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { isRootNode, isStateNode, StateNode } from '@trrack/core';
+import { isRootNode, isStateNode } from '@trrack/core';
 import { StimulusParams } from '../../../store/types';
 import { Registry } from './trrack-alpha/core/src/registry/reg';
 import { initializeTrrack } from './trrack-alpha/core/src/provenance/trrack';
@@ -139,7 +139,6 @@ export default function Canvas({
   }, 50), [actions, trrack]);
 
   const handleMouseDown = (e: KonvaEventObject<MouseEvent, unknown>) => {
-    console.log('down');
     if (!e.target || !e.target.getStage()) return;
 
     isDrawing.current = true;
@@ -150,7 +149,6 @@ export default function Canvas({
   };
 
   const handleMouseMove = (e: KonvaEventObject<TouchEvent, unknown> | KonvaEventObject<PointerEvent, unknown>) => {
-    console.log('move');
     // no drawing - skipping
     if (tool === 'eraser') {
       const pos = e.target.getStage()!.getPointerPosition()!;
@@ -178,7 +176,6 @@ export default function Canvas({
   };
 
   const handleMouseUp = () => {
-    console.log('up');
     isDrawing.current = false;
     trrack.apply('draw end', actions.drawEnd(structuredClone(lines).concat()), { isEphemeral: false, makeCheckpoint: false });
 
