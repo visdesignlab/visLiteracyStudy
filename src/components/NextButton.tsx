@@ -14,7 +14,7 @@ import { PreviousButton } from './PreviousButton';
 type Props = {
   label?: string;
   disabled?: boolean;
-  configInUse?: IndividualComponent;
+  config?: IndividualComponent;
   location?: ResponseBlockLocation;
   checkAnswer: JSX.Element | null;
 };
@@ -30,7 +30,7 @@ function formatTime(n: number): string | JSX.Element {
 export function NextButton({
   label = 'Next',
   disabled = false,
-  configInUse,
+  config,
   location,
   checkAnswer,
 }: Props) {
@@ -38,8 +38,8 @@ export function NextButton({
   const studyConfig = useStudyConfig();
   const navigate = useNavigate();
 
-  const nextButtonDisableTime = useMemo(() => configInUse?.nextButtonDisableTime ?? studyConfig.uiConfig.nextButtonDisableTime, [configInUse, studyConfig]);
-  const nextButtonEnableTime = useMemo(() => configInUse?.nextButtonEnableTime ?? studyConfig.uiConfig.nextButtonEnableTime ?? 0, [configInUse, studyConfig]);
+  const nextButtonDisableTime = useMemo(() => config?.nextButtonDisableTime ?? studyConfig.uiConfig.nextButtonDisableTime, [config, studyConfig]);
+  const nextButtonEnableTime = useMemo(() => config?.nextButtonEnableTime ?? studyConfig.uiConfig.nextButtonEnableTime ?? 0, [config, studyConfig]);
 
   const [timer, setTimer] = useState<number | undefined>(undefined);
   // Start a timer on first render, update timer every 100ms
@@ -69,9 +69,9 @@ export function NextButton({
     [nextButtonDisableTime, nextButtonEnableTime, timer],
   );
 
-  const nextOnEnter = useMemo(() => configInUse?.nextOnEnter ?? studyConfig.uiConfig.nextOnEnter, [configInUse, studyConfig]);
+  const nextOnEnter = useMemo(() => config?.nextOnEnter ?? studyConfig.uiConfig.nextOnEnter, [config, studyConfig]);
 
-  const isTabletSatisified = useMemo(() => (configInUse?.forceTouchScreen ? navigator.maxTouchPoints > 0 : true), [configInUse?.forceTouchScreen]);
+  const isTabletSatisified = useMemo(() => (config?.forceTouchScreen ? navigator.maxTouchPoints > 0 : true), [config?.forceTouchScreen]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -89,23 +89,23 @@ export function NextButton({
     return () => {};
   }, [disabled, isNextDisabled, buttonTimerSatisfied, goToNextStep, nextOnEnter, isTabletSatisified]);
 
-  const nextButtonDisabled = useMemo(() => !isTabletSatisified || disabled || isNextDisabled || !buttonTimerSatisfied, [isTabletSatisified, disabled, isNextDisabled, buttonTimerSatisfied]);
-  const previousButtonText = useMemo(() => configInUse?.previousButtonText ?? studyConfig.uiConfig.previousButtonText ?? 'Previous', [configInUse, studyConfig]);
+  const nextButtonDisabled = useMemo(() => disabled || isNextDisabled || !buttonTimerSatisfied, [disabled, isNextDisabled, buttonTimerSatisfied]);
+  const previousButtonText = useMemo(() => config?.previousButtonText ?? studyConfig.uiConfig.previousButtonText ?? 'Previous', [config, studyConfig]);
 
   return (
     <>
-      <Group justify="right" gap="xs">
+      <Group justify="right" gap="xs" mt="sm">
         {!isTabletSatisified ? (
           <Alert mt="md" title="Tablet required" color="blue" icon={<IconInfoCircle />}>
             This study requires you be on a tablet or have a touchscreen monitor. Please switch to a device with a touchscreen to continue.
           </Alert>
         ) : null }
-        {configInUse?.showTimer && timer && (
+        {config?.showTimer && timer && (
         <Text c="dimmed">
           {formatTime(timer)}
         </Text>
         )}
-        {configInUse?.previousButton && (
+        {config?.previousButton && (
           <PreviousButton
             label={previousButtonText}
             px={location === 'sidebar' && checkAnswer ? 8 : undefined}
@@ -132,12 +132,12 @@ export function NextButton({
               seconds.
             </Alert>
           )}
-          {nextButtonDisableTime && timer && (nextButtonDisableTime - timer) < (configInUse?.timeoutStartLimit ?? 10000) && (
+          {nextButtonDisableTime && timer && (nextButtonDisableTime - timer) < (config?.timeoutStartLimit ?? 10000) && (
             (nextButtonDisableTime - timer) > 0
               ? (
                 <Alert mt="md" title="Next button disables soon" color="yellow" icon={<IconAlertTriangle />}>
                   {
-                    configInUse?.timeoutMessage ?? `The next button disables in ${Math.ceil((nextButtonDisableTime - timer) / 1000)} seconds.`
+                    config?.timeoutMessage ?? `The next button disables in ${Math.ceil((nextButtonDisableTime - timer) / 1000)} seconds.`
                   }
 
                 </Alert>

@@ -1,6 +1,4 @@
-import {
-  AppShell, Text,
-} from '@mantine/core';
+import { Box, Text } from '@mantine/core';
 import { useEffect, useMemo, useState } from 'react';
 import { ReactMarkdownWrapper } from '../ReactMarkdownWrapper';
 import { useStudyConfig } from '../../store/hooks/useStudyConfig';
@@ -11,7 +9,7 @@ import { studyComponentToIndividualComponent } from '../../utils/handleComponent
 import { getStaticAssetByPath } from '../../utils/getStaticAsset';
 import { PREFIX } from '../../utils/Prefix';
 
-export function AppNavBar() {
+export function AppNavBar({ width, top, sidebarOpen }: { width: number, top: number, sidebarOpen: boolean }) {
   // Get the config for the current step
   const studyConfig = useStudyConfig();
   const currentComponent = useCurrentComponent();
@@ -26,8 +24,6 @@ export function AppNavBar() {
   }, [stepConfig, studyConfig]);
 
   const status = useStoredAnswer();
-  const trialHasSideBar = currentConfig?.withSidebar ?? studyConfig.uiConfig.withSidebar;
-  const trialHasSideBarResponses = true;
 
   const [importedInstructions, setImportedInstructions] = useState<string | null>(null);
 
@@ -50,10 +46,10 @@ export function AppNavBar() {
   const instructionLocation = useMemo(() => currentConfig?.instructionLocation ?? studyConfig.uiConfig.instructionLocation ?? 'sidebar', [currentConfig, studyConfig]);
   const instructionInSideBar = instructionLocation === 'sidebar';
 
-  return trialHasSideBar && currentConfig ? (
-    <AppShell.Navbar className="sidebar" bg="gray.1" display="block" style={{ zIndex: 0, overflowY: 'scroll' }}>
+  return currentConfig ? (
+    <Box className="sidebar" bg="gray.1" display={sidebarOpen ? 'block' : 'none'} style={{ zIndex: 0, marginTop: top, position: 'relative' }} w={width} miw={width}>
       {instructionInSideBar && instruction !== '' && (
-        <AppShell.Section
+        <Box
           bg="gray.3"
           p="md"
         >
@@ -61,29 +57,17 @@ export function AppNavBar() {
             Task:
           </Text>
           <ReactMarkdownWrapper text={instruction} />
-        </AppShell.Section>
+        </Box>
       )}
 
-      {trialHasSideBarResponses && (
-        <AppShell.Section p="md">
-          <ResponseBlock
-            key={`${currentComponent}-sidebar-response-block`}
-            status={status}
-            config={currentConfig}
-            location="sidebar"
-          />
-        </AppShell.Section>
-      )}
-    </AppShell.Navbar>
-  ) : (
-    <AppShell.Navbar bg="gray.1" display="block" style={{ zIndex: 0, overflowY: 'scroll' }}>
-      <ResponseBlock
-        key={`${currentComponent}-sidebar-response-block`}
-        status={status}
-        config={currentConfig}
-        location="sidebar"
-        style={{ display: 'hidden' }}
-      />
-    </AppShell.Navbar>
-  );
+      <Box p="md">
+        <ResponseBlock
+          key={`${currentComponent}-sidebar-response-block`}
+          status={status}
+          config={currentConfig}
+          location="sidebar"
+        />
+      </Box>
+    </Box>
+  ) : null;
 }

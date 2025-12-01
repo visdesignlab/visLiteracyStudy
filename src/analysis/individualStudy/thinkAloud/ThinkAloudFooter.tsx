@@ -12,22 +12,23 @@ import {
 import * as d3 from 'd3';
 
 import {
-  IconArrowLeft, IconArrowRight, IconInfoCircle, IconPlayerPauseFilled, IconPlayerPlayFilled,
+  IconArrowLeft, IconArrowRight, IconDeviceDesktopDown, IconInfoCircle, IconMusicDown, IconPlayerPauseFilled, IconPlayerPlayFilled, IconRestore,
 } from '@tabler/icons-react';
 import { useAsync } from '../../../store/hooks/useAsync';
-import { useStorageEngine } from '../../../storage/storageEngineHooks';
 import { useAuth } from '../../../store/hooks/useAuth';
 import {
-  EditedText, Tag, TranscribedAudio, TranscriptLinesWithTimes,
+  EditedText, ParticipantTags, Tag, TranscribedAudio, TranscriptLinesWithTimes,
 } from './types';
 import { AudioProvenanceVis } from '../../../components/audioAnalysis/AudioProvenanceVis';
-import { StorageEngine } from '../../../storage/engines/types';
-import { TranscriptLines } from './TextEditorComponents/TranscriptLines';
-import { TagSelector } from './TextEditorComponents/TagSelector';
+import { TranscriptSegmentsVis } from './TranscriptSegmentsVis';
+import { TagSelector } from './tags/TagSelector';
 import { getSequenceFlatMap } from '../../../utils/getSequenceFlatMap';
 import { encryptIndex } from '../../../utils/encryptDecryptIndex';
 import { PREFIX } from '../../../utils/Prefix';
 import { handleTaskAudio, handleTaskScreenRecording } from '../../../utils/handleDownloadAudio';
+import { ParticipantRejectModal } from '../ParticipantRejectModal';
+import { StorageEngine } from '../../../storage/engines/types';
+import { useReplayContext } from '../../../store/hooks/useReplay';
 
 const margin = {
   left: 5, top: 0, right: 5, bottom: 0,
@@ -41,9 +42,9 @@ function getParticipantData(trrackId: string | undefined, storageEngine: Storage
   return null;
 }
 
-async function getParticipantTags(authEmail: string, trrackId: string | undefined, task: string, storageEngine: StorageEngine | undefined) {
+async function getParticipantTags(authEmail: string, trrackId: string | undefined, studyId: string, storageEngine: StorageEngine | undefined) {
   if (storageEngine && trrackId) {
-    return (await storageEngine.getAllParticipantAndTaskTags(authEmail, trrackId, task));
+    return (await storageEngine.getAllParticipantAndTaskTags(authEmail, trrackId));
   }
 
   return null;
@@ -62,13 +63,11 @@ async function getTags(storageEngine: StorageEngine | undefined, type: 'particip
 }
 
 export function ThinkAloudFooter({
-  visibleParticipants, rawTranscript, currentShownTranscription, width, onTimeUpdate, isReplay, editedTranscript, currentTrial, saveProvenance, jumpedToLine = 0, studyId, setHasAudio,
-} : {visibleParticipants: string[], rawTranscript: TranscribedAudio | null, currentShownTranscription: number | null, width: number, onTimeUpdate: (n: number) => void, isReplay: boolean, editedTranscript?: EditedText[], currentTrial: string, saveProvenance?: (prov: unknown) => void, jumpedToLine?: number, studyId: string, setHasAudio: (b: boolean) => void}) {
-  const { storageEngine } = useStorageEngine();
-
+  visibleParticipants, rawTranscript, currentShownTranscription, width, onTimeUpdate, isReplay, editedTranscript, currentTrial, saveProvenance, jumpedToLine = 0, studyId, setHasAudio, storageEngine,
+} : {
+  visibleParticipants: string[], rawTranscript: TranscribedAudio | null, currentShownTranscription: number | null, width: number, onTimeUpdate: (n: number) => void, isReplay: boolean, editedTranscript?: EditedText[], currentTrial: string, saveProvenance: (prov: unknown) => void, jumpedToLine?: number, studyId: string, setHasAudio: (b: boolean) => void, storageEngine: StorageEngine | undefined,
+}) {
   const auth = useAuth();
-
-  const [speed, setSpeed] = useState<number>(1);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -78,9 +77,11 @@ export function ThinkAloudFooter({
 
   const { value: taskTags, execute: pullTags } = useAsync(getTags, [storageEngine, 'task']);
 
-  const { value: allPartTags, execute: pullAllPartTags } = useAsync(getTags, [storageEngine, 'participant']);
-  const [analysisIsPlaying, _setAnalysisIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const { value: allParticipantTags, execute: pullAllParticipantTags } = useAsync(getTags, [storageEngine, 'participant']);
+
+  const {
+    isPlaying, setIsPlaying, speed, setSpeed, setSeekTime, hasEnded,
+  } = useReplayContext();
 
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [screenRecordingUrl, setScreenRecordingUrl] = useState<string | null>(null);
@@ -136,31 +137,25 @@ export function ThinkAloudFooter({
     });
   }, [storageEngine, participantId, currentTrial, screenRecordingUrl]);
 
-  const setAnalysisIsPlaying = useCallback((playing: boolean) => {
-    localStorage.setItem('analysisIsPlaying', playing ? 'true' : 'false');
-    if (!playing) {
-      setIsMuted(true);
-    }
-    _setAnalysisIsPlaying(playing);
-  }, []);
-
   const [transcriptLines, setTranscriptLines] = useState<TranscriptLinesWithTimes[] | null>(null);
 
-  const { value: partTags, execute: pullPartTags } = useAsync(getParticipantTags, [auth.user.user?.email || 'temp', participantId, currentTrial, storageEngine]);
+  const { value: participantTags, execute: pullParticipantTags } = useAsync(getParticipantTags, [auth.user.user?.email || 'temp', participantId, studyId, storageEngine]);
 
-  // shouldnt this not work? I thought we needed to do something smarter because of dynamic stuff
+  const [localParticipantTags, setLocalParticipantTags] = useState<ParticipantTags>();
+
+  useEffect(() => {
+    if (participantTags) {
+      setLocalParticipantTags(participantTags);
+    }
+  }, [participantTags]);
+
   const currentTrialClean = useMemo(() => {
-    const split = currentTrial.split('_');
-    const joinExceptLast = split.slice(0, split.length - 1).join('_');
-
     // if we find ourselves with a wrong current trial, erase it
     if (participant && !participant.answers[currentTrial]) {
-      // still dont know why this isnt in the type
-      // @ts-ignore
-      setSearchParams({ participantId, currentTrial: Object.values(participant.answers).find((ans) => +ans.trialOrder.split('_')[0] === 0)?.identifier });
+      setSearchParams({ participantId, currentTrial: Object.entries(participant.answers).find(([_, ans]) => +ans.trialOrder.split('_')[0] === 0)?.[0] || '' });
     }
 
-    return joinExceptLast;
+    return participant ? participant.answers[currentTrial].componentName : '';
   }, [currentTrial, participant, participantId, setSearchParams]);
 
   const xScale = useMemo(() => {
@@ -236,9 +231,9 @@ export function ThinkAloudFooter({
 
   const setTags = useCallback((_tags: Tag[], type: 'task' | 'participant') => {
     if (storageEngine) {
-      storageEngine.saveTags(_tags, type).then(() => { type === 'task' ? pullTags(storageEngine, type) : pullAllPartTags(storageEngine, type); });
+      storageEngine.saveTags(_tags, type).then(() => { type === 'task' ? pullTags(storageEngine, type) : pullAllParticipantTags(storageEngine, type); });
     }
-  }, [pullAllPartTags, pullTags, storageEngine]);
+  }, [pullAllParticipantTags, pullTags, storageEngine]);
 
   const editTaskTagCallback = useCallback((oldTag: Tag, newTag: Tag) => {
     if (!taskTags) {
@@ -253,22 +248,25 @@ export function ThinkAloudFooter({
   }, [setTags, taskTags]);
 
   const editParticipantTagCallback = useCallback((oldTag: Tag, newTag: Tag) => {
-    if (!allPartTags) {
+    if (!allParticipantTags) {
       return;
     }
 
-    const tagIndex = allPartTags.findIndex((t) => t.id === oldTag.id);
-    const tagsCopy = Array.from(allPartTags);
+    const tagIndex = allParticipantTags.findIndex((t) => t.id === oldTag.id);
+    const tagsCopy = Array.from(allParticipantTags);
     tagsCopy[tagIndex] = newTag;
 
     setTags(tagsCopy, 'participant');
-  }, [setTags, allPartTags]);
+  }, [setTags, allParticipantTags]);
 
   const createTaskTagCallback = useCallback((t: Tag) => { setTags([...(taskTags || []), t], 'task'); }, [setTags, taskTags]);
 
   const createParticipantTagCallback = useCallback((t: Tag) => { setTags([...(taskTags || []), t], 'participant'); }, [setTags, taskTags]);
 
-  const jumpedToTime = useMemo(() => (transcriptLines ? transcriptLines[jumpedToLine]?.start || 0 : 0), [jumpedToLine, transcriptLines]);
+  useEffect(() => {
+    const t = transcriptLines ? transcriptLines[jumpedToLine]?.start || 0 : 0;
+    setSeekTime(t + 0.001);
+  }, [jumpedToLine, transcriptLines, setSeekTime]);
 
   const [timeString, setTimeString] = useState<string>('');
 
@@ -276,16 +274,16 @@ export function ThinkAloudFooter({
     <AppShell.Footer zIndex={101} withBorder={false}>
       <Stack style={{ backgroundColor: 'var(--mantine-color-blue-1)', height: '100%' }} gap={5} justify="center">
 
-        <AudioProvenanceVis isMuted={isMuted} setHasAudio={setHasAudio} jumpedToAudioTime={jumpedToTime} speed={speed} setSpeed={setSpeed} saveProvenance={saveProvenance} analysisIsPlaying={analysisIsPlaying} setAnalysisIsPlaying={setAnalysisIsPlaying} setTime={onTimeUpdate} setTimeString={(_t) => setTimeString(_t)} answers={participant ? participant.answers : {}} taskName={currentTrial} context={isReplay ? 'provenanceVis' : 'audioAnalysis'} />
-        {xScale && transcriptLines ? <TranscriptLines startTime={xScale.domain()[0]} xScale={xScale} transcriptLines={transcriptLines} currentShownTranscription={currentShownTranscription || 0} /> : null }
+        <AudioProvenanceVis setHasAudio={setHasAudio} saveProvenance={saveProvenance} setTime={onTimeUpdate} setTimeString={(_t) => setTimeString(_t)} answers={participant ? participant.answers : {}} taskName={currentTrial} context={isReplay ? 'provenanceVis' : 'audioAnalysis'} />
+        {xScale && transcriptLines ? <TranscriptSegmentsVis startTime={xScale.domain()[0]} xScale={xScale} transcriptLines={transcriptLines} currentShownTranscription={currentShownTranscription || 0} /> : null }
 
         <Group gap="xs" style={{ width: '100%' }} justify="center" wrap="nowrap">
           <Group wrap="nowrap">
             <Text ff="monospace" style={{ textAlign: 'right' }} mt="lg" c="dimmed">{timeString}</Text>
 
-            <Tooltip label="Play">
-              <ActionIcon mt={25} size="xl" variant="light" onClick={() => { setAnalysisIsPlaying(!analysisIsPlaying); setIsMuted(!isMuted); }}>
-                {analysisIsPlaying ? <IconPlayerPauseFilled /> : <IconPlayerPlayFilled /> }
+            <Tooltip label={hasEnded ? 'Restart' : isPlaying ? 'Pause' : 'Play'}>
+              <ActionIcon mt={25} size="xl" variant="light" onClick={() => { setIsPlaying(!isPlaying); }}>
+                {hasEnded ? <IconRestore /> : isPlaying ? <IconPlayerPauseFilled /> : <IconPlayerPlayFilled /> }
               </ActionIcon>
             </Tooltip>
 
@@ -338,38 +336,45 @@ export function ThinkAloudFooter({
                 </Tooltip>
                   )}
               label="Participant Id"
-              style={{ width: '250px' }}
+              style={{ width: '200px' }}
               value={participantId}
               onChange={(e: string | null) => {
                 setSearchParams({ currentTrial, participantId: e || '' });
                 localStorage.setItem('participantId', e || '');
               }}
-              data={visibleParticipants.map((part) => part)}
+              data={visibleParticipants.map((part) => part).sort()}
+              searchable
             />
 
             <Stack gap="4">
-              <Text size="sm" fw={500}>Participant Tags</Text>
+              <Group gap="xs" align="center">
+                <Text size="sm" fw={500}>Participant Tags</Text>
+                <Tooltip w={300} multiline label="Participant tags allow you to categorize or label the participant. Click in the box to add, create, or edit tags.">
+                  <IconInfoCircle size={16} />
+                </Tooltip>
+              </Group>
               <TagSelector
                 width={200}
-                tags={allPartTags || []}
+                tags={allParticipantTags || []}
                 editTagCallback={editParticipantTagCallback}
                 createTagCallback={createParticipantTagCallback}
                 tagsEmptyText="Add Participant Tags"
                 onSelectTags={(tempTags) => {
-                  if (storageEngine && partTags) {
-                    let copy = structuredClone(partTags);
+                  if (storageEngine && participantTags) {
+                    let copy = structuredClone(participantTags);
                     if (copy) {
-                      copy.partTags = tempTags;
+                      copy.participantTags = tempTags;
                     } else {
-                      copy = { partTags: [], taskTags: {} };
-                      copy.partTags = tempTags;
+                      copy = { participantTags: [], taskTags: {} };
+                      copy.participantTags = tempTags;
                     }
-                    storageEngine.saveAllParticipantAndTaskTags(auth.user.user?.email || 'temp', participantId, currentTrial, copy).then(() => {
-                      pullPartTags(auth.user.user?.email || 'temp', participantId, currentTrial, storageEngine);
+                    setLocalParticipantTags(copy);
+                    storageEngine.saveAllParticipantAndTaskTags(auth.user.user?.email || 'temp', participantId, copy).then(() => {
+                      pullParticipantTags(auth.user.user?.email || 'temp', participantId, studyId, storageEngine);
                     });
                   }
                 }}
-                selectedTags={partTags ? partTags.partTags : []}
+                selectedTags={localParticipantTags ? localParticipantTags.participantTags : []}
               />
             </Stack>
 
@@ -389,7 +394,7 @@ export function ThinkAloudFooter({
                 </Tooltip>
                   )}
               label="Task"
-              style={{ width: '250px' }}
+              style={{ width: '200px' }}
               value={currentTrialClean}
             // this needs to be in a helper or two which we dont currently have
               onChange={(e: string | null) => {
@@ -401,6 +406,7 @@ export function ThinkAloudFooter({
                 }
               }}
               data={participant ? getSequenceFlatMap(participant?.sequence) : []}
+              searchable
             />
             <Stack gap="4">
               <Group gap="xs" align="center">
@@ -416,28 +422,30 @@ export function ThinkAloudFooter({
                 createTagCallback={createTaskTagCallback}
                 tagsEmptyText="Add Task Tags"
                 onSelectTags={(tempTag) => {
-                  if (storageEngine && partTags) {
-                    let copy = structuredClone(partTags);
+                  if (storageEngine && participantTags) {
+                    let copy = structuredClone(participantTags);
                     if (copy) {
                       copy.taskTags[currentTrial] = tempTag;
                     } else {
-                      copy = { partTags: [], taskTags: {} };
+                      copy = { participantTags: [], taskTags: {} };
                       copy.taskTags[currentTrial] = tempTag;
                     }
-                    storageEngine.saveAllParticipantAndTaskTags(auth.user.user?.email || 'temp', participantId, currentTrial, copy).then(() => {
-                      pullPartTags(auth.user.user?.email || 'temp', participantId, currentTrial, storageEngine);
+                    setLocalParticipantTags(copy);
+
+                    storageEngine.saveAllParticipantAndTaskTags(auth.user.user?.email || 'temp', participantId, copy).then(() => {
+                      pullParticipantTags(auth.user.user?.email || 'temp', participantId, studyId, storageEngine);
                     });
                   }
                 }}
-                selectedTags={partTags ? partTags.taskTags[currentTrial] || [] : []}
+                selectedTags={localParticipantTags ? localParticipantTags.taskTags[currentTrial] || [] : []}
               />
             </Stack>
 
           </Group>
           <Button mt="lg" variant="light" component="a" href={isReplay ? `${PREFIX}analysis/stats/${studyId}/tagging?participantId=${participantId}&currentTrial=${currentTrial}` : `${PREFIX}${studyId}/${encryptIndex(participant ? +(participant.answers[currentTrial]?.trialOrder.split('_')[0] || 0) : 0)}?participantId=${participantId}&currentTrial=${currentTrial}`} target="_blank">
-            {isReplay ? 'Open Transcript' : 'Open Replay'}
+            {isReplay ? 'Transcript' : 'Replay'}
           </Button>
-          {/* <Group mt="lg">
+          <Group mt="lg">
             {audioUrl && (
             <Tooltip label="Download audio">
               <ActionIcon variant="light" size={30} onClick={handleDownloadAudio}>
@@ -452,8 +460,8 @@ export function ThinkAloudFooter({
               </ActionIcon>
             </Tooltip>
             )}
-            <ParticipantRejectModal selectedParticipants={[]} />
-          </Group> */}
+            <ParticipantRejectModal selectedParticipants={[]} footer />
+          </Group>
         </Group>
       </Stack>
     </AppShell.Footer>

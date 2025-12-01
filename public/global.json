@@ -1,8 +1,6 @@
 {
-  "$schema": "https://raw.githubusercontent.com/revisit-studies/study/v2.2.0/src/parser/GlobalConfigSchema.json",
-  "configsList": [
-    "demo-drawing"
-  ],
+  "$schema": "https://raw.githubusercontent.com/revisit-studies/study/v2.3.2/src/parser/GlobalConfigSchema.json",
+  "configsList": ["demo-drawing"],
   "configs": {
     "demo-drawing": {
       "path": "demo-drawing/config.json"

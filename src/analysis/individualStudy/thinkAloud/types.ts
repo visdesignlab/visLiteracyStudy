@@ -1,4 +1,4 @@
-export interface TranscribedAudioSnippet {
+interface TranscribedAudioSnippet {
     alternatives: {confidence: number, transcript: string}[]
     languageCode: string;
     resultEndTime: string | number;
@@ -15,13 +15,8 @@ export interface Tag {
 }
 
 export interface ParticipantTags {
-    partTags: Tag[],
+    participantTags: Tag[],
     taskTags: Record<string, Tag[]>
-}
-
-export interface StoredParticipantTags {
-    partTags: string[],
-    taskTags: Record<string, string[]>
 }
 
 export interface EditedText {

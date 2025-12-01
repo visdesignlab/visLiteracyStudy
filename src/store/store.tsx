@@ -23,6 +23,7 @@ export async function studyStoreCreator(
   modes: Record<REVISIT_MODE, boolean>,
   participantId: string,
   completed: boolean,
+  storageEngineFailedToConnect: boolean,
 ) {
   const flatSequence = getSequenceFlatMap(sequence);
 
@@ -39,6 +40,7 @@ export async function studyStoreCreator(
         `${id}_${idx}`,
         {
           answer: {},
+          identifier: `${id}_${idx}`,
           trialOrder: `${idx}`,
           componentName: id,
           incorrectAnswers: {},
@@ -109,7 +111,7 @@ export async function studyStoreCreator(
     config,
     showStudyBrowser: true,
     showHelpText: false,
-    alertModal: { show: false, message: '' },
+    alertModal: { show: false, message: '', title: '' },
     trialValidation: Object.keys(answers).length > 0 ? allValid : emptyValidation,
     reactiveAnswers: {},
     metadata,
@@ -119,7 +121,6 @@ export async function studyStoreCreator(
       stimulus: undefined,
       sidebar: undefined,
     },
-    analysisPlaybackTrial: '',
     analysisIsPlaying: false,
     analysisHasAudio: false,
     analysisHasScreenRecording: false,
@@ -133,6 +134,7 @@ export async function studyStoreCreator(
     funcSequence: {},
     completed,
     clickedPrevious: false,
+    storageEngineFailedToConnect,
   };
 
   const storeSlice = createSlice({
@@ -162,6 +164,7 @@ export async function studyStoreCreator(
         state.funcSequence[payload.funcName].push(payload.component);
         state.answers[identifier] = {
           answer: {},
+          identifier,
           incorrectAnswers: {},
           componentName: payload.component,
           trialOrder: `${payload.index}_${payload.funcIndex}`,
@@ -202,7 +205,7 @@ export async function studyStoreCreator(
       toggleShowHelpText: (state) => {
         state.showHelpText = !state.showHelpText;
       },
-      setAlertModal: (state, action: PayloadAction<{ show: boolean; message: string }>) => {
+      setAlertModal: (state, action: PayloadAction<{ show: boolean; message: string; title: string }>) => {
         state.alertModal = action.payload;
       },
       setReactiveAnswers: (state, action: PayloadAction<Record<string, ValueOf<StoredAnswer['answer']>>>) => {

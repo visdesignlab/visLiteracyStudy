@@ -1,4 +1,4 @@
-import { AppShell, Button } from '@mantine/core';
+import { AppShell, Button, Flex } from '@mantine/core';
 import { Outlet } from 'react-router';
 import {
   useEffect, useMemo, useRef,
@@ -23,6 +23,7 @@ import { ResolutionWarning } from './interface/ResolutionWarning';
 import { useFetchStylesheet } from '../utils/fetchStylesheet';
 import { ScreenRecordingContext, useScreenRecording } from '../store/hooks/useScreenRecording';
 import { ScreenRecordingRejection } from './interface/ScreenRecordingRejection';
+import { ReplayContext, useReplay } from '../store/hooks/useReplay';
 
 export function StepRenderer() {
   const windowEvents = useRef<EventType[]>([]);
@@ -43,6 +44,7 @@ export function StepRenderer() {
   const modes = useStoreSelector((state) => state.modes);
 
   const screenRecording = useScreenRecording();
+  const replay = useReplay();
 
   const { isRejected: isScreenRecordingUserRejected } = screenRecording;
 
@@ -124,54 +126,58 @@ export function StepRenderer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const { studyNavigatorEnabled, dataCollectionEnabled } = useMemo(() => modes, [modes]);
+  const { developmentModeEnabled, dataCollectionEnabled } = useMemo(() => modes, [modes]);
 
   // No default value for withSidebar since it's a required field in uiConfig
-  const sidebarOpen = useMemo(() => ((analysisHasScreenRecording && analysisCanPlayScreenRecording) ? false : (componentConfig.withSidebar ?? studyConfig.uiConfig.withSidebar)), [componentConfig, studyConfig, analysisHasScreenRecording, analysisCanPlayScreenRecording]);
+  const sidebarOpen = useMemo(() => (((analysisHasScreenRecording && analysisCanPlayScreenRecording) || currentComponent === 'end') ? false : (componentConfig.withSidebar ?? studyConfig.uiConfig.withSidebar)), [analysisHasScreenRecording, analysisCanPlayScreenRecording, currentComponent, componentConfig.withSidebar, studyConfig.uiConfig.withSidebar]);
   const sidebarWidth = useMemo(() => componentConfig?.sidebarWidth ?? studyConfig.uiConfig.sidebarWidth ?? 300, [componentConfig, studyConfig]);
   const showTitleBar = useMemo(() => componentConfig.showTitleBar ?? studyConfig.uiConfig.showTitleBar ?? true, [componentConfig, studyConfig]);
 
-  const asideOpen = useMemo(() => studyNavigatorEnabled && showStudyBrowser, [studyNavigatorEnabled, showStudyBrowser]);
+  const asideOpen = useMemo(() => developmentModeEnabled && showStudyBrowser, [developmentModeEnabled, showStudyBrowser]);
 
   const [hasAudio, setHasAudio] = useState<boolean>();
 
   return (
     <WindowEventsContext.Provider value={windowEvents}>
       <ScreenRecordingContext.Provider value={screenRecording}>
-        <AppShell
-          padding="md"
-          header={{ height: showTitleBar ? 70 : 0 }}
-          navbar={{ width: sidebarWidth, breakpoint: 'xs', collapsed: { desktop: !sidebarOpen, mobile: !sidebarOpen } }}
-          aside={{ width: 360, breakpoint: 'xs', collapsed: { desktop: !asideOpen, mobile: !asideOpen } }}
-          footer={{ height: isAnalysis ? 125 + (hasAudio ? 55 : 0) : 0 }}
-        >
-          <AppNavBar />
-          <AppAside />
-          {showTitleBar && (
-          <AppHeader studyNavigatorEnabled={studyNavigatorEnabled} dataCollectionEnabled={dataCollectionEnabled} />
-          )}
-          <ResolutionWarning />
-          {isScreenRecordingUserRejected && <ScreenRecordingRejection />}
-          <HelpModal />
-          <AlertModal />
-          <AppShell.Main className="main" style={{ display: 'flex', flexDirection: 'column' }}>
-            {!showTitleBar && !showStudyBrowser && studyNavigatorEnabled && (
-            <Button
-              variant="transparent"
-              leftSection={<IconArrowLeft size={14} />}
-              onClick={() => dispatch(toggleStudyBrowser())}
-              size="xs"
-              style={{ position: 'fixed', top: '10px', right: '10px' }}
-            >
-              Study Browser
-            </Button>
+        <ReplayContext.Provider value={replay}>
+          <AppShell
+            padding="md"
+            header={{ height: showTitleBar ? 70 : 0 }}
+            aside={{ width: 360, breakpoint: 'xs', collapsed: { desktop: !asideOpen, mobile: !asideOpen } }}
+            footer={{ height: isAnalysis ? 125 + (hasAudio ? 55 : 0) : 0 }}
+          >
+            <AppAside />
+            {showTitleBar && (
+            <AppHeader developmentModeEnabled={developmentModeEnabled} dataCollectionEnabled={dataCollectionEnabled} />
             )}
-            <Outlet />
-          </AppShell.Main>
-          {isAnalysis && (
-          <AnalysisFooter setHasAudio={setHasAudio} />
-          )}
-        </AppShell>
+            <ResolutionWarning />
+            {isScreenRecordingUserRejected && <ScreenRecordingRejection />}
+            <HelpModal />
+            <AlertModal />
+            <Flex direction="row" gap="xs">
+              <AppNavBar width={sidebarWidth} top={showTitleBar ? 70 : 0} sidebarOpen={sidebarOpen} />
+              {/* 10px is the gap between the sidebar and the main content */}
+              <AppShell.Main className="main" style={{ display: 'flex', flexDirection: 'column' }} w={sidebarOpen ? `calc(100% - ${sidebarWidth}px - 10px)` : '100%'}>
+                {!showTitleBar && !showStudyBrowser && developmentModeEnabled && (
+                <Button
+                  variant="subtle"
+                  leftSection={<IconArrowLeft size={14} />}
+                  onClick={() => dispatch(toggleStudyBrowser())}
+                  size="xs"
+                  style={{ position: 'fixed', top: '10px', right: '10px' }}
+                >
+                  Study Browser
+                </Button>
+                )}
+                <Outlet />
+              </AppShell.Main>
+            </Flex>
+            {isAnalysis && (
+            <AnalysisFooter setHasAudio={setHasAudio} key={currentComponent} />
+            )}
+          </AppShell>
+        </ReplayContext.Provider>
       </ScreenRecordingContext.Provider>
     </WindowEventsContext.Provider>
   );

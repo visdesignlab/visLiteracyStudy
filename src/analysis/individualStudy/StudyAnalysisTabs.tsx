@@ -1,5 +1,5 @@
 import {
-  Alert, AppShell, Checkbox, Container, Flex, Group, LoadingOverlay, Stack, Tabs, Text, Title,
+  Alert, AppShell, Center, Checkbox, Container, Flex, Group, LoadingOverlay, Stack, Tabs, Text, Title, MultiSelect,
 } from '@mantine/core';
 import { useNavigate, useParams } from 'react-router';
 import {
@@ -10,7 +10,7 @@ import {
   IconDashboard,
 } from '@tabler/icons-react';
 import {
-  useEffect, useMemo, useState,
+  useCallback, useEffect, useMemo, useState,
 } from 'react';
 import { useResizeObserver } from '@mantine/hooks';
 import { AppHeader } from '../interface/AppHeader';
@@ -21,7 +21,7 @@ import { SummaryView } from './summary/SummaryView';
 import { TableView } from './table/TableView';
 import { StatsView } from './stats/StatsView';
 import { useStorageEngine } from '../../storage/storageEngineHooks';
-import { ManageAccordion } from './management/ManageAccordion';
+import { ManageView } from './management/ManageView';
 import { useAuth } from '../../store/hooks/useAuth';
 import { parseStudyConfig } from '../../parser/parser';
 import { useAsync } from '../../store/hooks/useAsync';
@@ -30,6 +30,7 @@ import { DownloadButtons } from '../../components/downloader/DownloadButtons';
 import { useStudyRecordings } from '../../utils/useStudyRecordings';
 import 'mantine-react-table/styles.css';
 import { ThinkAloudAnalysis } from './thinkAloud/ThinkAloudAnalysis';
+import { FirebaseStorageEngine } from '../../storage/engines/FirebaseStorageEngine';
 
 const TABLE_HEADER_HEIGHT = 37; // Height of the tabs header
 
@@ -48,12 +49,14 @@ function sortByStartTime(a: ParticipantData, b: ParticipantData) {
   return bStartTimes[0] - aStartTimes[0];
 }
 
-function getParticipantsData(studyConfig: StudyConfig | undefined, storageEngine: StorageEngine | undefined, studyId: string | undefined) : Promise<Record<number, ParticipantData>> {
-  if (!studyConfig || !storageEngine || !studyId) return Promise.resolve([]);
+async function getParticipantsData(studyConfig: StudyConfig | undefined, storageEngine: StorageEngine | undefined, studyId: string | undefined) : Promise<Record<number, ParticipantData>> {
+  if (studyId && storageEngine) {
+    await storageEngine.initializeStudyDb(studyId);
+  }
 
-  storageEngine?.initializeStudyDb(studyId);
+  if (!studyConfig || !storageEngine || !studyId) return [];
 
-  return storageEngine.getAllParticipantsData(studyId);
+  return await storageEngine.getAllParticipantsData(studyId);
 }
 
 export function StudyAnalysisTabs({ globalConfig }: { globalConfig: GlobalConfig; }) {
@@ -61,6 +64,10 @@ export function StudyAnalysisTabs({ globalConfig }: { globalConfig: GlobalConfig
   const [studyConfig, setStudyConfig] = useState<StudyConfig | undefined>(undefined);
 
   const [includedParticipants, setIncludedParticipants] = useState<string[]>(['completed', 'inprogress', 'rejected']);
+
+  const [selectedStages, setSelectedStages] = useState<string[]>(['ALL']);
+  const [availableStages, setAvailableStages] = useState<{ value: string; label: string }[]>([{ value: 'ALL', label: 'ALL' }]);
+  const [stageColors, setStageColors] = useState<Record<string, string>>({});
   const [selectedParticipants, setSelectedParticipants] = useState<ParticipantData[]>([]);
 
   const { hasAudioRecording, hasScreenRecording } = useStudyRecordings(studyConfig);
@@ -79,12 +86,17 @@ export function StudyAnalysisTabs({ globalConfig }: { globalConfig: GlobalConfig
     if (!expData) return { completed: 0, inprogress: 0, rejected: 0 };
     const expList = Object.values(expData);
 
+    // Apply stage filter before counting
+    const stageFiltered = selectedStages.includes('ALL')
+      ? expList
+      : expList.filter((d) => selectedStages.includes(d.stage || ''));
+
     return {
-      completed: expList.filter((d) => !d.rejected && d.completed).length,
-      inprogress: expList.filter((d) => !d.rejected && !d.completed).length,
-      rejected: expList.filter((d) => d.rejected).length,
+      completed: stageFiltered.filter((d) => !d.rejected && d.completed).length,
+      inprogress: stageFiltered.filter((d) => !d.rejected && !d.completed).length,
+      rejected: stageFiltered.filter((d) => d.rejected).length,
     };
-  }, [expData]);
+  }, [expData, selectedStages]);
 
   const selectedParticipantCounts = useMemo(() => {
     if (selectedParticipants.length === 0) return { completed: 0, inprogress: 0, rejected: 0 };
@@ -103,12 +115,46 @@ export function StudyAnalysisTabs({ globalConfig }: { globalConfig: GlobalConfig
     const comp = includedParticipants.includes('completed') ? expList.filter((d) => !d.rejected && d.completed) : [];
     const prog = includedParticipants.includes('inprogress') ? expList.filter((d) => !d.rejected && !d.completed) : [];
     const rej = includedParticipants.includes('rejected') ? expList.filter((d) => d.rejected) : [];
-    return [...comp, ...prog, ...rej].sort(sortByStartTime);
-  }, [expData, includedParticipants]);
 
+    const statusFiltered = [...comp, ...prog, ...rej];
+
+    // Apply stage filter - if "ALL" is selected, show all participants
+    const stageFiltered = selectedStages.includes('ALL')
+      ? statusFiltered
+      : statusFiltered.filter((d) => selectedStages.includes(d.stage || ''));
+
+    return stageFiltered.sort(sortByStartTime);
+  }, [expData, includedParticipants, selectedStages]);
+
+  // Load available stages
+  const loadStages = useCallback(async () => {
+    if (!studyId || !storageEngine) return;
+
+    try {
+      const stageData = await storageEngine.getStageData(studyId);
+      const stageOptions = stageData.allStages.map((stage) => ({
+        value: stage.stageName,
+        label: stage.stageName,
+      }));
+      setAvailableStages([{ value: 'ALL', label: 'ALL' }, ...stageOptions]);
+      // Create a map of stage names to colors
+      const colors: Record<string, string> = {};
+      stageData.allStages.forEach((stage) => {
+        colors[stage.stageName] = stage.color;
+      });
+      setStageColors(colors);
+    } catch (error) {
+      console.error('Failed to load stages:', error);
+      setAvailableStages([{ value: 'ALL', label: 'ALL' }]);
+      setStageColors({});
+    }
+  }, [studyId, storageEngine]);
+
+  // Load stages and clear selection when dependencies change or tab switches
   useEffect(() => {
+    loadStages();
     setSelectedParticipants([]);
-  }, [analysisTab]);
+  }, [loadStages, analysisTab]);
 
   useEffect(() => {
     if (!studyId) return () => { };
@@ -144,7 +190,7 @@ export function StudyAnalysisTabs({ globalConfig }: { globalConfig: GlobalConfig
         <Stack ref={ref} style={{ height: '100%', maxHeight: '100dvh', overflow: 'hidden' }} justify="space-between">
 
           <Flex direction="row" align="center" justify="space-between">
-            <Flex direction="row" align="center">
+            <Flex direction="row" align="center" gap="md">
               <Title order={5} mr="sm">{studyId}</Title>
               {studyConfig && (
                 <DownloadButtons
@@ -157,6 +203,32 @@ export function StudyAnalysisTabs({ globalConfig }: { globalConfig: GlobalConfig
               )}
             </Flex>
             <Flex direction="row" align="center">
+              <Text size="sm" fw={500}>Stage:</Text>
+              <MultiSelect
+                data={availableStages}
+                value={selectedStages}
+                onChange={(values) => {
+                  if (values.includes('ALL') && !selectedStages.includes('ALL')) {
+                    setSelectedStages(['ALL']);
+                  } else if (values.includes('ALL') && selectedStages.includes('ALL')) {
+                    setSelectedStages(values.filter((v) => v !== 'ALL'));
+                  } else if (values.length === 0) {
+                    setSelectedStages(['ALL']);
+                  } else {
+                    setSelectedStages(values);
+                  }
+                }}
+                w={250}
+                size="sm"
+                clearable={false}
+                maxValues={5}
+                styles={{
+                  input: {
+                    minHeight: '36px',
+                  },
+                }}
+                mx="sm"
+              />
               <Text mt={-2} size="sm">Participants: </Text>
               <Checkbox.Group
                 value={includedParticipants}
@@ -214,21 +286,21 @@ export function StudyAnalysisTabs({ globalConfig }: { globalConfig: GlobalConfig
                 {studyConfig && <SummaryView studyConfig={studyConfig} visibleParticipants={visibleParticipants} />}
               </Tabs.Panel>
               <Tabs.Panel style={{ height: `calc(100% - ${TABLE_HEADER_HEIGHT}px)` }} value="table" pt="xs">
-                {studyConfig && <TableView width={width} visibleParticipants={visibleParticipants} studyConfig={studyConfig} refresh={() => execute(studyConfig, storageEngine, studyId)} selectedParticipants={selectedParticipants} onSelectionChange={setSelectedParticipants} />}
+                {studyConfig && <TableView width={width} stageColors={stageColors} visibleParticipants={visibleParticipants} studyConfig={studyConfig} refresh={() => execute(studyConfig, storageEngine, studyId)} selectedParticipants={selectedParticipants} onSelectionChange={setSelectedParticipants} />}
               </Tabs.Panel>
               <Tabs.Panel style={{ overflow: 'auto' }} value="stats" pt="xs">
                 {studyConfig && <StatsView studyConfig={studyConfig} visibleParticipants={visibleParticipants} />}
               </Tabs.Panel>
               <Tabs.Panel value="tagging" pt="xs">
-                {studyConfig && <ThinkAloudAnalysis visibleParticipants={visibleParticipants} />}
+                {studyConfig && storageEngine?.getEngine() === 'firebase' ? <ThinkAloudAnalysis visibleParticipants={visibleParticipants} storageEngine={storageEngine as FirebaseStorageEngine} /> : <Center>Think aloud coding is only available when using Firebase.</Center>}
               </Tabs.Panel>
               {storageEngine?.getEngine() === 'firebase' && (
                 <Tabs.Panel style={{ overflow: 'auto' }} value="live-monitor" pt="xs">
-                  {studyConfig && <LiveMonitorView studyConfig={studyConfig} storageEngine={storageEngine} studyId={studyId} includedParticipants={includedParticipants} />}
+                  {studyConfig && <LiveMonitorView studyConfig={studyConfig} storageEngine={storageEngine} studyId={studyId} includedParticipants={includedParticipants} selectedStages={selectedStages} />}
                 </Tabs.Panel>
               )}
-              <Tabs.Panel value="manage" pt="xs">
-                {studyId && user.isAdmin ? <ManageAccordion studyId={studyId} refresh={() => execute(studyConfig, storageEngine, studyId)} /> : <Container mt={20}><Alert title="Unauthorized Access" variant="light" color="red" icon={<IconInfoCircle />}>You are not authorized to manage the data for this study.</Alert></Container>}
+              <Tabs.Panel style={{ overflow: 'auto' }} value="manage" pt="xs">
+                {studyId && user.isAdmin ? <ManageView studyId={studyId} refresh={() => execute(studyConfig, storageEngine, studyId)} /> : <Container mt={20}><Alert title="Unauthorized Access" variant="light" color="red" icon={<IconInfoCircle />}>You are not authorized to manage the data for this study.</Alert></Container>}
               </Tabs.Panel>
             </Tabs>
           ) : null }

@@ -1,4 +1,3 @@
-import { User } from '@firebase/auth';
 import localforage from 'localforage';
 import { v4 as uuidv4 } from 'uuid';
 import throttle from 'lodash.throttle';
@@ -8,24 +7,16 @@ import { ParticipantData } from '../types';
 import { hash, isParticipantData } from './utils';
 import { RevisitNotification } from '../../utils/notifications';
 import {
-  EditedText, ParticipantTags, Tag, TaglessEditedText, TranscribedAudio,
+  ParticipantTags, Tag, TaglessEditedText, TranscribedAudio,
 } from '../../analysis/individualStudy/thinkAloud/types';
 
 export interface StoredUser {
-  email: string,
+  email: string | null,
   uid: string | null,
 }
 
-export interface LocalStorageUser {
-  name: string,
-  email: string,
-  uid: string,
-}
-
-export type UserOptions = User | LocalStorageUser | null;
-
 export interface UserWrapped {
-  user: UserOptions,
+  user: StoredUser | null,
   determiningStatus: boolean,
   isAdmin: boolean,
   adminVerification:boolean
@@ -41,9 +32,38 @@ export type SequenceAssignment = {
   total: number; // Total number of questions/steps
   answered: string[]; // Number of answered questions
   isDynamic: boolean; // Whether the study contains dynamic blocks
+  stage: string; // The stage of the participant in the study
 };
 
-export type REVISIT_MODE = 'dataCollectionEnabled' | 'studyNavigatorEnabled' | 'analyticsInterfacePubliclyAccessible';
+export type REVISIT_MODE = 'dataCollectionEnabled' | 'developmentModeEnabled' | 'dataSharingEnabled';
+
+export function cleanupModes(modes: Record<string, boolean>): Record<REVISIT_MODE, boolean> {
+  const cleanedModes: Record<string, boolean> = { ...modes };
+
+  if ('studyNavigatorEnabled' in modes && !('developmentModeEnabled' in modes)) {
+    cleanedModes.developmentModeEnabled = modes.studyNavigatorEnabled;
+    delete cleanedModes.studyNavigatorEnabled;
+  }
+
+  if ('analyticsInterfacePubliclyAccessible' in modes && !('dataSharingEnabled' in modes)) {
+    cleanedModes.dataSharingEnabled = modes.analyticsInterfacePubliclyAccessible;
+    delete cleanedModes.analyticsInterfacePubliclyAccessible;
+  }
+
+  return cleanedModes as Record<REVISIT_MODE, boolean>;
+}
+
+export interface StageInfo {
+  stageName: string;
+  color: string;
+}
+
+interface StageData {
+  currentStage: StageInfo;
+  allStages: StageInfo[];
+}
+
+const defaultStageColor = '#F05A30';
 
 export type StorageObjectType = 'sequenceArray' | 'participantData' | 'config' | string;
 export type StorageObject<T extends StorageObjectType> =
@@ -57,13 +77,13 @@ export type StorageObject<T extends StorageObjectType> =
     ? TranscribedAudio
     : T extends 'editedText'
     ? TaglessEditedText[]
-    : T extends 'partTags'
+    : T extends 'participantTags'
     ? ParticipantTags
     : T extends 'tags'
     ? Tag[]
     : Blob; // Fallback for any random string
 
-export interface CloudStorageEngineError {
+interface CloudStorageEngineError {
   title: string;
   message: string;
   details?: string;
@@ -185,10 +205,13 @@ export abstract class StorageEngine {
   abstract connect(): Promise<void>;
 
   // Gets the modes for the given studyId. The modes are stored as a record with the mode name as the key and a boolean value indicating whether the mode is enabled or not.
-  abstract getModes(studyId: string): Promise<Record<REVISIT_MODE, boolean>>;
+  abstract getModes(studyId: string): Promise<Record<REVISIT_MODE, boolean> & { stage?: StageData }>;
 
   // Sets the mode for the given studyId. The mode is stored as a record with the mode name as the key and a boolean value indicating whether the mode is enabled or not.
   abstract setMode(studyId: string, mode: REVISIT_MODE, value: boolean): Promise<void>;
+
+  // Protected helper: Sets the full modes document (including stage data and mode flags)
+  protected abstract _setModesDocument(studyId: string, modesDocument: Record<REVISIT_MODE, boolean> & { stage?: StageData }): Promise<void>;
 
   // Gets the audio URL for the given task and participantId. This method is used to fetch the audio file from the storage engine.
   protected abstract _getAudioUrl(task: string, participantId?: string): Promise<string | null>;
@@ -259,6 +282,82 @@ export abstract class StorageEngine {
   // Verify study database using provided primitive from storage engine with a throttle of 10 seconds.
   protected async verifyStudyDatabase() {
     return await this.__throttleVerifyStudyDatabase();
+  }
+
+  async getStageData(studyId: string): Promise<StageData> {
+    const modesDoc = await this.getModes(studyId);
+
+    if (modesDoc && modesDoc.stage) {
+      return modesDoc.stage as StageData;
+    }
+
+    // Set default stage data if it doesn't exist
+    const defaultStageData: StageData = {
+      currentStage: { stageName: 'DEFAULT', color: defaultStageColor },
+      allStages: [{ stageName: 'DEFAULT', color: defaultStageColor }],
+    };
+    await this.setCurrentStage(studyId, 'DEFAULT', defaultStageColor);
+    return defaultStageData;
+  }
+
+  // Setting current stage
+  async setCurrentStage(studyId: string, stageName: string, color: string = defaultStageColor): Promise<void> {
+    const modesDoc = await this.getModes(studyId);
+
+    // Initialize if doesn't exist or invalid
+    if (!modesDoc.stage) {
+      modesDoc.stage = {
+        currentStage: { stageName: 'DEFAULT', color: defaultStageColor },
+        allStages: [{ stageName: 'DEFAULT', color: defaultStageColor }],
+      };
+    }
+
+    // Check if stage already exists in allStages
+    const existingStageIndex = modesDoc.stage.allStages.findIndex(
+      (s) => s.stageName === stageName,
+    );
+
+    if (existingStageIndex === -1) {
+      modesDoc.stage.allStages.push({ stageName, color });
+    }
+
+    modesDoc.stage.currentStage = { stageName, color };
+
+    const updatedModesDoc = {
+      ...modesDoc,
+      stage: modesDoc.stage,
+    };
+
+    await this._setModesDocument(studyId, updatedModesDoc);
+  }
+
+  // Updating stage color
+  async updateStageColor(studyId: string, stageName: string, color: string): Promise<void> {
+    const modesDoc = await this.getModes(studyId);
+
+    if (!modesDoc.stage) {
+      throw new Error('Stage data not initialized');
+    }
+
+    const updatedAllStages = modesDoc.stage.allStages.map(
+      (s) => (s.stageName === stageName ? { ...s, color } : s),
+    );
+
+    const updatedCurrentStage = modesDoc.stage.currentStage.stageName === stageName
+      ? { ...modesDoc.stage.currentStage, color }
+      : modesDoc.stage.currentStage;
+
+    const updatedStageData = {
+      currentStage: updatedCurrentStage,
+      allStages: updatedAllStages,
+    };
+
+    const updatedModesDoc = {
+      ...modesDoc,
+      stage: updatedStageData,
+    };
+
+    await this._setModesDocument(studyId, updatedModesDoc);
   }
 
   // Saves the new config for the study. This will overwrite the existing sequence array so that the new sequences are compatible with the new config.
@@ -354,6 +453,8 @@ export abstract class StorageEngine {
     let sequenceAssignments = await this.getAllSequenceAssignments(this.studyId);
 
     const modes = await this.getModes(this.studyId);
+    const stageData = await this.getStageData(this.studyId);
+    const currentStage = stageData.currentStage.stageName;
 
     // Find all rejected documents
     const rejectedDocs = sequenceAssignments
@@ -373,6 +474,7 @@ export abstract class StorageEngine {
           total: 0,
           answered: [],
           isDynamic: false,
+          stage: currentStage,
         };
         // Mark the first reject as claimed
         await this._claimSequenceAssignment(firstReject.participantId, firstReject);
@@ -391,6 +493,7 @@ export abstract class StorageEngine {
         total: 0,
         answered: [],
         isDynamic: false,
+        stage: currentStage,
       };
       await this._createSequenceAssignment(this.currentParticipantId, participantSequenceAssignmentData, true);
     }
@@ -458,6 +561,8 @@ export abstract class StorageEngine {
 
     // Get modes
     const modes = await this.getModes(this.studyId);
+    const stageData = await this.getStageData(this.studyId);
+    const currentStage = stageData.currentStage.stageName;
 
     if (isParticipantData(participant)) {
       // Participant already initialized
@@ -478,6 +583,7 @@ export abstract class StorageEngine {
       completed: false,
       rejected: false,
       participantTags: [],
+      stage: currentStage,
     };
 
     if (modes.dataCollectionEnabled) {
@@ -506,56 +612,23 @@ export abstract class StorageEngine {
   }
 
   async getTags(tagType: string) {
-    return await this._getFromStorage(`audio/transcriptAndTags/${tagType}`, 'tags', this.studyId);
+    return await this._getFromStorage(`audio/transcriptAndTags/${tagType}`, 'tags');
   }
 
-  async getTranscription(taskName: string, participantId: string, studyId: string) : Promise<TranscribedAudio | null> {
-    return await this._getFromStorage(`audio/${participantId}_${taskName}.wav`, 'transcription.txt', studyId);
-  }
+  async getAllParticipantAndTaskTags(authEmail: string, participantId: string) {
+    const tags = await this._getFromStorage(`audio/transcriptAndTags/${authEmail}/${participantId}`, 'participantTags');
 
-  async getEditedTranscript(participantId: string, authEmail: string, task: string) {
-    const transcript = await this._getFromStorage(`audio/transcriptAndTags/${authEmail}/${participantId}/${task}`, 'editedText', this.studyId);
-
-    if (Array.isArray(transcript)) {
-      const tags = await this.getTags('text');
-
-      if (tags) {
-        // loop over the transcript and merge the tags
-        transcript.forEach((line) => {
-          line.selectedTags = line.selectedTags.map((tag) => {
-            const matchingTag = tags.find((t) => t.id === tag.id);
-            return matchingTag!;
-          });
-        });
-      }
-
-      return transcript as EditedText[];
-    }
-
-    this.saveEditedTranscript(participantId, authEmail, task, []);
-    return [];
-  }
-
-  async saveEditedTranscript(participantId: string, authEmail: string, task: string, editedText: EditedText[]) {
-    const taglessTranscript = editedText.map((line) => ({ ...line, selectedTags: line.selectedTags.filter((tag) => tag !== undefined) })) as TaglessEditedText[];
-
-    this._pushToStorage(`audio/transcriptAndTags/${authEmail}/${participantId}/${task}`, 'editedText', taglessTranscript);
-  }
-
-  async getAllParticipantAndTaskTags(authEmail: string, participantId: string, task: string): Promise<ParticipantTags | null> {
-    const tags = await this._getFromStorage(`audio/transcriptAndTags/${authEmail}/${participantId}/${task}`, 'partTags', this.studyId);
-
-    if (tags?.partTags) {
+    if (tags?.participantTags) {
       return tags;
     }
 
-    this.saveAllParticipantAndTaskTags(authEmail, participantId, task, { partTags: [], taskTags: {} });
+    this.saveAllParticipantAndTaskTags(authEmail, participantId, { participantTags: [], taskTags: {} });
 
-    return { partTags: [], taskTags: {} };
+    return { participantTags: [], taskTags: {} };
   }
 
-  async saveAllParticipantAndTaskTags(authEmail: string, participantId: string, task: string, participantTags: ParticipantTags) {
-    await this._pushToStorage(`audio/transcriptAndTags/${authEmail}/${participantId}/${task}`, 'partTags', participantTags);
+  async saveAllParticipantAndTaskTags(authEmail: string, participantId: string, participantTags: ParticipantTags) {
+    return this._pushToStorage(`audio/transcriptAndTags/${authEmail}/${participantId}`, 'participantTags', participantTags);
   }
 
   // Gets the participant data for the current participant or a specific participantId.
@@ -618,11 +691,10 @@ export abstract class StorageEngine {
   }
 
   // Rejects a participant with the given participantId and reason.
-  async rejectParticipant(participantId: string, reason: string, studyId?: string) {
+  async rejectParticipant(participantId: string, reason: string) {
     const participant = await this._getFromStorage(
       `participants/${participantId}`,
       'participantData',
-      studyId,
     );
 
     try {
@@ -661,11 +733,10 @@ export abstract class StorageEngine {
   }
 
   // Un-rejects a participant with the given participantId.
-  async undoRejectParticipant(participantId: string, studyId?: string) {
+  async undoRejectParticipant(participantId: string) {
     const participant = await this._getFromStorage(
       `participants/${participantId}`,
       'participantData',
-      studyId,
     );
 
     try {
@@ -1228,6 +1299,12 @@ export abstract class CloudStorageEngine extends StorageEngine {
 
   // Removes the admin user with the given email from the storage engine.
   abstract removeAdminUser(email: string): Promise<void>;
+
+  abstract login(): Promise<StoredUser | null | void>;
+
+  abstract unsubscribe(callback: (user: StoredUser | null) => Promise<void>): () => void;
+
+  abstract logout(): Promise<void>;
 
   /*
   * HIGHER-LEVEL METHODS

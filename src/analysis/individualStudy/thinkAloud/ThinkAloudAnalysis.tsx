@@ -10,18 +10,18 @@ import debounce from 'lodash.debounce';
 
 import { useResizeObserver } from '@mantine/hooks';
 import { useAsync } from '../../../store/hooks/useAsync';
-import { useStorageEngine } from '../../../storage/storageEngineHooks';
 import { useAuth } from '../../../store/hooks/useAuth';
 import { ParticipantData } from '../../../storage/types';
 import {
   EditedText,
 } from './types';
 import { TextEditor } from './TextEditor';
-import { StorageEngine } from '../../../storage/engines/types';
 import { ThinkAloudFooter } from './ThinkAloudFooter';
 import { useEvent } from '../../../store/hooks/useEvent';
+import { FirebaseStorageEngine } from '../../../storage/engines/FirebaseStorageEngine';
+import { ReplayContext, useReplay } from '../../../store/hooks/useReplay';
 
-async function getTranscript(storageEngine: StorageEngine | undefined, partId: string | undefined, trialName: string | undefined, authEmail: string | null | undefined) {
+async function getTranscript(storageEngine: FirebaseStorageEngine, partId: string | undefined, trialName: string | undefined, authEmail: string | null | undefined) {
   if (storageEngine && partId && trialName && authEmail) {
     return await storageEngine.getEditedTranscript(partId, authEmail, trialName);
   }
@@ -29,7 +29,7 @@ async function getTranscript(storageEngine: StorageEngine | undefined, partId: s
   return null;
 }
 
-function getParticipantData(trrackId: string | undefined, storageEngine: StorageEngine | undefined) {
+function getParticipantData(trrackId: string | undefined, storageEngine: FirebaseStorageEngine) {
   if (storageEngine) {
     return storageEngine.getParticipantData(trrackId);
   }
@@ -37,9 +37,9 @@ function getParticipantData(trrackId: string | undefined, storageEngine: Storage
   return null;
 }
 
-function getRawTranscript(storageEngine: StorageEngine | undefined, currentTrial: string, participantId: string, studyId: string | undefined) {
+function getRawTranscript(storageEngine: FirebaseStorageEngine, currentTrial: string, participantId: string, studyId: string | undefined) {
   if (storageEngine && studyId) {
-    return storageEngine?.getTranscription(currentTrial, participantId, studyId).then((data) => {
+    return storageEngine.getTranscription(currentTrial, participantId).then((data) => {
       if (!data || !data.results) {
         return null;
       }
@@ -57,9 +57,7 @@ function getRawTranscript(storageEngine: StorageEngine | undefined, currentTrial
   return null;
 }
 
-export function ThinkAloudAnalysis({ visibleParticipants } : {visibleParticipants: ParticipantData[]}) {
-  const { storageEngine } = useStorageEngine();
-
+export function ThinkAloudAnalysis({ visibleParticipants, storageEngine } : { visibleParticipants: ParticipantData[], storageEngine: FirebaseStorageEngine }) {
   const auth = useAuth();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -73,6 +71,8 @@ export function ThinkAloudAnalysis({ visibleParticipants } : {visibleParticipant
 
   const { value: participant } = useAsync(getParticipantData, [participantId, storageEngine]);
   const { studyId } = useParams();
+
+  const replay = useReplay();
 
   const [hasAudio, setHasAudio] = useState<boolean>();
 
@@ -92,11 +92,10 @@ export function ThinkAloudAnalysis({ visibleParticipants } : {visibleParticipant
 
   useEffect(() => {
     if (!currentTrial && !participantId && visibleParticipants.length > 0) {
-      // why doesnt this show on the type
-      // @ts-ignore
-      setSearchParams({ participantId: visibleParticipants[0].participantId, currentTrial: Object.values(visibleParticipants[0].answers).find((ans) => +ans.trialOrder.split('_')[0] === 0)?.identifier });
+      setSearchParams({ participantId: visibleParticipants[0].participantId, currentTrial: Object.entries(visibleParticipants[0].answers).find(([_, ans]) => +ans.trialOrder.split('_')[0] === 0)?.[0] || '' });
     }
     // I really only want to do this on mount, so leaving this empty
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const setEditedTranscript = useCallback((editedText: EditedText[]) => {
@@ -115,13 +114,17 @@ export function ThinkAloudAnalysis({ visibleParticipants } : {visibleParticipant
   }, [onlineTranscriptList, transcriptStatus]);
 
   // Update the current transcription based on the playTime.
-  // TODO:: this is super unperformant, but I don't have a solution atm. think about it harder
   const onTimeUpdate = useEvent((playTime: number) => {
     if (rawTranscript && currentShownTranscription !== null && participant && playTime > 0) {
       let tempCurrentShownTranscription = currentShownTranscription;
       const startTime = (currentTrial ? participant.answers[currentTrial].startTime : participant.answers.audioTest.startTime);
 
       const timeInSeconds = Math.abs(playTime - startTime) / 1000;
+
+      if (!rawTranscript.results[tempCurrentShownTranscription]) {
+        setCurrentShownTranscription(0);
+        return;
+      }
 
       if (timeInSeconds > (rawTranscript.results[tempCurrentShownTranscription].resultEndTime as number)) {
         while (timeInSeconds > (rawTranscript.results[tempCurrentShownTranscription].resultEndTime as number)) {
@@ -159,7 +162,6 @@ export function ThinkAloudAnalysis({ visibleParticipants } : {visibleParticipant
 
   const changeLine = useCallback((focusedLine: number) => {
     const currentLine = editedTranscript[focusedLine].transcriptMappingStart;
-
     setJumpedToLine(currentLine);
   }, [editedTranscript]);
 
@@ -169,20 +171,23 @@ export function ThinkAloudAnalysis({ visibleParticipants } : {visibleParticipant
   }, [participantId, currentTrial]);
 
   return (
-    <Group wrap="nowrap" gap={25}>
-      <Stack ref={ref} style={{ width: '100%' }} gap={10}>
+    <ReplayContext.Provider value={replay}>
 
-        {!participantId || !currentTrial ? <Center><Text c="dimmed" size="24">Select a Participant and Trial to Analyze</Text></Center>
-          : !hasAudio || (rawTranscriptStatus === 'success' && rawTranscript === null) ? <Center><Text c="dimmed" size="24">No transcripts found for this task</Text></Center> : (
+      <Group wrap="nowrap" gap={25}>
+        <Stack ref={ref} style={{ width: '100%' }} gap={10}>
 
-            <Stack>
-              <TextEditor onClickLine={changeLine} transcriptList={editedTranscript} setTranscriptList={setEditedTranscript} currentShownTranscription={currentShownTranscription} />
-            </Stack>
-          )}
+          {!participantId || !currentTrial ? <Center><Text c="dimmed" size="24">Select a Participant and Trial to Analyze</Text></Center>
+            : !hasAudio || (rawTranscriptStatus === 'success' && rawTranscript === null) ? <Center><Text c="dimmed" size="24">No transcripts found for this task</Text></Center> : (
 
-        <ThinkAloudFooter setHasAudio={setHasAudio} studyId={studyId || ''} jumpedToLine={jumpedToLine} editedTranscript={editedTranscript} currentTrial={currentTrial} isReplay={false} visibleParticipants={visibleParticipants.map((v) => v.participantId)} rawTranscript={rawTranscript} onTimeUpdate={onTimeUpdate} currentShownTranscription={currentShownTranscription} width={width} />
-      </Stack>
+              <Stack>
+                <TextEditor onClickLine={changeLine} transcriptList={editedTranscript} setTranscriptList={setEditedTranscript} currentShownTranscription={currentShownTranscription} />
+              </Stack>
+            )}
 
-    </Group>
+          <ThinkAloudFooter key={`${participantId}-${currentTrial}`} setHasAudio={setHasAudio} saveProvenance={() => null} studyId={studyId || ''} jumpedToLine={jumpedToLine} editedTranscript={editedTranscript} currentTrial={currentTrial} isReplay={false} visibleParticipants={visibleParticipants.map((v) => v.participantId)} rawTranscript={rawTranscript} onTimeUpdate={onTimeUpdate} currentShownTranscription={currentShownTranscription} width={width} storageEngine={storageEngine} />
+        </Stack>
+
+      </Group>
+    </ReplayContext.Provider>
   );
 }

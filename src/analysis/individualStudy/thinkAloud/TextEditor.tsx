@@ -3,6 +3,7 @@ import {
   useMemo, useRef,
 } from 'react';
 import {
+  Grid,
   Group, Stack, Text,
   Tooltip,
 } from '@mantine/core';
@@ -11,7 +12,9 @@ import { useEvent } from '../../../store/hooks/useEvent';
 import {
   EditedText, Tag,
 } from './types';
-import { IconComponent } from './tiptapExtensions/IconComponent';
+import {
+  TranscriptLine,
+} from './TranscriptLine';
 import { useStorageEngine } from '../../../storage/storageEngineHooks';
 import { useAsync } from '../../../store/hooks/useAsync';
 import { StorageEngine } from '../../../storage/engines/types';
@@ -31,7 +34,9 @@ async function getTags(storageEngine: StorageEngine | undefined) {
 
 export function TextEditor({
   currentShownTranscription, transcriptList, setTranscriptList, onClickLine,
-} : {currentShownTranscription: number, transcriptList: EditedText[], setTranscriptList: (e: EditedText[]) => void, onClickLine: (focusedLine: number) => void}) {
+} : {
+  currentShownTranscription: number, transcriptList: EditedText[], setTranscriptList: (e: EditedText[]) => void, onClickLine: (focusedLine: number) => void
+}) {
   const { storageEngine } = useStorageEngine();
 
   const { value: tags, execute: pullTags } = useAsync(getTags, [storageEngine]);
@@ -130,7 +135,7 @@ export function TextEditor({
   }, []);
 
   const transcript = useMemo(() => (transcriptList.map((line, i) => (
-    <IconComponent
+    <TranscriptLine
       onClickLine={onClickLine}
       editTagCallback={editTagCallback}
       createTagCallback={createTagCallback}
@@ -154,23 +159,29 @@ export function TextEditor({
 
   return (
     <Stack gap={0}>
-      <Group mb="sm" justify="space-between" wrap="nowrap" style={{ width: '100%' }}>
-        <Text fw={700} size="xl">Transcripts</Text>
-        <Group gap="175" justify="flex-start" style={{ width: '500px' }}>
+      <Grid style={{ width: '100%' }} mb="sm">
+        <Grid.Col span={8}>
+          <Text fw={700} size="xl">Transcripts</Text>
+        </Grid.Col>
+        <Grid.Col span={2}>
+
           <Group gap="xs" align="center">
-            <Text fw={700} ml="lg" size="xl">Text Tags</Text>
+            <Text fw={700} size="xl">Text Tags</Text>
             <Tooltip w={300} multiline label="Text tags allow you to categorize segments of text. Click in the box to add, create, or edit tags.">
               <IconInfoCircle size={16} />
             </Tooltip>
           </Group>
+        </Grid.Col>
+        <Grid.Col span={2}>
+
           <Group gap="xs" align="center">
             <Text fw={700} size="xl">Annotations</Text>
             <Tooltip w={300} multiline label="Annotations allow you to add additional context or notes to segments of text.">
               <IconInfoCircle size={16} />
             </Tooltip>
           </Group>
-        </Group>
-      </Group>
+        </Grid.Col>
+      </Grid>
 
       <Stack gap={5}>
         {transcript}
