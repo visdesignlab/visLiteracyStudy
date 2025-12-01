@@ -139,6 +139,7 @@ export default function Canvas({
   }, 50), [actions, trrack]);
 
   const handleMouseDown = (e: KonvaEventObject<MouseEvent, unknown>) => {
+    console.log('down');
     if (!e.target || !e.target.getStage()) return;
 
     isDrawing.current = true;
@@ -149,6 +150,7 @@ export default function Canvas({
   };
 
   const handleMouseMove = (e: KonvaEventObject<TouchEvent, unknown>) => {
+    console.log('move');
     // no drawing - skipping
     if (tool === 'eraser') {
       const pos = e.target.getStage()!.getPointerPosition()!;
@@ -176,6 +178,7 @@ export default function Canvas({
   };
 
   const handleMouseUp = () => {
+    console.log('up');
     isDrawing.current = false;
     trrack.apply('draw end', actions.drawEnd(structuredClone(lines).concat()), { isEphemeral: false, makeCheckpoint: false });
 
