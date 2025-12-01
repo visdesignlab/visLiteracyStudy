@@ -149,7 +149,7 @@ export default function Canvas({
     }]);
   };
 
-  const handleMouseMove = (e: KonvaEventObject<TouchEvent, unknown>) => {
+  const handleMouseMove = (e: KonvaEventObject<TouchEvent, unknown> | KonvaEventObject<PointerEvent, unknown>) => {
     console.log('move');
     // no drawing - skipping
     if (tool === 'eraser') {
