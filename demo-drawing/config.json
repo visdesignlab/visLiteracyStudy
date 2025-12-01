@@ -87,7 +87,7 @@
           "location": "sidebar",
           "required": true,
           "prompt": "Have you finished critiquing the visualization?",
-          "options": ["Yes", "No"],
+          "options": ["Yes"],
           "requiredValue": "Yes"
         }
       ]
@@ -105,7 +105,7 @@
           "location": "sidebar",
           "required": true,
           "prompt": "Have you finished critiquing the visualization?",
-          "options": ["Yes", "No"],
+          "options": ["Yes"],
           "requiredValue": "Yes"
         }
       ]
@@ -115,7 +115,7 @@
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
       "instruction": "First, please <b>speak out loud</b> about what you are thinking as you look at the chart and make sense of it. \n\n  Next, please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
-      "path": "demo-drawing/assets/critiqueTasks/T20.jpg",
+      "path": "demo-drawing/assets/critiqueTasks/T20.png",
       "response": [
         {
           "id": "drawing100m",
@@ -123,7 +123,7 @@
           "location": "sidebar",
           "required": true,
           "prompt": "Have you finished critiquing the visualization?",
-          "options": ["Yes", "No"],
+          "options": ["Yes"],
           "requiredValue": "Yes"
         }
       ]
@@ -145,7 +145,7 @@
           "location": "sidebar",
           "required": true,
           "prompt": "Have you finished critiquing the visualization?",
-          "options": ["Yes", "No"],
+          "options": ["Yes"],
           "requiredValue": "Yes"
         }
       ]
@@ -185,7 +185,7 @@
           "location": "sidebar",
           "required": true,
           "prompt": "Have you finished critiquing the visualization?",
-          "options": ["Yes", "No"],
+          "options": ["Yes"],
           "requiredValue": "Yes"
         }
       ]
@@ -324,7 +324,7 @@
           "location": "sidebar",
           "required": true,
           "prompt": "Have you finished drawing your visualization?",
-          "options": ["Yes", "No"],
+          "options": ["Yes"],
           "requiredValue": "Yes"
         }
       ]
@@ -343,7 +343,7 @@
           "location": "sidebar",
           "required": true,
           "prompt": "Are you ready to begin?",
-          "options": ["Yes", "No"],
+          "options": ["Yes"],
           "requiredValue": "Yes"
         }
       ]
@@ -362,7 +362,7 @@
           "location": "sidebar",
           "required": true,
           "prompt": "Have you finished drawing your visualization?",
-          "options": ["Yes", "No"],
+          "options": ["Yes"],
           "requiredValue": "Yes"
         }
       ]
@@ -381,7 +381,7 @@
           "location": "sidebar",
           "required": true,
           "prompt": "Have you finished drawing your visualization?",
-          "options": ["Yes", "No"],
+          "options": ["Yes"],
           "requiredValue": "Yes"
         }
       ]
@@ -400,7 +400,7 @@
           "location": "sidebar",
           "required": true,
           "prompt": "Have you finished drawing your visualization?",
-          "options": ["Yes", "No"],
+          "options": ["Yes"],
           "requiredValue": "Yes"
         }
       ]
@@ -419,7 +419,7 @@
           "location": "sidebar",
           "required": true,
           "prompt": "Have you finished drawing your visualization?",
-          "options": ["Yes", "No"],
+          "options": ["Yes"],
           "requiredValue": "Yes"
         }
       ]
@@ -438,7 +438,7 @@
           "location": "sidebar",
           "required": true,
           "prompt": "Have you finished drawing your visualization?",
-          "options": ["Yes", "No"],
+          "options": ["Yes"],
           "requiredValue": "Yes"
         }
       ]
@@ -492,21 +492,6 @@
       "consent",
       "$mic-check.co.audioTest",
       {
-        "id": "critiquePart",
-        "components": [
-          "critiqueIntro",
-          {
-            "components": [
-              "critiqueCalvi2",
-              "critiqueUntimelyDeath",
-              "critiqueSciArticles"
-            ],
-            "order": "random"
-          }
-        ],
-        "order": "fixed"
-      },
-      {
         "id": "drawingPart",
         "components": [
           "drawingIntro",
@@ -540,6 +525,21 @@
               }
             ],
             "order": "fixed"
+          }
+        ],
+        "order": "fixed"
+      },
+      {
+        "id": "critiquePart",
+        "components": [
+          "critiqueIntro",
+          {
+            "components": [
+              "critiqueCalvi2",
+              "critiqueUntimelyDeath",
+              "critiqueSciArticles"
+            ],
+            "order": "random"
           }
         ],
         "order": "fixed"
