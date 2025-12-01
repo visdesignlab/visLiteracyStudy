@@ -276,6 +276,9 @@ export default function Canvas({
           onTouchStart={handleMouseDown as unknown as (e: KonvaEventObject<TouchEvent, unknown>) => void}
           onTouchMove={handleMouseMove}
           onTouchEnd={handleMouseUp}
+          onPointerDown={handleMouseDown}
+          onPointerMove={handleMouseMove}
+          onPointerUp={handleMouseUp}
         >
           <Layer>
             {lines.map((line, i) => (
