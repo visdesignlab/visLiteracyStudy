@@ -23,7 +23,7 @@
     "showTitleBar": false,
     "sidebarWidth": 250
   },
-  "importedLibraries": ["mic-check", "mini-vlat"],
+  "importedLibraries": ["mic-check", "mini-vlat", "calvi"],
   "components": {
     "introduction": {
       "type": "markdown",
@@ -409,7 +409,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a table showing the rankings of bundesliga football teams across the first seven weeks of the season. \n\n ![demo](demo-drawing/assets/drawingTasks/rankingTask.png) \n\n Sketch a visualization showing the teams rankings over time. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending around 7 minutes on this task.",
+      "instruction": "Below is a table showing the rankings of the top five bundesliga football teams across the first six weeks of the season. \n\n ![demo](demo-drawing/assets/drawingTasks/rankingTask.png) \n\n Sketch a visualization showing the teams rankings over time. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending around 7 minutes on this task.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "showTimer": true,
       "response": [
@@ -524,7 +524,7 @@
                 "components": ["drawingRainfall", "drawingFollowUpRainfall"]
               }
             ],
-            "order": "fixed"
+            "order": "random"
           }
         ],
         "order": "fixed"
@@ -544,9 +544,38 @@
         ],
         "order": "fixed"
       },
+      "vlatIntro",
       {
-        "components": ["vlatIntro", "$mini-vlat.se.full"],
-        "order": "fixed",
+        "components": [
+          "$mini-vlat.co.treemap",
+          "$mini-vlat.co.stackedBar100",
+          "$mini-vlat.co.histogram",
+          "$mini-vlat.co.choropleth",
+          "$mini-vlat.co.piechart",
+          "$mini-vlat.co.bubblechart",
+          "$mini-vlat.co.stackedbar",
+          "$mini-vlat.co.linechart",
+          "$mini-vlat.co.barchart",
+          "$mini-vlat.co.areachar",
+          "$mini-vlat.co.stackedarea",
+          "$mini-vlat.co.scatterplot",
+          "$calvi.co.T3",
+          "$calvi.co.T10",
+          "$calvi.co.T14",
+          "$calvi.co.T20",
+          "$calvi.co.T25",
+          "$calvi.co.T26",
+          "$calvi.co.T30",
+          "$calvi.co.T35",
+          "$calvi.co.T37",
+          "$calvi.co.T40",
+          "$calvi.co.T42",
+          "$calvi.co.T43",
+          "$calvi.co.T47",
+          "$calvi.co.T48",
+          "$calvi.co.T49"
+        ],
+        "order": "random",
         "id": "vlatPart"
       },
       "postStudy"

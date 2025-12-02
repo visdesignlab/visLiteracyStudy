@@ -266,7 +266,7 @@ export default function Canvas({
         <Stage
           style={{ cursor: tool === 'eraser' ? `src${IconEraser}` : 'default' }}
           width={width}
-          height={window.innerHeight - 200}
+          height={window.innerHeight}
           onMouseDown={handleMouseDown}
           onMousemove={handleMouseMove}
           onMouseup={handleMouseUp}

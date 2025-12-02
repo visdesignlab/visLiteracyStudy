@@ -26,7 +26,7 @@ const markdownComponents: Partial<Components> = {
   h5({ node: _, ...props }) { return <Title {...props} order={5} pb={12} />; },
   h6({ node: _, ...props }) { return <Title {...props} order={6} pb={12} />; },
   a({ node: _, ...props }) { return <Anchor {...props} ref={undefined} />; },
-  ul({ node: _, ...props }) { return <List withPadding {...props} pb={8} />; },
+  ul({ node: _, ...props }) { return <List withPadding {...props} pl={8} pr={0} />; },
   ol({ node: _, type: _type, ...props }) { return <List {...props} type="ordered" withPadding pb={8} />; },
   table({ node: _, ...props }) { return <Table {...props} mb={12} borderColor="grey" />; },
   thead({ node: _, ...props }) { return <Table.Thead {...props} />; },
