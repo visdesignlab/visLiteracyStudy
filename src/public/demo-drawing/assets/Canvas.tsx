@@ -136,7 +136,7 @@ export default function Canvas({
 
   const debouncedApply = useMemo(() => throttle((l: Lines) => {
     trrack.apply('drawing', actions.draw(structuredClone(l).concat()), { isEphemeral: true, makeCheckpoint: false });
-  }, 50), [actions, trrack]);
+  }, 100), [actions, trrack]);
 
   const handleMouseDown = (e: KonvaEventObject<MouseEvent, unknown>) => {
     if (!e.target || !e.target.getStage()) return;
