@@ -1,5 +1,5 @@
 import {
-  Box, Group, DEFAULT_THEME,
+  Box, Group,
   SegmentedControl,
   ColorSwatch,
   Stack,
@@ -10,61 +10,56 @@ import {
 import {
   IconArrowBackUp,
   IconArrowForwardUp,
-  IconCircleFilled, IconEraser, IconPencil,
+  IconCircleFilled, IconEraser, IconMicrophone, IconPencil,
 } from '@tabler/icons-react';
 import {
-  useEffect, useMemo, useRef, useState,
+  useEffect, useMemo, useState,
 } from 'react';
-import {
-  Circle, Layer, Line, Stage,
-} from 'react-konva';
+
+import 'tldraw/tldraw.css';
+
 import throttle from 'lodash.throttle';
 import { useResizeObserver } from '@mantine/hooks';
-import { KonvaEventObject } from 'konva/lib/Node';
 import { isRootNode, isStateNode } from '@trrack/core';
+import {
+  DefaultColorThemePalette, TLDefaultColorThemeColor, Tldraw, TLEditorSnapshot,
+} from 'tldraw';
 import { StimulusParams } from '../../../store/types';
 import { Registry } from './trrack-alpha/core/src/registry/reg';
 import { initializeTrrack } from './trrack-alpha/core/src/provenance/trrack';
+import TlDrawEditor from './trrack-alpha/TlDrawEditor';
+import { RecordingAudioWaveform } from '../../../components/interface/RecordingAudioWaveform';
 
 const COLORS = [
-  DEFAULT_THEME.colors.red[5],
-  DEFAULT_THEME.colors.green[5],
-  DEFAULT_THEME.colors.blue[5],
-  DEFAULT_THEME.colors.orange[5],
-  DEFAULT_THEME.colors.gray[5],
-  DEFAULT_THEME.colors.dark[5],
-  DEFAULT_THEME.colors.violet[5],
+  'red', 'green', 'blue', 'orange', 'grey', 'black', 'violet',
 ];
 
 export type Lines = { tool: string; points: number[], width: number, color: string }[]
 
-export type KonvaState = {
-  lines: Lines;
+export type TLDrawState = {
+  state: TLEditorSnapshot | null;
   tool: 'pen' | 'eraser';
   color: string;
   penSize: string;
 };
 
 export default function Canvas({
-  parameters, provenanceState, setAnswer, answers,
-} : StimulusParams<{responseId: string}, KonvaState>) {
+  parameters, provenanceState, setAnswer,
+} : StimulusParams<{responseId: string}, TLDrawState>) {
   const [tool, setTool] = useState('pen');
-  const [penSize, setPenSize] = useState<string>('5');
-  const [lines, setLines] = useState<Lines>([]);
-  const [color, onColorChange] = useState(DEFAULT_THEME.colors.red[5]);
+  const [penSize, setPenSize] = useState<string>('m');
+  const [color, onColorChange] = useState('red');
+  const [snapshot, setSnapshot] = useState<null | undefined | TLEditorSnapshot>(null);
 
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const isDrawing = useRef(false);
   const [undoStack, setUndoStack] = useState<string[]>([]);
 
   const [ref, { width }] = useResizeObserver();
 
   useEffect(() => {
     if (provenanceState) {
-      setLines(provenanceState.lines || []);
       setTool(provenanceState.tool || 'pen');
-      setPenSize(provenanceState.penSize || '5');
-      onColorChange(provenanceState.color || DEFAULT_THEME.colors.red[5]);
+      setPenSize(provenanceState.penSize || 'm');
+      onColorChange(provenanceState.color || 'red');
     }
   }, [provenanceState]);
 
@@ -72,55 +67,55 @@ export default function Canvas({
   const { actions, trrack } = useMemo(() => {
     const reg = Registry.create();
 
-    const draw = reg.register('draw', (state: KonvaState, _lines) => {
-      state.lines = _lines;
+    const draw = reg.register('draw', (state: TLDrawState, _lines) => {
+      state.state = _lines;
       return state;
     });
 
-    const drawEnd = reg.register('drawEnd', (state: KonvaState, _lines) => {
-      state.lines = _lines;
+    const drawEnd = reg.register('drawEnd', (state: TLDrawState, _lines) => {
+      state.state = _lines;
       return state;
     });
 
-    const clear = reg.register('clear', (state: KonvaState, _lines) => {
-      state.lines = [];
+    const clear = reg.register('clear', (state: TLDrawState, _lines) => {
+      state.state = _lines;
       return state;
     });
 
-    const undo = reg.register('undo', (state: KonvaState, _lines) => {
-      state.lines = _lines;
+    const undo = reg.register('undo', (state: TLDrawState, _lines) => {
+      state.state = _lines;
       return state;
     });
 
-    const redo = reg.register('redo', (state: KonvaState, _lines) => {
-      state.lines = _lines;
+    const redo = reg.register('redo', (state: TLDrawState, _lines) => {
+      state.state = _lines;
       return state;
     });
 
-    const trrackInst = initializeTrrack<KonvaState>({
+    const _setPenSize = reg.register('penSize', (state: TLDrawState, _penSize) => {
+      state.penSize = _penSize;
+      return state;
+    });
+
+    const _setColor = reg.register('color', (state: TLDrawState, _color) => {
+      state.color = _color;
+      return state;
+    });
+
+    const _setTool = reg.register('tool', (state: TLDrawState, _tool) => {
+      state.tool = _tool;
+      return state;
+    });
+
+    const trrackInst = initializeTrrack<TLDrawState>({
       registry: reg,
       initialState: {
-        lines: [],
+        state: null,
         tool: 'pen',
-        color: DEFAULT_THEME.colors.red[5],
-        penSize: '5',
+        color: 'red',
+        penSize: 's',
       },
     });
-
-    if (parameters.responseId) {
-      const answer = Object.keys(answers).find((a) => a.startsWith(parameters.responseId)) || '';
-
-      if (answers[answer].provenanceGraph.stimulus) {
-        trrackInst.importObject(structuredClone(answers[answer].provenanceGraph.stimulus));
-      }
-
-      const state = trrackInst.getState(trrackInst.current);
-
-      setLines(state.lines || []);
-      setTool(state.tool || 'pen');
-      setPenSize(state.penSize || '5');
-      onColorChange(state.color || DEFAULT_THEME.colors.red[5]);
-    }
 
     return {
       actions: {
@@ -129,64 +124,28 @@ export default function Canvas({
         undo,
         clear,
         redo,
+        setPenSize: _setPenSize,
+        setColor: _setColor,
+        setTool: _setTool,
       },
       trrack: trrackInst,
     };
   }, []);
 
-  const debouncedApply = useMemo(() => throttle((l: Lines) => {
-    trrack.apply('drawing', actions.draw(structuredClone(l).concat()), { isEphemeral: true, makeCheckpoint: false });
-  }, 100), [actions, trrack]);
-
-  const handleMouseDown = (e: KonvaEventObject<MouseEvent, unknown>) => {
-    if (!e.target || !e.target.getStage()) return;
-
-    isDrawing.current = true;
-    const pos = e.target.getStage()!.getPointerPosition()!;
-    setLines([...lines, {
-      tool, points: [pos.x, pos.y], width: tool === 'pen' ? +penSize : +penSize * 8, color,
-    }]);
-  };
-
-  const handleMouseMove = (e: KonvaEventObject<TouchEvent, unknown> | KonvaEventObject<PointerEvent, unknown>) => {
-    // no drawing - skipping
-    if (tool === 'eraser') {
-      const pos = e.target.getStage()!.getPointerPosition()!;
-      setMousePos({ x: pos.x, y: pos.y });
-    }
-
-    if (!isDrawing.current) {
-      return;
-    }
-    const stage = e.target.getStage()!;
-    const point = stage.getPointerPosition()!;
-    const lastLine = structuredClone(lines[lines.length - 1]);
-    // add point
-    lastLine.points = lastLine.points.concat([point.x, point.y]);
-
-    // replace last
-    lines.splice(lines.length - 1, 1, lastLine);
-    setLines(lines.concat());
-
-    if (undoStack) {
-      setUndoStack([]);
-    }
-
-    debouncedApply(lines.concat());
-  };
-
-  const handleMouseUp = () => {
-    isDrawing.current = false;
-    trrack.apply('draw end', actions.drawEnd(structuredClone(lines).concat()), { isEphemeral: false, makeCheckpoint: false });
-
+  const debouncedApply = useMemo(() => throttle((l: TLEditorSnapshot) => {
+    trrack.apply('drawing', actions.draw(l), { isEphemeral: true, makeCheckpoint: false });
     setAnswer({
       status: true,
       provenanceGraph: trrack.graph.backend,
       answers: {},
     });
-  };
 
-  // console.log(undoStack, trrack.graph);
+    setSnapshot(null);
+  }, 100), [actions, setAnswer, trrack]);
+
+  const handleMouseMove = (e: TLEditorSnapshot) => {
+    debouncedApply(e);
+  };
 
   return (
     <Box
@@ -204,27 +163,31 @@ export default function Canvas({
               { label: <IconPencil size={16} stroke={2.5} color="black" />, value: 'pen' },
               { label: <IconEraser size={16} stroke={2.5} color="black" />, value: 'eraser' },
             ]}
-            onChange={setTool}
+            onChange={(c) => { setTool(c); trrack.apply('Set Tool', actions.setTool(c)); }}
           />
           <SegmentedControl
             size="md"
             color="lightgray"
             data={[
-              { label: <IconCircleFilled size={8} color="black" />, value: '5' },
-              { label: <IconCircleFilled size={12} color="black" />, value: '15' },
-              { label: <IconCircleFilled size={16} color="black" />, value: '25' },
+              { label: <IconCircleFilled size={8} color="black" />, value: 'm' },
+              { label: <IconCircleFilled size={12} color="black" />, value: 'l' },
+              { label: <IconCircleFilled size={16} color="black" />, value: 'xl' },
             ]}
-            onChange={setPenSize}
+            onChange={(c) => { setPenSize(c); trrack.apply('Change Pen Size', actions.setPenSize(c)); }}
           />
           <Group gap={6}>
-            {COLORS.map((c) => <ColorSwatch onClick={() => onColorChange(c)} key={c} color={c} style={{ cursor: 'pointer', outlineOffset: '1px', outline: c === color ? '2px solid black' : 'none' }} />)}
+            {COLORS.map((c) => (
+              <ColorSwatch
+                onClick={() => { onColorChange(c); trrack.apply('Change Color', actions.setColor(c)); }}
+                key={c}
+                // @ts-ignore
+                color={DefaultColorThemePalette.lightMode[c as unknown].solid}
+                style={{ cursor: 'pointer', outlineOffset: '1px', outline: c === color ? '2px solid black' : 'none' }}
+              />
+            ))}
           </Group>
 
-          <Button onClick={() => {
-            trrack.apply('clear', actions.clear([]), { isEphemeral: false, makeCheckpoint: false });
-            setLines([]);
-          }}
-          >
+          <Button onClick={() => setSnapshot(undefined)}>
             Clear all
           </Button>
           <Tooltip label="Undo">
@@ -236,8 +199,7 @@ export default function Canvas({
                 const currentNode = trrack.current.id;
                 if (isStateNode(trrack.current)) {
                   const prevState = trrack.getState(trrack.graph.backend.nodes[ephemeralNode]);
-                  trrack.apply('undo', actions.undo(structuredClone(prevState.lines)), { isEphemeral: true, makeCheckpoint: false });
-                  setLines(prevState.lines);
+                  trrack.apply('undo', actions.undo(prevState.state), { isEphemeral: true, makeCheckpoint: false });
                   setUndoStack([...undoStack, currentNode]);
                 }
               }}
@@ -251,8 +213,7 @@ export default function Canvas({
               disabled={undoStack.length === 0}
               onClick={() => {
                 const newState = trrack.getState(trrack.graph.backend.nodes[undoStack[undoStack.length - 1]]);
-                trrack.apply('redo', actions.undo(structuredClone(newState.lines)), { isEphemeral: true, makeCheckpoint: false });
-                setLines(newState.lines);
+                trrack.apply('redo', actions.undo(newState.state), { isEphemeral: true, makeCheckpoint: false });
                 setUndoStack(undoStack.slice(0, -1));
               }}
             >
@@ -261,42 +222,18 @@ export default function Canvas({
             </ActionIcon>
           </Tooltip>
 
+          <Group gap={20} wrap="nowrap">
+            <IconMicrophone color="red" />
+            <RecordingAudioWaveform />
+          </Group>
+
         </Group>
 
-        <Stage
-          style={{ cursor: tool === 'eraser' ? `src${IconEraser}` : 'default' }}
-          width={width}
-          height={window.innerHeight}
-          onMouseDown={handleMouseDown}
-          onMousemove={handleMouseMove}
-          onMouseup={handleMouseUp}
-          onTouchStart={handleMouseDown as unknown as (e: KonvaEventObject<TouchEvent, unknown>) => void}
-          onTouchMove={handleMouseMove}
-          onTouchEnd={handleMouseUp}
-          onPointerDown={handleMouseDown}
-          onPointerMove={handleMouseMove}
-          onPointerUp={handleMouseUp}
-        >
-          <Layer>
-            {lines.map((line, i) => (
-              <Line
-                key={i}
-                points={line.points}
-                stroke={line.color}
-                strokeWidth={line.width}
-                tension={0.5}
-                lineCap="round"
-                lineJoin="round"
-                globalCompositeOperation={
-                line.tool === 'eraser' ? 'destination-out' : 'source-over'
-              }
-              />
-            ))}
-            {tool === 'eraser' ? (
-              <Circle x={mousePos.x} y={mousePos.y} radius={+penSize * 4} fill="black" opacity={0.1} />
-            ) : null}
-          </Layer>
-        </Stage>
+        <div style={{ height: window.innerHeight - 100, width }}>
+          <Tldraw persistenceKey={parameters.responseId} hideUi initialState="" licenseKey="tldraw-2026-03-18/WyJlNm1fQTFpTiIsWyIqIl0sMTYsIjIwMjYtMDMtMTgiXQ.F1gp8Hb+4X6fiFeLt3VpyDgpLdqOpWzQ+BCDN9X6c/WiasoArZ2Uj7tUM0vqX1NYy4BebKY5BRJr92nuqwXuKA">
+            <TlDrawEditor color={color} drawingTool={tool} size={penSize} onDraw={handleMouseMove} snapshot={provenanceState?.state || snapshot} />
+          </Tldraw>
+        </div>
       </Stack>
     </Box>
   );
