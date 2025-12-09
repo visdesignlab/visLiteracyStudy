@@ -63,6 +63,8 @@ export default function Canvas({
     }
   }, [provenanceState]);
 
+  console.log(snapshot);
+
   // creating provenance tracking
   const { actions, trrack } = useMemo(() => {
     const reg = Registry.create();
@@ -84,11 +86,14 @@ export default function Canvas({
 
     const undo = reg.register('undo', (state: TLDrawState, _lines) => {
       state.state = _lines;
+      console.log('setting undo');
+      setSnapshot(_lines || undefined);
       return state;
     });
 
     const redo = reg.register('redo', (state: TLDrawState, _lines) => {
       state.state = _lines;
+      setSnapshot(_lines || undefined);
       return state;
     });
 
@@ -213,7 +218,7 @@ export default function Canvas({
               disabled={undoStack.length === 0}
               onClick={() => {
                 const newState = trrack.getState(trrack.graph.backend.nodes[undoStack[undoStack.length - 1]]);
-                trrack.apply('redo', actions.undo(newState.state), { isEphemeral: true, makeCheckpoint: false });
+                trrack.apply('redo', actions.redo(newState.state), { isEphemeral: true, makeCheckpoint: false });
                 setUndoStack(undoStack.slice(0, -1));
               }}
             >

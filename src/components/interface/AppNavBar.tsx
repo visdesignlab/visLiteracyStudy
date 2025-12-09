@@ -1,5 +1,5 @@
 import {
-  AppShell, Box, Center, Group, ScrollArea, Text,
+  AppShell, Box, Group, ScrollArea, Text,
 } from '@mantine/core';
 import { useEffect, useMemo, useState } from 'react';
 import { IconMicrophone } from '@tabler/icons-react';
