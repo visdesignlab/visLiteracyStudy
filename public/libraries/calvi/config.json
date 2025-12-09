@@ -9,7 +9,7 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/normal/N1.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -49,7 +49,7 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/normal/N2.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -89,7 +89,7 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/normal/N3.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -130,7 +130,7 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/normal/N4.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -170,7 +170,7 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/normal/N5.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -210,7 +210,7 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/normal/N6.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -250,7 +250,7 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/normal/N7.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -286,7 +286,7 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/normal/N8.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -322,7 +322,7 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/normal/N9.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -362,7 +362,7 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/normal/N10.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -398,7 +398,7 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/normal/N11.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -438,7 +438,7 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/normal/N12.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -478,7 +478,7 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/normal/N13.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -518,7 +518,7 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/normal/N14.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -544,7 +544,7 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/normal/N15.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -579,14 +579,21 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/trick/T1.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "style": {
+        "width": "700px"
+      },
+      "nextButtonText": "Next",
+      "recordAudio": false,
+
+      "instruction": "Do U.S. states have a more similar number of sunny days in the summer or in the winter?",
       "response": [
         {
           "id": "q1",
           "type": "radio",
           "required": true,
           "location": "sidebar",
-          "prompt": "Do U.S. states have a more similar number of sunny days in the summer or in the winter?",
+          "prompt": "Your answer",
+
           "options": [
             {
               "label": "Summer",
@@ -613,15 +620,21 @@
     "T2": {
       "description": "Windy Days in Summer vs Winter",
       "type": "image",
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T2.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "recordAudio": false,
+
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
           "type": "radio",
           "required": true,
           "location": "sidebar",
+
           "prompt": "Do U.S. states have a more similar number of windy days in the summer or in the winter?",
           "options": [
             {
@@ -649,16 +662,24 @@
     "T3": {
       "description": "Concert Ticket Sales",
       "type": "image",
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T3.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "recordAudio": false,
+
+      "instruction": "What is the number of concert tickets sold on Aug 10 as a proportion of that on Aug 11?",
+
       "response": [
         {
           "id": "q1",
           "type": "radio",
           "required": true,
+          "prompt": "Your answer",
+
           "location": "sidebar",
-          "prompt": "What is the number of concert tickets sold on Aug 10 as a proportion of that on Aug 11?",
           "options": [
             {
               "label": "20%",
@@ -691,7 +712,12 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/trick/T4.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "response": [
         {
           "id": "q1",
@@ -731,7 +757,12 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/trick/T5.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "response": [
         {
           "id": "q1",
@@ -771,7 +802,12 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/trick/T6.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "response": [
         {
           "id": "q1",
@@ -811,7 +847,12 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/trick/T8.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "response": [
         {
           "id": "q1",
@@ -851,7 +892,12 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/trick/T9.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "response": [
         {
           "id": "q1",
@@ -891,14 +937,21 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/trick/T10.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
+      "instruction": "Predatory species Z is more prevalent in NC than in AZ.",
       "response": [
         {
           "id": "q1",
           "type": "radio",
           "required": true,
+          "prompt": "Your answer",
+
           "location": "sidebar",
-          "prompt": "Predatory species Z is more prevalent in NC than in AZ.",
           "options": [
             {
               "label": "True",
@@ -925,9 +978,14 @@
     "T11": {
       "description": "Risk of Bacteria Z in WY vs ND",
       "type": "image",
+      "style": {
+        "width": "700px"
+      },
+      "recordAudio": false,
+
       "path": "libraries/calvi/assets/questions/trick/T11.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -961,9 +1019,14 @@
     "T12": {
       "description": "Tree Planting Trend 1960\u20131980",
       "type": "image",
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T12.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "recordAudio": false,
+
       "response": [
         {
           "id": "q1",
@@ -997,9 +1060,14 @@
     "T13": {
       "description": "Bookstore Trend 2000\u20132020",
       "type": "image",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T13.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -1033,16 +1101,23 @@
     "T14": {
       "description": "Movie Release Trend",
       "type": "image",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T14.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "instruction": "Which of the following is true about the annual number of new movies released in city X?",
       "response": [
         {
           "id": "q1",
           "type": "radio",
           "required": true,
+          "prompt": "Your answer",
+
           "location": "sidebar",
-          "prompt": "Which of the following is true about the annual number of new movies released in city X?",
           "options": [
             {
               "label": "There were more new movies released in 1992 than in 1994.",
@@ -1073,9 +1148,14 @@
     "T15": {
       "description": "Sales Trend for Item X (Apr to Jul)",
       "type": "image",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T15.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -1109,9 +1189,14 @@
     "T16": {
       "description": "Apple Harvest Trend",
       "type": "image",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T16.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -1145,9 +1230,14 @@
     "T17": {
       "description": "Sunlight vs Growth for Plant P",
       "type": "image",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T17.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -1185,9 +1275,14 @@
     "T18": {
       "description": "Vacation Days vs Satisfaction",
       "type": "image",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T18.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -1225,9 +1320,14 @@
     "T19": {
       "description": "Weight vs Survival Rate for Z",
       "type": "image",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T19.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -1265,16 +1365,24 @@
     "T20": {
       "description": "Prevalence of Plant Y Globally",
       "type": "image",
+      "recordAudio": false,
+
       "path": "libraries/calvi/assets/questions/trick/T20.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "style": {
+        "width": "700px"
+      },
+      "instruction": "Which of the following is true about the prevalence of the plant species Y?",
+
       "response": [
         {
           "id": "q1",
           "type": "radio",
           "required": true,
           "location": "sidebar",
-          "prompt": "Which of the following is true about the prevalence of the plant species Y?",
+          "prompt": "Your answer",
+
           "options": [
             {
               "label": "It is more prevalent in region D than in E.",
@@ -1306,9 +1414,14 @@
     "T21": {
       "description": "Bar chart of rainfall over 14 days",
       "type": "image",
+      "recordAudio": false,
+
       "path": "libraries/calvi/assets/questions/trick/T21.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "style": {
+        "width": "700px"
+      },
       "response": [
         {
           "id": "q21",
@@ -1346,9 +1459,14 @@
     "T22": {
       "description": "Line chart of airport visitors from 2000 to 2005",
       "type": "image",
+      "recordAudio": false,
+
       "path": "libraries/calvi/assets/questions/trick/T22.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "style": {
+        "width": "700px"
+      },
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q22",
@@ -1382,9 +1500,14 @@
     "T23": {
       "description": "Area chart of monthly shirt sales in 2021",
       "type": "image",
+      "recordAudio": false,
+
       "path": "libraries/calvi/assets/questions/trick/T23.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "style": {
+        "width": "700px"
+      },
       "response": [
         {
           "id": "q23",
@@ -1418,16 +1541,23 @@
     "T25": {
       "description": "Market share of shampoo brands",
       "type": "image",
+      "recordAudio": false,
+
       "path": "libraries/calvi/assets/questions/trick/T25.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "style": {
+        "width": "700px"
+      },
+      "nextButtonText": "Next",
+      "instruction": "Which of the following is true about the three brands of shampoo in city Y from 2001 to 2005?",
       "response": [
         {
           "id": "q1",
           "type": "radio",
           "required": true,
           "location": "sidebar",
-          "prompt": "Which of the following is true about the three brands of shampoo in city Y from 2001 to 2005?",
+          "prompt": "Your answer",
+
           "options": [
             {
               "label": "The market share of brand C is on an increasing trend from 2001 to 2005.",
@@ -1460,14 +1590,21 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/trick/T26.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
+      "instruction": "Approximately, what is the number of votes for candidate A as a proportion of those for candidate B?",
       "response": [
         {
           "id": "q1",
           "type": "radio",
           "required": true,
           "location": "sidebar",
-          "prompt": "Approximately, what is the number of votes for candidate A as a proportion of those for candidate B?",
+          "prompt": "Your answer",
+
           "options": [
             {
               "label": "50%",
@@ -1500,7 +1637,12 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/trick/T27.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "response": [
         {
           "id": "q1",
@@ -1536,7 +1678,12 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/trick/T28.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "response": [
         {
           "id": "q1",
@@ -1572,7 +1719,12 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/trick/T29.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "response": [
         {
           "id": "q1",
@@ -1608,14 +1760,21 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/trick/T30.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "style": {
+        "width": "700px"
+      },
+      "nextButtonText": "Next",
+      "recordAudio": false,
+
+      "instruction": "Was the average amount of precipitation over 15 years in region D higher than that in region C?",
       "response": [
         {
           "id": "q1",
           "type": "radio",
           "required": true,
           "location": "sidebar",
-          "prompt": "Was the average amount of precipitation over 15 years in region D higher than that in region C?",
+          "prompt": "Your answer",
+
           "options": [
             {
               "label": "Yes",
@@ -1642,9 +1801,14 @@
     "T34": {
       "description": "Board game sales trend analysis",
       "type": "image",
+      "recordAudio": false,
+
       "path": "libraries/calvi/assets/questions/trick/T34.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "style": {
+        "width": "700px"
+      },
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -1671,16 +1835,23 @@
     "T35": {
       "description": "Vegetable planting trends by three farms",
       "type": "image",
+      "recordAudio": false,
+
       "path": "libraries/calvi/assets/questions/trick/T35.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "style": {
+        "width": "700px"
+      },
+      "instruction": "Assuming today is Feb 20, 2022, which of the following is true about the vegetables planted by the three farms?",
       "response": [
         {
           "id": "q1",
           "type": "radio",
           "required": true,
           "location": "sidebar",
-          "prompt": "Assuming today is Feb 20, 2022, which of the following is true about the vegetables planted by the three farms?",
+          "prompt": "Your answer",
+
           "options": [
             {
               "label": "All three farms planted more vegetables in 2022 than they did in the previous years.",
@@ -1705,7 +1876,12 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/trick/T36.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "recordAudio": false,
+
+      "nextButtonText": "Next",
+      "style": {
+        "width": "700px"
+      },
       "response": [
         {
           "id": "q1",
@@ -1730,14 +1906,20 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/trick/T37.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "recordAudio": false,
+
+      "nextButtonText": "Next",
+      "style": {
+        "width": "700px"
+      },
+      "instruction": "Assuming today is May 01, 2022, which of the following statements is true?",
       "response": [
         {
           "id": "q1",
           "type": "radio",
           "required": true,
           "location": "sidebar",
-          "prompt": "Assuming today is May 01, 2022, which of the following statements is true?",
+          "prompt": "Your answer",
           "options": [
             {
               "label": "Company Z had more new employees in 2018 than in 2020.",
@@ -1760,9 +1942,14 @@
     "T38": {
       "description": "Work hours and happiness correlation",
       "type": "image",
+      "recordAudio": false,
+
       "path": "libraries/calvi/assets/questions/trick/T38.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "style": {
+        "width": "700px"
+      },
       "response": [
         {
           "id": "q1",
@@ -1785,9 +1972,14 @@
     "T39": {
       "description": "Work hours and salary correlation",
       "type": "image",
+      "recordAudio": false,
+
       "path": "libraries/calvi/assets/questions/trick/T39.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "style": {
+        "width": "700px"
+      },
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -1812,14 +2004,22 @@
       "type": "image",
       "path": "libraries/calvi/assets/questions/trick/T40.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
+      "instruction": "Does any members of species C weigh more than 5 lbs?",
+
       "response": [
         {
           "id": "q1",
           "type": "radio",
           "required": true,
+          "prompt": "Your answer",
+
           "location": "sidebar",
-          "prompt": "Does any members of species C weigh more than 5 lbs?",
           "options": [
             { "label": "Yes", "value": "A" },
             { "label": "No", "value": "B" },
@@ -1835,16 +2035,23 @@
     "T42": {
       "description": "Infection rates per 1,000",
       "type": "image",
+      "recordAudio": false,
+
       "path": "libraries/calvi/assets/questions/trick/T42.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "style": {
+        "width": "700px"
+      },
+      "instruction": "Which region had the highest number of confirmed cases per 1,000 people?",
       "response": [
         {
           "id": "q1",
           "type": "radio",
           "required": true,
+          "prompt": "Your answer",
+
           "location": "sidebar",
-          "prompt": "Which region had the highest number of confirmed cases per 1,000 people?",
           "options": [
             { "label": "A", "value": "A" },
             { "label": "B", "value": "B" },
@@ -1861,16 +2068,22 @@
     "T43": {
       "description": "Sales trend for gift shop A",
       "type": "image",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T43.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "instruction": "What is the trend of sales in gift shop A from Jan to Dec?",
       "response": [
         {
           "id": "q1",
           "type": "radio",
           "required": true,
           "location": "sidebar",
-          "prompt": "What is the trend of sales in gift shop A from Jan to Dec?",
+          "prompt": "Your answer",
           "options": [
             { "label": "Generally increasing", "value": "A" },
             { "label": "Generally decreasing", "value": "B" },
@@ -1887,9 +2100,14 @@
     "T44": {
       "description": "Book price trend in City Z",
       "type": "image",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T44.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -1913,9 +2131,14 @@
     "T45": {
       "description": "Ice cream brand voting across states",
       "type": "image",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T45.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -1945,9 +2168,14 @@
     "T46": {
       "description": "Water sales vs temperature",
       "type": "image",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T46.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -1970,16 +2198,23 @@
     "T47": {
       "description": "Reading preferences by time of day",
       "type": "image",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T47.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "instruction": "True or False: More than half of the people in county Z prefer reading at night.",
       "response": [
         {
           "id": "q1",
           "type": "radio",
           "required": true,
+          "prompt": "Your answer",
+
           "location": "sidebar",
-          "prompt": "True or False: More than half of the people in county Z prefer reading at night.",
           "options": [
             { "label": "True", "value": "A" },
             { "label": "False", "value": "B" },
@@ -1995,16 +2230,23 @@
     "T48": {
       "description": "Voting on hiking trails",
       "type": "image",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T48.jpg",
+      "instruction": "Which of the following is true?",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
           "type": "radio",
           "required": true,
+          "prompt": "Your answer",
+
           "location": "sidebar",
-          "prompt": "Which of the following is true?",
           "options": [
             {
               "label": "Hiking trail A will be voted as the favorite trail.",
@@ -2027,16 +2269,22 @@
     "T49": {
       "description": "Average mall customers in Town X",
       "type": "image",
+      "recordAudio": false,
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T49.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
+      "instruction": "In town X, what is the approximate average number of customers at mall A from Jan to Mar?",
+
       "response": [
         {
           "id": "q1",
           "type": "radio",
           "required": true,
+          "prompt": "Your answer",
           "location": "sidebar",
-          "prompt": "In town X, what is the approximate average number of customers at mall A from Jan to Mar?",
           "options": [
             { "label": "200", "value": "A" },
             { "label": "300", "value": "B" },
@@ -2050,9 +2298,14 @@
     "T50": {
       "description": "Average new buildings in City Z",
       "type": "image",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T50.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",
@@ -2073,9 +2326,14 @@
     "T52": {
       "description": "Monthly sales trend for store B",
       "type": "image",
+      "recordAudio": false,
+
+      "style": {
+        "width": "700px"
+      },
       "path": "libraries/calvi/assets/questions/trick/T52.jpg",
       "nextButtonLocation": "sidebar",
-      "nextButtonText": "Continue",
+      "nextButtonText": "Next",
       "response": [
         {
           "id": "q1",

@@ -20,6 +20,8 @@ Below is part of a computer directory showing the names and sizes (in megabytes)
     - Graph.doc (3MB)
     - Graph-vid.mov (210 MB)
 
+Sketch a visualization that you believe best represents this data.
+
 While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. 
 
-We suggest spending around 7 minutes on this task.
+We suggest spending no more than 7 minutes on this task.

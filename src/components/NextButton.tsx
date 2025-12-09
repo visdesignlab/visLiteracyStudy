@@ -71,11 +71,11 @@ export function NextButton({
 
   const nextOnEnter = useMemo(() => config?.nextOnEnter ?? studyConfig.uiConfig.nextOnEnter, [config, studyConfig]);
 
-  const isTabletSatisified = useMemo(() => (config?.forceTouchScreen ? navigator.maxTouchPoints > 0 : true), [config?.forceTouchScreen]);
+  const isTabletSatisfied = useMemo(() => (config?.forceTouchScreen ? navigator.maxTouchPoints > 0 : true), [config?.forceTouchScreen]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Enter' && !disabled && !isNextDisabled && buttonTimerSatisfied && isTabletSatisified) {
+      if (event.key === 'Enter' && !disabled && !isNextDisabled && buttonTimerSatisfied && isTabletSatisfied) {
         goToNextStep();
       }
     };
@@ -87,15 +87,15 @@ export function NextButton({
       };
     }
     return () => {};
-  }, [disabled, isNextDisabled, buttonTimerSatisfied, goToNextStep, nextOnEnter, isTabletSatisified]);
+  }, [disabled, isNextDisabled, buttonTimerSatisfied, goToNextStep, nextOnEnter, isTabletSatisfied]);
 
-  const nextButtonDisabled = useMemo(() => disabled || isNextDisabled || !buttonTimerSatisfied, [disabled, isNextDisabled, buttonTimerSatisfied]);
+  const nextButtonDisabled = useMemo(() => disabled || isNextDisabled || !isTabletSatisfied || !buttonTimerSatisfied, [disabled, isNextDisabled, isTabletSatisfied, buttonTimerSatisfied]);
   const previousButtonText = useMemo(() => config?.previousButtonText ?? studyConfig.uiConfig.previousButtonText ?? 'Previous', [config, studyConfig]);
 
   return (
     <>
       <Group justify="right" gap="xs" mt="sm">
-        {!isTabletSatisified ? (
+        {!isTabletSatisfied ? (
           <Alert mt="md" title="Tablet required" color="blue" icon={<IconInfoCircle />}>
             This study requires you be on a tablet or have a touchscreen monitor. Please switch to a device with a touchscreen to continue.
           </Alert>

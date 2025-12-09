@@ -138,7 +138,6 @@ export function ComponentController() {
       }).then((s) => {
         const recorder = new MediaRecorder(s);
 
-        console.log(recorder);
         audioStream.current = recorder;
 
         let chunks : Blob[] = [];

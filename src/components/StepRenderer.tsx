@@ -144,6 +144,7 @@ export function StepRenderer() {
           <AppShell
             padding="md"
             header={{ height: showTitleBar ? 70 : 0 }}
+            navbar={{ width: sidebarWidth, breakpoint: 'sm', collapsed: { desktop: !sidebarOpen, mobile: !sidebarOpen } }}
             aside={{ width: 360, breakpoint: 'xs', collapsed: { desktop: !asideOpen, mobile: !asideOpen } }}
             footer={{ height: isAnalysis ? 125 + (hasAudio ? 55 : 0) : 0 }}
           >
@@ -155,11 +156,10 @@ export function StepRenderer() {
             {isScreenRecordingUserRejected && <ScreenRecordingRejection />}
             <HelpModal />
             <AlertModal />
-            <Flex direction="row" gap="xs">
-              <AppNavBar width={sidebarWidth} top={showTitleBar ? 70 : 0} sidebarOpen={sidebarOpen} />
-              {/* 10px is the gap between the sidebar and the main content */}
-              <AppShell.Main className="main" style={{ display: 'flex', flexDirection: 'column' }} w={sidebarOpen ? `calc(100% - ${sidebarWidth}px - 10px)` : '100%'}>
-                {!showTitleBar && !showStudyBrowser && developmentModeEnabled && (
+
+            {/* 10px is the gap between the sidebar and the main content */}
+            <AppShell.Main style={{ display: 'flex', flexDirection: 'column' }}>
+              {!showTitleBar && !showStudyBrowser && developmentModeEnabled && (
                 <Button
                   variant="subtle"
                   leftSection={<IconArrowLeft size={14} />}
@@ -169,10 +169,10 @@ export function StepRenderer() {
                 >
                   Study Browser
                 </Button>
-                )}
-                <Outlet />
-              </AppShell.Main>
-            </Flex>
+              )}
+              <Outlet />
+            </AppShell.Main>
+            <AppNavBar width={sidebarWidth} top={showTitleBar ? 70 : 0} sidebarOpen={sidebarOpen} />
             {isAnalysis && (
             <AnalysisFooter setHasAudio={setHasAudio} key={currentComponent} />
             )}

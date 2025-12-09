@@ -9,6 +9,7 @@
         "trueAnswer": 1,
         "chartType": "treemap"
       },
+      "recordAudio": false,
       "instruction": "eBay is nested in the Software category.",
       "instructionLocation": "sidebar",
       "type": "image",
@@ -17,7 +18,6 @@
         "width": "500px"
       },
       "nextButtonLocation": "sidebar",
-      "nextButtonDisableTime": 25000,
       "response": [
         {
           "id": "res-treemap",
@@ -25,11 +25,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": [
-            "True",
-            "False",
-            "Skip"
-          ]
+          "options": ["True", "False", "Skip"]
         }
       ],
       "correctAnswer": [
@@ -44,6 +40,8 @@
         "trueAnswer": 0,
         "chartType": "stackedBar100"
       },
+      "recordAudio": false,
+
       "instruction": "Which country has the lowest proportion of Gold medals?",
       "instructionLocation": "sidebar",
       "type": "image",
@@ -52,7 +50,6 @@
         "width": "600px"
       },
       "nextButtonLocation": "sidebar",
-      "nextButtonDisableTime": 25000,
       "response": [
         {
           "id": "res-stackedBar100",
@@ -60,13 +57,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": [
-            "Great Britain",
-            "USA",
-            "Japan",
-            "Australia",
-            "Skip"
-          ]
+          "options": ["Great Britain", "USA", "Japan", "Australia", "Skip"]
         }
       ],
       "correctAnswer": [
@@ -81,6 +72,8 @@
         "trueAnswer": 1,
         "chartType": "histogram"
       },
+      "recordAudio": false,
+
       "instruction": "What distance have customers traveled in the taxi the most?",
       "instructionLocation": "sidebar",
       "type": "image",
@@ -89,7 +82,6 @@
         "width": "500px"
       },
       "nextButtonLocation": "sidebar",
-      "nextButtonDisableTime": 25000,
       "response": [
         {
           "id": "res-histogram",
@@ -97,13 +89,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": [
-            "50-70km",
-            "30-40km",
-            "20-30km",
-            "50-60km",
-            "Skip"
-          ]
+          "options": ["50-70km", "30-40km", "20-30km", "50-60km", "Skip"]
         }
       ],
       "correctAnswer": [
@@ -118,6 +104,8 @@
         "trueAnswer": 0,
         "chartType": "choropleth"
       },
+      "recordAudio": false,
+
       "instruction": "In 2020, the unemployment rate for Washington (WA) was higher than that of Wisconsin (WI)?",
       "instructionLocation": "sidebar",
       "type": "image",
@@ -126,7 +114,6 @@
         "width": "500px"
       },
       "nextButtonLocation": "sidebar",
-      "nextButtonDisableTime": 25000,
       "response": [
         {
           "id": "res-choropleth",
@@ -134,11 +121,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": [
-            "True",
-            "False",
-            "Skip"
-          ]
+          "options": ["True", "False", "Skip"]
         }
       ],
       "correctAnswer": [
@@ -153,6 +136,8 @@
         "trueAnswer": 0,
         "chartType": "piechart"
       },
+      "recordAudio": false,
+
       "instruction": "What is the approximate global smartphone market share of Samsung?",
       "instructionLocation": "sidebar",
       "type": "image",
@@ -161,7 +146,6 @@
         "width": "500px"
       },
       "nextButtonLocation": "sidebar",
-      "nextButtonDisableTime": 25000,
       "response": [
         {
           "id": "res-piechart",
@@ -169,13 +153,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": [
-            "17.6%",
-            "25.3%",
-            "10.9%",
-            "35.2%",
-            "Skip"
-          ]
+          "options": ["17.6%", "25.3%", "10.9%", "35.2%", "Skip"]
         }
       ],
       "correctAnswer": [
@@ -198,7 +176,6 @@
         "width": "500px"
       },
       "nextButtonLocation": "sidebar",
-      "nextButtonDisableTime": 25000,
       "response": [
         {
           "id": "res-bubblechart",
@@ -206,13 +183,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": [
-            "Beijing",
-            "Shanghai",
-            "London",
-            "Seoul",
-            "Skip"
-          ]
+          "options": ["Beijing", "Shanghai", "London", "Seoul", "Skip"]
         }
       ],
       "correctAnswer": [
@@ -227,6 +198,8 @@
         "trueAnswer": 1,
         "chartType": "stackedbar"
       },
+      "recordAudio": false,
+
       "instruction": "What is the cost of peanuts in Seoul?",
       "instructionLocation": "sidebar",
       "type": "image",
@@ -235,7 +208,6 @@
         "width": "600px"
       },
       "nextButtonLocation": "sidebar",
-      "nextButtonDisableTime": 25000,
       "response": [
         {
           "id": "res-stackedbar",
@@ -243,13 +215,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": [
-            "$5.2",
-            "$6.1",
-            "$7.5",
-            "$4.5",
-            "Skip"
-          ]
+          "options": ["$5.2", "$6.1", "$7.5", "$4.5", "Skip"]
         }
       ],
       "correctAnswer": [
@@ -264,6 +230,8 @@
         "trueAnswer": 0,
         "chartType": "linechart"
       },
+      "recordAudio": false,
+
       "instruction": "What was the price of a barrel of oil in February 2020?",
       "instructionLocation": "sidebar",
       "type": "image",
@@ -272,7 +240,6 @@
         "width": "550px"
       },
       "nextButtonLocation": "sidebar",
-      "nextButtonDisableTime": 25000,
       "response": [
         {
           "id": "res-linechart",
@@ -280,13 +247,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": [
-            "$50.54",
-            "$47.02",
-            "$42.34",
-            "$43.48",
-            "Skip"
-          ]
+          "options": ["$50.54", "$47.02", "$42.34", "$43.48", "Skip"]
         }
       ],
       "correctAnswer": [
@@ -301,6 +262,8 @@
         "trueAnswer": 1,
         "chartType": "barchart"
       },
+      "recordAudio": false,
+
       "instruction": "What is the average internet speed in Japan?",
       "instructionLocation": "sidebar",
       "type": "image",
@@ -309,7 +272,6 @@
         "width": "500px"
       },
       "nextButtonLocation": "sidebar",
-      "nextButtonDisableTime": 25000,
       "response": [
         {
           "id": "res-barchart",
@@ -338,6 +300,8 @@
         "trueAnswer": 0,
         "chartType": "areachart"
       },
+      "recordAudio": false,
+
       "instruction": "What was the average price of a pound of coffee in October 2019?",
       "instructionLocation": "sidebar",
       "type": "image",
@@ -346,7 +310,6 @@
         "width": "500px"
       },
       "nextButtonLocation": "sidebar",
-      "nextButtonDisableTime": 25000,
       "response": [
         {
           "id": "res-areachar",
@@ -354,13 +317,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": [
-            "0.71",
-            "0.90",
-            "0.80",
-            "0.63",
-            "Skip"
-          ]
+          "options": ["0.71", "0.90", "0.80", "0.63", "Skip"]
         }
       ],
       "correctAnswer": [
@@ -375,6 +332,8 @@
         "trueAnswer": 1,
         "chartType": "stackedarea"
       },
+      "recordAudio": false,
+
       "instruction": "What was the ratio of girls named \"Isla\" to girls named \"Amelia\" in 2012 in the UK?",
       "instructionLocation": "sidebar",
       "type": "image",
@@ -383,7 +342,6 @@
         "width": "500px"
       },
       "nextButtonLocation": "sidebar",
-      "nextButtonDisableTime": 25000,
       "response": [
         {
           "id": "res-stackedarea",
@@ -391,13 +349,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": [
-            "1 to 1",
-            "1 to 2",
-            "1 to 3",
-            "1 to 4",
-            "Skip"
-          ]
+          "options": ["1 to 1", "1 to 2", "1 to 3", "1 to 4", "Skip"]
         }
       ],
       "correctAnswer": [
@@ -412,6 +364,8 @@
         "trueAnswer": 1,
         "chartType": "scatterplot"
       },
+      "recordAudio": false,
+
       "instruction": "There is a negative relationship between the height and the weight of the 85 males.",
       "instructionLocation": "sidebar",
       "type": "image",
@@ -420,7 +374,6 @@
         "width": "500px"
       },
       "nextButtonLocation": "sidebar",
-      "nextButtonDisableTime": 25000,
       "response": [
         {
           "id": "res-scatterplot",
@@ -428,11 +381,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": [
-            "True",
-            "False",
-            "Skip"
-          ]
+          "options": ["True", "False", "Skip"]
         }
       ],
       "correctAnswer": [

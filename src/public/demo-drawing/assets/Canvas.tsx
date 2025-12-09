@@ -222,11 +222,6 @@ export default function Canvas({
             </ActionIcon>
           </Tooltip>
 
-          <Group gap={20} wrap="nowrap">
-            <IconMicrophone color="red" />
-            <RecordingAudioWaveform />
-          </Group>
-
         </Group>
 
         <div style={{ height: window.innerHeight - 100, width }}>
