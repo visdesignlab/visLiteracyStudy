@@ -1,5 +1,5 @@
 import {
-  AppShell, Box, Group, ScrollArea, Text,
+  AppShell, Box, Center, Group, ScrollArea, Text,
 } from '@mantine/core';
 import { useEffect, useMemo, useState } from 'react';
 import { IconMicrophone } from '@tabler/icons-react';
@@ -56,7 +56,6 @@ export function AppNavBar({ width, top, sidebarOpen }: { width: number, top: num
 
     <AppShell.Navbar>
       <ScrollArea h="100%" bg="gray.1" style={{ height: '100%' }} styles={{ viewport: { height: '100%' }, root: { height: '100%' } }}>
-
         <Box
           className="sidebar"
           bg="gray.1"
@@ -67,27 +66,37 @@ export function AppNavBar({ width, top, sidebarOpen }: { width: number, top: num
           w={width}
           miw={width}
         >
-          {instructionInSideBar && instruction !== '' && (
-          <Box
-            bg="gray.3"
-            p="md"
-          >
-            <Group justify="space-between">
-              <Text span c="orange.8" fw={700} inherit>
-                Task:
-              </Text>
-              {
+          {instructionInSideBar && instruction !== '' ? (
+            <Box
+              bg="gray.3"
+              p="md"
+            >
+              <Group justify="space-between">
+                <Text span c="orange.8" fw={700} inherit>
+                  Task:
+                </Text>
+                {
                 isRecording ? (
-                  <Group gap={4} wrap="nowrap">
+                  <Group gap={4} style={{ width: '100%' }} wrap="nowrap">
                     <IconMicrophone color="red" />
                     <RecordingAudioWaveform />
                   </Group>
                 ) : null
               }
-            </Group>
-            <ReactMarkdownWrapper text={instruction} />
-          </Box>
-          )}
+              </Group>
+              <ReactMarkdownWrapper text={instruction} />
+            </Box>
+          ) : isRecording ? (
+            <Center>
+
+              <Group gap={4} wrap="nowrap">
+
+                <IconMicrophone color="red" />
+                <RecordingAudioWaveform />
+              </Group>
+            </Center>
+
+          ) : null}
 
           <Box p="md">
             <ResponseBlock

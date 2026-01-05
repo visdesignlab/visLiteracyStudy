@@ -10,7 +10,7 @@ import {
 import {
   IconArrowBackUp,
   IconArrowForwardUp,
-  IconCircleFilled, IconEraser, IconMicrophone, IconPencil,
+  IconCircleFilled, IconEraser, IconPencil,
 } from '@tabler/icons-react';
 import {
   useEffect, useMemo, useState,
@@ -20,15 +20,14 @@ import 'tldraw/tldraw.css';
 
 import throttle from 'lodash.throttle';
 import { useResizeObserver } from '@mantine/hooks';
-import { isRootNode, isStateNode } from '@trrack/core';
+import { isStateNode } from '@trrack/core';
 import {
-  DefaultColorThemePalette, TLDefaultColorThemeColor, Tldraw, TLEditorSnapshot,
+  DefaultColorThemePalette, Tldraw, TLEditorSnapshot,
 } from 'tldraw';
 import { StimulusParams } from '../../../store/types';
 import { Registry } from './trrack-alpha/core/src/registry/reg';
 import { initializeTrrack } from './trrack-alpha/core/src/provenance/trrack';
 import TlDrawEditor from './trrack-alpha/TlDrawEditor';
-import { RecordingAudioWaveform } from '../../../components/interface/RecordingAudioWaveform';
 
 const COLORS = [
   'red', 'green', 'blue', 'orange', 'grey', 'black', 'violet',
@@ -44,12 +43,14 @@ export type TLDrawState = {
 };
 
 export default function Canvas({
-  parameters, provenanceState, setAnswer,
+  parameters, provenanceState, setAnswer, answers,
 } : StimulusParams<{responseId: string}, TLDrawState>) {
   const [tool, setTool] = useState('pen');
   const [penSize, setPenSize] = useState<string>('m');
   const [color, onColorChange] = useState('red');
   const [snapshot, setSnapshot] = useState<null | undefined | TLEditorSnapshot>(null);
+
+  const [canUndo, setCanUndo] = useState(false);
 
   const [undoStack, setUndoStack] = useState<string[]>([]);
 
@@ -62,8 +63,6 @@ export default function Canvas({
       onColorChange(provenanceState.color || 'red');
     }
   }, [provenanceState]);
-
-  console.log(snapshot);
 
   // creating provenance tracking
   const { actions, trrack } = useMemo(() => {
@@ -80,13 +79,13 @@ export default function Canvas({
     });
 
     const clear = reg.register('clear', (state: TLDrawState, _lines) => {
-      state.state = _lines;
+      state.state = null;
+      setSnapshot(undefined);
       return state;
     });
 
     const undo = reg.register('undo', (state: TLDrawState, _lines) => {
       state.state = _lines;
-      console.log('setting undo');
       setSnapshot(_lines || undefined);
       return state;
     });
@@ -138,12 +137,16 @@ export default function Canvas({
   }, []);
 
   const debouncedApply = useMemo(() => throttle((l: TLEditorSnapshot) => {
-    trrack.apply('drawing', actions.draw(l), { isEphemeral: true, makeCheckpoint: false });
+    trrack.apply('drawing', actions.draw(l), { isEphemeral: false, makeCheckpoint: false });
     setAnswer({
       status: true,
       provenanceGraph: trrack.graph.backend,
       answers: {},
     });
+
+    setCanUndo(true);
+
+    setUndoStack([]);
 
     setSnapshot(null);
   }, 100), [actions, setAnswer, trrack]);
@@ -192,13 +195,17 @@ export default function Canvas({
             ))}
           </Group>
 
-          <Button onClick={() => setSnapshot(undefined)}>
+          <Button onClick={() => {
+            trrack.apply('clearing', actions.clear(null), { isEphemeral: false, makeCheckpoint: false });
+            setUndoStack([]);
+          }}
+          >
             Clear all
           </Button>
           <Tooltip label="Undo">
             <ActionIcon
               variant="light"
-              disabled={isRootNode(trrack.graph.backend.nodes[trrack.getLastNNonEphemeralNode(undoStack.length)])}
+              disabled={!canUndo}
               onClick={() => {
                 const ephemeralNode = trrack.getLastNNonEphemeralNode(undoStack.length + 1);
                 const currentNode = trrack.current.id;
@@ -230,7 +237,7 @@ export default function Canvas({
         </Group>
 
         <div style={{ height: window.innerHeight - 100, width }}>
-          <Tldraw persistenceKey={parameters.responseId} hideUi initialState="" licenseKey="tldraw-2026-03-18/WyJlNm1fQTFpTiIsWyIqIl0sMTYsIjIwMjYtMDMtMTgiXQ.F1gp8Hb+4X6fiFeLt3VpyDgpLdqOpWzQ+BCDN9X6c/WiasoArZ2Uj7tUM0vqX1NYy4BebKY5BRJr92nuqwXuKA">
+          <Tldraw persistenceKey={`${parameters.responseId} - ${answers.introduction_0.answer}`} hideUi initialState="" licenseKey="tldraw-2026-03-18/WyJlNm1fQTFpTiIsWyIqIl0sMTYsIjIwMjYtMDMtMTgiXQ.F1gp8Hb+4X6fiFeLt3VpyDgpLdqOpWzQ+BCDN9X6c/WiasoArZ2Uj7tUM0vqX1NYy4BebKY5BRJr92nuqwXuKA">
             <TlDrawEditor color={color} drawingTool={tool} size={penSize} onDraw={handleMouseMove} snapshot={provenanceState?.state || snapshot} />
           </Tldraw>
         </div>

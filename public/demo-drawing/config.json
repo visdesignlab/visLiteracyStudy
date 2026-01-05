@@ -115,7 +115,7 @@
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
       "instruction": "First, please <b>speak out loud</b> about what you are thinking as you look at the chart and make sense of it. \n\n  Next, please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
-      "path": "demo-drawing/assets/critiqueTasks/T20.png",
+      "path": "demo-drawing/assets/critiqueTasks/T2.png",
       "response": [
         {
           "id": "drawing100m",
@@ -462,35 +462,42 @@
         }
       ]
     },
-    "postStudy": {
+    "postStudyProblems": {
       "type": "questionnaire",
-      "recordAudio": false,
-
+      "recordAudio": true,
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
       "response": [
         {
+          "id": "instructions",
+          "type": "textOnly",
+          "prompt": "Please answer the following questions by  <b>speaking out loud</b>."
+        },
+        {
           "id": "problems",
-          "type": "longText",
-          "required": true,
-          "prompt": "Did you experience any problems with our tool?"
+          "type": "textOnly",
+          "prompt": "1. Did you experience any problems with our tool?"
         },
         {
           "id": "otherIssues",
-          "type": "longText",
-          "required": true,
-          "prompt": "Any other issues or anything you would like to tell us?"
+          "type": "textOnly",
+          "prompt": "2. Any other issues or anything you would like to tell us?"
         },
         {
           "id": "enjoyDrawing",
-          "type": "longText",
-          "required": true,
-          "prompt": "Please provide any comments you had about your experience drawing visualizations?"
+          "type": "textOnly",
+          "prompt": "3. Please provide any comments you had about your experience drawing visualizations?"
         },
         {
           "id": "enjoyThinkingAloud",
-          "type": "longText",
+          "type": "textOnly",
+          "prompt": "4. Please provide any comments you had about thinking-aloud during this study?"
+        },
+        {
+          "id": "doneTalking",
+          "type": "radio",
           "required": true,
-          "prompt": "Please provide any comments you had about thinking-aloud during this study?"
+          "prompt": "Have you answered all of the above questions out loud?",
+          "options": ["Yes"]
         },
         {
           "id": "howDraw",
@@ -599,7 +606,7 @@
         "order": "random",
         "id": "vlatPart"
       },
-      "postStudy"
+      "postStudyProblems"
     ]
   }
 }

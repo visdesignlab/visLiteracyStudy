@@ -1,5 +1,4 @@
 import {
-  ReactNode,
   useEffect,
   useState,
   useMemo,
@@ -32,6 +31,140 @@ import { ResourceNotFound } from '../ResourceNotFound';
 import { encryptIndex } from '../utils/encryptDecryptIndex';
 import { parseStudyConfig } from '../parser/parser';
 import { hash } from '../storage/engines/utils';
+import { useAsync } from '../store/hooks/useAsync';
+import { StorageEngine } from '../storage/engines/types';
+
+async function initializeUserStoreRouting(storageEngine: StorageEngine | undefined, activeConfig: ParsedConfig<StudyConfig> | null, studyId: string, searchParams: URLSearchParams, participantId: string | null, setStore: (store: Nullable<StudyStore>) => void, setRoutes: (routes: RouteObject[]) => void) {
+  if (!storageEngine || !activeConfig || !studyId) return;
+
+  try {
+    // Make sure that we have a study database and that the study database has a sequence array
+    await storageEngine.initializeStudyDb(studyId);
+    await storageEngine.saveConfig(activeConfig);
+
+    const sequenceArray = await storageEngine.getSequenceArray();
+    if (!sequenceArray) {
+      await storageEngine.setSequenceArray(
+        await generateSequenceArray(activeConfig),
+      );
+    }
+
+    // Get or generate participant session
+    const urlParticipantId = activeConfig.uiConfig.urlParticipantIdParam
+      ? searchParams.get(activeConfig.uiConfig.urlParticipantIdParam)
+          || undefined
+      : undefined;
+    const searchParamsObject = Object.fromEntries(searchParams.entries());
+
+    const ipRes = await fetch('https://api.ipify.org?format=json').catch(
+      (_) => '',
+    );
+    const ip: { ip: string } = ipRes instanceof Response ? await ipRes.json() : { ip: '' };
+
+    const metadata: ParticipantMetadata = {
+      language: navigator.language,
+      userAgent: navigator.userAgent,
+      resolution: {
+        width: window.screen.width,
+        height: window.screen.height,
+        availHeight: window.screen.availHeight,
+        availWidth: window.screen.availWidth,
+        colorDepth: window.screen.colorDepth,
+        orientation: window.screen.orientation.type,
+        pixelDepth: window.screen.pixelDepth,
+      },
+      ip: ip.ip,
+    };
+
+    const participantSession = await storageEngine.initializeParticipantSession(
+      searchParamsObject,
+      activeConfig,
+      metadata,
+      participantId || urlParticipantId,
+    );
+
+    const modes = await storageEngine.getModes(studyId);
+    const activeHash = await hash(JSON.stringify(activeConfig));
+
+    let participantConfig = activeConfig;
+
+    if (participantSession.participantConfigHash !== activeHash) {
+      participantConfig = (await storageEngine.getAllConfigsFromHash([participantSession.participantConfigHash], studyId))[participantSession.participantConfigHash] as ParsedConfig<StudyConfig>;
+    }
+
+    // Initialize the redux stores
+    const newStore = await studyStoreCreator(
+      studyId,
+      participantConfig,
+      participantSession.sequence,
+      metadata,
+      participantSession.answers,
+      modes,
+      participantSession.participantId,
+      participantSession.completed,
+      false,
+    );
+    setStore(newStore);
+  } catch (error) {
+    console.error('Error initializing user store routing:', error);
+    // Fallback: initialize the store with empty data
+    const emptyStore = await studyStoreCreator(
+      studyId,
+      activeConfig,
+      generateSequenceArray(activeConfig)[0],
+      {
+        language: '',
+        userAgent: '',
+        resolution: {
+          width: 0,
+          height: 0,
+          availHeight: 0,
+          availWidth: 0,
+          colorDepth: 0,
+          orientation: '',
+          pixelDepth: 0,
+        },
+        ip: '',
+      },
+      {},
+      { developmentModeEnabled: true, dataSharingEnabled: true, dataCollectionEnabled: false },
+      '',
+      false,
+      true,
+    );
+    setStore(emptyStore);
+  }
+
+  // Initialize the routing
+  setRoutes([
+    {
+      element: <StepRenderer />,
+      children: [
+        {
+          path: '/',
+          element: <NavigateWithParams to={encryptIndex(0)} replace />,
+        },
+        {
+          path: '/:index/:funcIndex?',
+          element:
+                activeConfig.errors.length > 0 ? (
+                  <>
+                    <Title order={2} mb={8}>
+                      Error loading config
+                    </Title>
+                    <ErrorLoadingConfig
+                      issues={activeConfig.errors}
+                      type="error"
+                    />
+                  </>
+                ) : (
+                  <ComponentController />
+                ),
+        },
+      ],
+    },
+  ]);
+}
 
 export function Shell({ globalConfig }: { globalConfig: GlobalConfig }) {
   // Pull study config
@@ -75,160 +208,17 @@ export function Shell({ globalConfig }: { globalConfig: GlobalConfig }) {
 
   const participantId = useMemo(() => searchParams.get('participantId'), [searchParams]);
 
-  useEffect(() => {
-    async function initializeUserStoreRouting() {
-      // Check that we have a storage engine and active config (studyId is set for config, but typescript complains)
-      if (!storageEngine || !activeConfig || !studyId) return;
-
-      try {
-      // Make sure that we have a study database and that the study database has a sequence array
-        await storageEngine.initializeStudyDb(studyId);
-        await storageEngine.saveConfig(activeConfig);
-
-        const sequenceArray = await storageEngine.getSequenceArray();
-        if (!sequenceArray) {
-          await storageEngine.setSequenceArray(
-            await generateSequenceArray(activeConfig),
-          );
-        }
-
-        // Get or generate participant session
-        const urlParticipantId = activeConfig.uiConfig.urlParticipantIdParam
-          ? searchParams.get(activeConfig.uiConfig.urlParticipantIdParam)
-          || undefined
-          : undefined;
-        const searchParamsObject = Object.fromEntries(searchParams.entries());
-
-        const ipRes = await fetch('https://api.ipify.org?format=json').catch(
-          (_) => '',
-        );
-        const ip: { ip: string } = ipRes instanceof Response ? await ipRes.json() : { ip: '' };
-
-        const metadata: ParticipantMetadata = {
-          language: navigator.language,
-          userAgent: navigator.userAgent,
-          resolution: {
-            width: window.screen.width,
-            height: window.screen.height,
-            availHeight: window.screen.availHeight,
-            availWidth: window.screen.availWidth,
-            colorDepth: window.screen.colorDepth,
-            orientation: window.screen.orientation.type,
-            pixelDepth: window.screen.pixelDepth,
-          },
-          ip: ip.ip,
-        };
-
-        const participantSession = await storageEngine.initializeParticipantSession(
-          searchParamsObject,
-          activeConfig,
-          metadata,
-          participantId || urlParticipantId,
-        );
-
-        const modes = await storageEngine.getModes(studyId);
-        const activeHash = await hash(JSON.stringify(activeConfig));
-
-        let participantConfig = activeConfig;
-
-        if (participantSession.participantConfigHash !== activeHash) {
-          participantConfig = (await storageEngine.getAllConfigsFromHash([participantSession.participantConfigHash], studyId))[participantSession.participantConfigHash] as ParsedConfig<StudyConfig>;
-        }
-
-        // Initialize the redux stores
-        const newStore = await studyStoreCreator(
-          studyId,
-          participantConfig,
-          participantSession.sequence,
-          metadata,
-          participantSession.answers,
-          modes,
-          participantSession.participantId,
-          participantSession.completed,
-          false,
-        );
-        setStore(newStore);
-      } catch (error) {
-        console.error('Error initializing user store routing:', error);
-        // Fallback: initialize the store with empty data
-        const emptyStore = await studyStoreCreator(
-          studyId,
-          activeConfig,
-          generateSequenceArray(activeConfig)[0],
-          {
-            language: '',
-            userAgent: '',
-            resolution: {
-              width: 0,
-              height: 0,
-              availHeight: 0,
-              availWidth: 0,
-              colorDepth: 0,
-              orientation: '',
-              pixelDepth: 0,
-            },
-            ip: '',
-          },
-          {},
-          { developmentModeEnabled: true, dataSharingEnabled: true, dataCollectionEnabled: false },
-          '',
-          false,
-          true,
-        );
-        setStore(emptyStore);
-      }
-
-      // Initialize the routing
-      setRoutes([
-        {
-          element: <StepRenderer />,
-          children: [
-            {
-              path: '/',
-              element: <NavigateWithParams to={encryptIndex(0)} replace />,
-            },
-            {
-              path: '/:index/:funcIndex?',
-              element:
-                activeConfig.errors.length > 0 ? (
-                  <>
-                    <Title order={2} mb={8}>
-                      Error loading config
-                    </Title>
-                    <ErrorLoadingConfig
-                      issues={activeConfig.errors}
-                      type="error"
-                    />
-                  </>
-                ) : (
-                  <ComponentController />
-                ),
-            },
-          ],
-        },
-      ]);
-    }
-    initializeUserStoreRouting();
-  }, [storageEngine, activeConfig, studyId, searchParams, participantId]);
+  const { status } = useAsync(initializeUserStoreRouting, [storageEngine, activeConfig, studyId, searchParams, participantId, setStore, setRoutes]);
 
   const routing = useRoutes(routes);
 
-  let toRender: ReactNode = null;
-
-  // Definitely a 404
-  if (!isValidStudyId) {
-    toRender = <ResourceNotFound />;
-  } else if (routes.length === 0) {
-    toRender = <LoadingOverlay visible />;
-  } else {
-    // If routing is null, we didn't match any routes
-    toRender = routing && store ? (
-      <StudyStoreContext.Provider value={store}>
-        <Provider store={store.store}>{routing}</Provider>
-      </StudyStoreContext.Provider>
-    ) : (
-      <ResourceNotFound />
-    );
-  }
-  return toRender;
+  return !isValidStudyId ? <ResourceNotFound />
+    : routes.length === 0 || status !== 'success' ? <LoadingOverlay visible />
+      : routing && store ? (
+        <StudyStoreContext.Provider value={store}>
+          <Provider store={store.store}>{routing}</Provider>
+        </StudyStoreContext.Provider>
+      ) : (
+        <ResourceNotFound />
+      );
 }

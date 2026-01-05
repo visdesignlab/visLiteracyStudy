@@ -145,6 +145,7 @@ export async function studyStoreCreator(
         state.config = payload;
       },
       setIsRecording(state, { payload }: PayloadAction<boolean>) {
+        console.log('changing recording');
         state.isRecording = payload;
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -383,6 +384,8 @@ export async function studyStoreCreator(
       preloadedState: initialState,
     },
   );
+
+  console.log('creating new store');
 
   return { store, actions: storeSlice.actions };
 }
