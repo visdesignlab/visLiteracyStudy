@@ -15,7 +15,7 @@
       "type": "image",
       "path": "libraries/mini-vlat/assets/TreeMap.png",
       "style": {
-        "width": "500px"
+        "width": "700px"
       },
       "nextButtonLocation": "sidebar",
       "response": [
@@ -25,7 +25,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": ["True", "False", "Skip"]
+          "options": ["True", "False"]
         }
       ],
       "correctAnswer": [
@@ -57,7 +57,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": ["Great Britain", "USA", "Japan", "Australia", "Skip"]
+          "options": ["Great Britain", "USA", "Japan", "Australia"]
         }
       ],
       "correctAnswer": [
@@ -79,7 +79,7 @@
       "type": "image",
       "path": "libraries/mini-vlat/assets/Histogram.png",
       "style": {
-        "width": "500px"
+        "width": "700px"
       },
       "nextButtonLocation": "sidebar",
       "response": [
@@ -89,7 +89,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": ["50-70km", "30-40km", "20-30km", "50-60km", "Skip"]
+          "options": ["20-30km", "30-40km", "50-60km", "50-70km"]
         }
       ],
       "correctAnswer": [
@@ -111,7 +111,7 @@
       "type": "image",
       "path": "libraries/mini-vlat/assets/Choropleth.png",
       "style": {
-        "width": "500px"
+        "width": "700px"
       },
       "nextButtonLocation": "sidebar",
       "response": [
@@ -121,7 +121,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": ["True", "False", "Skip"]
+          "options": ["True", "False"]
         }
       ],
       "correctAnswer": [
@@ -137,13 +137,12 @@
         "chartType": "piechart"
       },
       "recordAudio": false,
-
       "instruction": "What is the approximate global smartphone market share of Samsung?",
       "instructionLocation": "sidebar",
       "type": "image",
       "path": "libraries/mini-vlat/assets/PieChart.png",
       "style": {
-        "width": "500px"
+        "width": "700px"
       },
       "nextButtonLocation": "sidebar",
       "response": [
@@ -153,7 +152,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": ["17.6%", "25.3%", "10.9%", "35.2%", "Skip"]
+          "options": ["17.6%", "25.3%", "10.9%", "35.2%"]
         }
       ],
       "correctAnswer": [
@@ -168,12 +167,13 @@
         "trueAnswer": 1,
         "chartType": "bubblechart"
       },
+      "recordAudio": false,
       "instruction": "Which city's metro system has the largest number of stations?",
       "instructionLocation": "sidebar",
       "type": "image",
       "path": "libraries/mini-vlat/assets/BubbleChart.png",
       "style": {
-        "width": "500px"
+        "width": "700px"
       },
       "nextButtonLocation": "sidebar",
       "response": [
@@ -183,7 +183,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": ["Beijing", "Shanghai", "London", "Seoul", "Skip"]
+          "options": ["Beijing", "Shanghai", "London", "Seoul"]
         }
       ],
       "correctAnswer": [
@@ -205,7 +205,7 @@
       "type": "image",
       "path": "libraries/mini-vlat/assets/StackedBar.png",
       "style": {
-        "width": "600px"
+        "width": "700px"
       },
       "nextButtonLocation": "sidebar",
       "response": [
@@ -215,7 +215,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": ["$5.2", "$6.1", "$7.5", "$4.5", "Skip"]
+          "options": ["$4.5", "$5.2", "$6.1", "$7.5"]
         }
       ],
       "correctAnswer": [
@@ -237,7 +237,7 @@
       "type": "image",
       "path": "libraries/mini-vlat/assets/LineChart.png",
       "style": {
-        "width": "550px"
+        "width": "750px"
       },
       "nextButtonLocation": "sidebar",
       "response": [
@@ -247,7 +247,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": ["$50.54", "$47.02", "$42.34", "$43.48", "Skip"]
+          "options": ["$42.34", "$43.48", "$47.02", "$50.54"]
         }
       ],
       "correctAnswer": [
@@ -269,7 +269,7 @@
       "type": "image",
       "path": "libraries/mini-vlat/assets/BarChart.png",
       "style": {
-        "width": "500px"
+        "width": "700px"
       },
       "nextButtonLocation": "sidebar",
       "response": [
@@ -279,13 +279,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": [
-            "42.30 Mbps",
-            "40.51 Mbps",
-            "35.25 Mbps",
-            "16.16 Mbps",
-            "Skip"
-          ]
+          "options": ["16.16 Mbps", "35.25 Mbps", "40.51 Mbps", "42.30 Mbps"]
         }
       ],
       "correctAnswer": [
@@ -307,7 +301,7 @@
       "type": "image",
       "path": "libraries/mini-vlat/assets/AreaChart.png",
       "style": {
-        "width": "500px"
+        "width": "700px"
       },
       "nextButtonLocation": "sidebar",
       "response": [
@@ -317,7 +311,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": ["0.71", "0.90", "0.80", "0.63", "Skip"]
+          "options": ["0.90", "0.80", "0.71", "0.63"]
         }
       ],
       "correctAnswer": [
@@ -339,7 +333,7 @@
       "type": "image",
       "path": "libraries/mini-vlat/assets/StackedArea.png",
       "style": {
-        "width": "500px"
+        "width": "700px"
       },
       "nextButtonLocation": "sidebar",
       "response": [
@@ -349,7 +343,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": ["1 to 1", "1 to 2", "1 to 3", "1 to 4", "Skip"]
+          "options": ["1 to 1", "1 to 2", "1 to 3", "1 to 4"]
         }
       ],
       "correctAnswer": [
@@ -371,7 +365,7 @@
       "type": "image",
       "path": "libraries/mini-vlat/assets/Scatterplot.png",
       "style": {
-        "width": "500px"
+        "width": "700px"
       },
       "nextButtonLocation": "sidebar",
       "response": [
@@ -381,7 +375,7 @@
           "required": true,
           "location": "sidebar",
           "type": "radio",
-          "options": ["True", "False", "Skip"]
+          "options": ["True", "False"]
         }
       ],
       "correctAnswer": [
