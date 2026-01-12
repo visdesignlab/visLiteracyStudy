@@ -470,35 +470,155 @@
         {
           "id": "instructions",
           "type": "textOnly",
-          "prompt": "Please answer the following questions by  <b>speaking out loud</b>."
+          "prompt": "Please answer the following question by  <b>speaking out loud</b>."
         },
         {
           "id": "problems",
           "type": "textOnly",
-          "prompt": "1. Did you experience any problems with our tool?"
-        },
-        {
-          "id": "otherIssues",
-          "type": "textOnly",
-          "prompt": "2. Any other issues or anything you would like to tell us?"
-        },
-        {
-          "id": "enjoyDrawing",
-          "type": "textOnly",
-          "prompt": "3. Please provide any comments you had about your experience drawing visualizations?"
-        },
-        {
-          "id": "enjoyThinkingAloud",
-          "type": "textOnly",
-          "prompt": "4. Please provide any comments you had about thinking-aloud during this study?"
+          "prompt": "<b>Did you experience any problems with our tool?</b>"
         },
         {
           "id": "doneTalking",
           "type": "radio",
           "required": true,
-          "prompt": "Have you answered all of the above questions out loud?",
+          "prompt": "Have you answered the above question out loud?",
           "options": ["Yes"]
+        }
+      ]
+    },
+    "postStudyIssues": {
+      "type": "questionnaire",
+      "recordAudio": true,
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "response": [
+        {
+          "id": "instructions",
+          "type": "textOnly",
+          "prompt": "Please answer the following question by  <b>speaking out loud</b>."
         },
+
+        {
+          "id": "otherIssues",
+          "type": "textOnly",
+          "prompt": "<b>Any other issues or anything you would like to tell us?</b>"
+        },
+        {
+          "id": "doneTalking",
+          "type": "radio",
+          "required": true,
+          "prompt": "Have you answered the above question out loud?",
+          "options": ["Yes"]
+        }
+      ]
+    },
+    "postStudyDrawingExperience": {
+      "type": "questionnaire",
+      "recordAudio": true,
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "response": [
+        {
+          "id": "instructions",
+          "type": "textOnly",
+          "prompt": "Please answer the following question by  <b>speaking out loud</b>."
+        },
+        {
+          "id": "enjoyDrawing",
+          "type": "textOnly",
+          "prompt": "<b>Please provide any comments you had about your experience drawing visualizations?</b>"
+        },
+        {
+          "id": "doneTalking",
+          "type": "radio",
+          "required": true,
+          "prompt": "Have you answered the above question out loud?",
+          "options": ["Yes"]
+        }
+      ]
+    },
+    "postStudyAloudExperience": {
+      "type": "questionnaire",
+      "recordAudio": true,
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "response": [
+        {
+          "id": "instructions",
+          "type": "textOnly",
+          "prompt": "Please answer the following question by  <b>speaking out loud</b>."
+        },
+        {
+          "id": "enjoyThinkingAloud",
+          "type": "textOnly",
+          "prompt": "<b>Please provide any comments you had about thinking-aloud during this study?</b>"
+        },
+        {
+          "id": "doneTalking",
+          "type": "radio",
+          "required": true,
+          "prompt": "Have you answered the above question out loud?",
+          "options": ["Yes"]
+        }
+      ]
+    },
+    "demographics": {
+      "type": "questionnaire",
+      "recordAudio": false,
+      "description": "Basic demographic questions including gender, age, and education",
+      "response": [
+        {
+          "id": "gender",
+          "prompt": "What is your **gender**?",
+          "required": true,
+          "location": "aboveStimulus",
+          "type": "radio",
+          "withOther": true,
+          "options": [
+            "Woman",
+            "Man",
+            "Non-binary / Genderqueer / Third gender",
+            "Genderfluid / Gender non-conforming",
+            "Questioning",
+            "Prefer not to say"
+          ]
+        },
+        {
+          "id": "age",
+          "prompt": "What is your **age**?",
+          "required": true,
+          "location": "aboveStimulus",
+          "type": "radio",
+          "options": [
+            "Under 18 years",
+            "18-24 years",
+            "25-34 years",
+            "35-44 years",
+            "45-54 years",
+            "55-64 years",
+            "65 years or older",
+            "Prefer not to say"
+          ]
+        },
+        {
+          "id": "education",
+          "prompt": "What is the **highest degree or level of education** you have completed?",
+          "required": true,
+          "location": "aboveStimulus",
+          "type": "radio",
+          "withOther": true,
+          "options": [
+            "Less than high school",
+            "High school diploma or equivalent",
+            "Bachelor's degree or equivalent",
+            "Master's degree or equivalent",
+            "Doctoral degree or equivalent"
+          ]
+        }
+      ]
+    },
+    "postStudyHowDraw": {
+      "type": "questionnaire",
+      "recordAudio": false,
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "response": [
         {
           "id": "howDraw",
           "type": "checkbox",
@@ -511,6 +631,40 @@
           ]
         }
       ]
+    },
+    "preStudyVisAbility": {
+      "type": "questionnaire",
+      "recordAudio": false,
+      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
+      "response": [
+        {
+          "id": "howDraw",
+          "type": "likert",
+          "required": true,
+          "numItems": 7,
+          "prompt": "How comfortable are you at interpreting numbers, percentages, and basic statistics?",
+          "leftLabel": "Not at all confident",
+          "rightLabel": "Extremely confident"
+        },
+        {
+          "id": "visLit",
+          "type": "likert",
+          "required": true,
+          "numItems": 7,
+          "prompt": "How confident are you in your ability to accurately interpret and critique charts, graphs, and other visualizations?",
+          "leftLabel": "Not at all confident",
+          "rightLabel": "Extremely confident"
+        },
+        {
+          "id": "visDraw",
+          "type": "likert",
+          "required": true,
+          "numItems": 7,
+          "prompt": "How confident are you in your ability to design and create charts, graphs, and other visualizations?",
+          "leftLabel": "Not at all confident",
+          "rightLabel": "Extremely confident"
+        }
+      ]
     }
   },
   "sequence": {
@@ -519,6 +673,7 @@
       "introduction",
       "consent",
       "$mic-check.co.audioTest",
+      "preStudyVisAbility",
       {
         "id": "drawingPart",
         "components": [
@@ -606,7 +761,12 @@
         "order": "random",
         "id": "vlatPart"
       },
-      "postStudyProblems"
+      "postStudyProblems",
+      "postStudyIssues",
+      "postStudyDrawingExperience",
+      "postStudyAloudExperience",
+      "postStudyHowDraw",
+      "demographics"
     ]
   }
 }
