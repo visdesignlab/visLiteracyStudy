@@ -27,7 +27,7 @@
   "components": {
     "introduction": {
       "type": "markdown",
-      "forceTouchScreen": true,
+      "forceTouchScreen": false,
       "recordAudio": false,
       "path": "demo-drawing/assets/introduction.md",
       "response": [
