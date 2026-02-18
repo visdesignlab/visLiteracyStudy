@@ -2,7 +2,7 @@ import {
   Center, Flex, Loader, Space, Text,
 } from '@mantine/core';
 import {
-  useEffect, useState, useCallback, useMemo,
+  useEffect, useState, useCallback, useMemo, useRef,
 } from 'react';
 import { useStudyConfig } from '../store/hooks/useStudyConfig';
 import { ReactMarkdownWrapper } from './ReactMarkdownWrapper';
@@ -13,6 +13,7 @@ import { download } from './downloader/DownloadTidy';
 import { useStudyId } from '../routes/utils';
 import { useIsAnalysis } from '../store/hooks/useIsAnalysis';
 import { useStoreDispatch, useStoreActions } from '../store/store';
+import { useEvent } from '../store/hooks/useEvent';
 
 export function StudyEnd() {
   const studyConfig = useStudyConfig();
@@ -23,6 +24,34 @@ export function StudyEnd() {
   const isAnalysis = useIsAnalysis();
 
   const [completed, setCompleted] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const cancelledRef = useRef(false);
+
+  const runVerify = useCallback(async () => {
+    if (storageEngine && !cancelledRef.current) {
+      const isComplete = await storageEngine.verifyCompletion();
+      if (isComplete && !cancelledRef.current) {
+        setCompleted(true);
+      }
+    }
+  }, [storageEngine]);
+
+  const verifyLoop = useEvent(async () => {
+    if (completed || cancelledRef.current) {
+      return;
+    }
+    try {
+      await runVerify();
+    } catch (error) {
+      console.error('An error occurred while verifying completion', error);
+    } finally {
+      // Schedule the next execution after the current one is complete
+      // Only schedule if not completed and not cancelled to avoid unnecessary iterations
+      if (!completed && !cancelledRef.current) {
+        timeoutRef.current = setTimeout(verifyLoop, 2000);
+      }
+    }
+  });
 
   useEffect(() => {
     // Don't save to the storage engine in analysis
@@ -31,17 +60,25 @@ export function StudyEnd() {
       return;
     }
 
+    // Reset cancelled flag for React 18 StrictMode remounts
+    cancelledRef.current = false;
+
     // Set completed in the store
     dispatch(setParticipantCompleted(true));
 
+    // Start the first execution
+    verifyLoop();
+
     // verify that storageEngine.verifyCompletion() returns true, loop until it does
-    const interval = setInterval(async () => {
-      const isComplete = await storageEngine!.verifyCompletion();
-      if (isComplete) {
-        setCompleted(true);
-        clearInterval(interval);
+
+    // Cleanup function to prevent memory leaks
+    return () => {
+      cancelledRef.current = true;
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
-    }, 2000);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
