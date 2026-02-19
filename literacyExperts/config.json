@@ -362,7 +362,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a list of authors, how many papers each author has published, and how many papers author pairs have published together. \n\n ![demo](demo-drawing/assets/drawingTasks/networkTask.png) \n\n  Sketch a visualization that you believe best represents this data. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
+      "instruction": "Below is a list of people, how many friends each person has, and how many friends that pairs of people share together. \n\n ![demo](demo-drawing/assets/drawingTasks/networkTask.png) \n\n  Sketch a visualization that you believe best represents this data. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "showTimer": true,
       "parameters": {
