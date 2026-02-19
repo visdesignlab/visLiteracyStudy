@@ -12,8 +12,7 @@ import { studyComponentToIndividualComponent } from '../../utils/handleComponent
 import { getStaticAssetByPath } from '../../utils/getStaticAsset';
 import { PREFIX } from '../../utils/Prefix';
 import { RecordingAudioWaveform } from './RecordingAudioWaveform';
-import { useStoreSelector } from '../../store/store';
-import { useScreenRecording } from '../../store/hooks/useScreenRecording';
+import { useRecording } from '../../store/hooks/useRecording';
 
 export function AppNavBar({ width, top, sidebarOpen }: { width: number, top: number, sidebarOpen: boolean }) {
   // Get the config for the current step
@@ -52,9 +51,7 @@ export function AppNavBar({ width, top, sidebarOpen }: { width: number, top: num
   const instructionLocation = useMemo(() => currentConfig?.instructionLocation ?? studyConfig.uiConfig.instructionLocation ?? 'sidebar', [currentConfig, studyConfig]);
   const instructionInSideBar = instructionLocation === 'sidebar';
 
-  const { isAudioRecording: isRecording, isAudioCapturing } = useScreenRecording();
-
-  console.log(isRecording, isAudioCapturing);
+  const { isAudioRecording: isRecording } = useRecording();
 
   return currentConfig ? (
 

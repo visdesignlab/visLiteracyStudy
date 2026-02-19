@@ -1,4 +1,4 @@
-import { AppShell, Button, Flex } from '@mantine/core';
+import { AppShell, Button } from '@mantine/core';
 import { Outlet } from 'react-router';
 import {
   useEffect, useMemo, useRef,
@@ -144,6 +144,7 @@ export function StepRenderer() {
         <ReplayContext.Provider value={replay}>
           <AppShell
             padding="md"
+            styles={{ main: { height: '100dvh' } }}
             header={{ height: showTitleBar ? 70 : 0 }}
             navbar={{ width: sidebarWidth, breakpoint: 'sm', collapsed: { desktop: !sidebarOpen, mobile: !sidebarOpen } }}
             aside={{ width: 360, breakpoint: 'xs', collapsed: { desktop: !asideOpen, mobile: !asideOpen } }}

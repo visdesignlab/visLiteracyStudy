@@ -57,7 +57,7 @@ export function AudioTest({ setAnswer }: StimulusParams<undefined>) {
   }, [setAnswer]);
 
   return (
-    <Center style={{ height: '70%', width: '100%' }}>
+    <Center style={{ width: '100%' }}>
       <Stack>
         <Text ta="center">
           Please allow us to access your microphone. There may be a popup in your browser window asking for access, click accept.
