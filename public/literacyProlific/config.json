@@ -99,7 +99,7 @@
         "maxHeight": "100%"
       },
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "First, please speak out loud about what you are thinking as you look at the chart and make sense of it. \n\n  Next, Please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
+      "instruction": "First, please <b>speak out loud</b> to describe what you are thinking as you look at the chart and make sense of it. \n\n While doing so, please apply your own knowledge and experiences to the chart in order to better understand it. \n\n  Next, Please critique the following visualization. \n\n Please discuss any aspects of the visualization you like or dislike, and describe your reasoning. Finally, provide and any suggestions you have for improvement.",
       "path": "literacyProlific/assets/critiqueTasks/T40.jpg",
       "response": [
         {
@@ -120,7 +120,7 @@
         "maxHeight": "100%"
       },
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "First, please <b>speak out loud</b> about what you are thinking as you look at the chart and make sense of it. \n\n  Next, please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
+      "instruction": "First, please <b>speak out loud</b> to describe what you are thinking as you look at the chart and make sense of it. \n\n While doing so, please apply your own knowledge and experiences to the chart in order to better understand it. \n\n  Next, Please critique the following visualization. \n\n Please discuss any aspects of the visualization you like or dislike, and describe your reasoning. Finally, provide and any suggestions you have for improvement.",
       "path": "literacyProlific/assets/critiqueTasks/T2.png",
       "response": [
         {
@@ -142,7 +142,7 @@
       },
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "First, please speak out loud about what you are thinking as you look at the chart and make sense of it. \n\n Next, Please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
+      "instruction": "First, please <b>speak out loud</b> to describe what you are thinking as you look at the chart and make sense of it. \n\n While doing so, please apply your own knowledge and experiences to the chart in order to better understand it. \n\n  Next, Please critique the following visualization. \n\n Please discuss any aspects of the visualization you like or dislike, and describe your reasoning. Finally, provide and any suggestions you have for improvement.",
       "path": "literacyProlific/assets/critiqueTasks/untimelyDeath.png",
       "response": [
         {
@@ -164,7 +164,7 @@
       },
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "First, please speak out loud about what you are thinking as you look at the chart and make sense of it. \n\n  Next, Please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
+      "instruction": "First, please <b>speak out loud</b> to describe what you are thinking as you look at the chart and make sense of it. \n\n While doing so, please apply your own knowledge and experiences to the chart in order to better understand it. \n\n  Next, Please critique the following visualization. \n\n Please discuss any aspects of the visualization you like or dislike, and describe your reasoning. Finally, provide and any suggestions you have for improvement.",
       "path": "literacyProlific/assets/critiqueTasks/sciArticles.png",
       "response": [
         {
