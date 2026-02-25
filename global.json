@@ -1,12 +1,15 @@
 {
   "$schema": "https://raw.githubusercontent.com/revisit-studies/study/v2.3.2/src/parser/GlobalConfigSchema.json",
-  "configsList": ["demo-drawing", "literacy-experts"],
+  "configsList": ["literacy-prolific", "literacy-experts", "demo-drawing"],
   "configs": {
-    "demo-drawing": {
-      "path": "demo-drawing/config.json"
+    "literacy-prolific": {
+      "path": "literacyProlific/config.json"
     },
     "literacy-experts": {
       "path": "literacyExperts/config.json"
+    },
+    "demo-drawing": {
+      "path": "demo-drawing/config.json"
     }
   }
 }

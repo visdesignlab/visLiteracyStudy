@@ -99,7 +99,7 @@
       },
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
       "instruction": "First, please <b>speak out loud</b> to describe what you are thinking as you look at the chart and make sense of it. \n\n While doing so, please apply your own knowledge and experiences to the chart in order to better understand it. \n\n  Next, Please critique the following visualization. \n\n Please discuss any aspects of the visualization you like or dislike, and describe your reasoning. Finally, provide and any suggestions you have for improvement.",
-      "path": "demo-drawing/assets/critiqueTasks/T40.jpg",
+      "path": "literacyExperts/assets/critiqueTasks/T40.jpg",
       "response": [
         {
           "id": "drawing100m",
@@ -120,7 +120,7 @@
       },
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
       "instruction": "First, please <b>speak out loud</b> to describe what you are thinking as you look at the chart and make sense of it. \n\n While doing so, please apply your own knowledge and experiences to the chart in order to better understand it. \n\n  Next, Please critique the following visualization. \n\n Please discuss any aspects of the visualization you like or dislike, and describe your reasoning. Finally, provide and any suggestions you have for improvement.",
-      "path": "demo-drawing/assets/critiqueTasks/T2.png",
+      "path": "literacyExperts/assets/critiqueTasks/T2.png",
       "response": [
         {
           "id": "drawing100m",
@@ -143,7 +143,7 @@
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
       "instruction": "First, please <b>speak out loud</b> to describe what you are thinking as you look at the chart and make sense of it. \n\n While doing so, please apply your own knowledge and experiences to the chart in order to better understand it. \n\n  Next, Please critique the following visualization. \n\n Please discuss any aspects of the visualization you like or dislike, and describe your reasoning. Finally, provide and any suggestions you have for improvement.",
-      "path": "demo-drawing/assets/critiqueTasks/untimelyDeath.png",
+      "path": "literacyExperts/assets/critiqueTasks/untimelyDeath.png",
       "response": [
         {
           "id": "drawing100m",
@@ -165,7 +165,7 @@
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
       "instruction": "First, please <b>speak out loud</b> to describe what you are thinking as you look at the chart and make sense of it. \n\n While doing so, please apply your own knowledge and experiences to the chart in order to better understand it. \n\n  Next, Please critique the following visualization. \n\n Please discuss any aspects of the visualization you like or dislike, and describe your reasoning. Finally, provide and any suggestions you have for improvement.",
-      "path": "demo-drawing/assets/critiqueTasks/sciArticles.png",
+      "path": "literacyExperts/assets/critiqueTasks/sciArticles.png",
       "response": [
         {
           "id": "drawing100m",
@@ -183,7 +183,7 @@
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
       "instruction": "First, please <b>speak out loud</b> to describe what you are thinking as you look at the chart and make sense of it. \n\n While doing so, please apply your own knowledge and experiences to the chart in order to better understand it. \n\n  Next, Please critique the following visualization. \n\n Please discuss any aspects of the visualization you like or dislike, and describe your reasoning. Finally, provide and any suggestions you have for improvement.",
-      "path": "demo-drawing/assets/critiqueTasks/nytWealthyFams.mov",
+      "path": "literacyExperts/assets/critiqueTasks/nytWealthyFams.mov",
       "response": [
         {
           "id": "drawing100m",
@@ -320,7 +320,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instructionPath": "demo-drawing/assets/drawingTasks/treeInstructions.md",
+      "instructionPath": "literacyExperts/assets/drawingTasks/treeInstructions.md",
       "path": "demo-drawing/assets/Canvas.tsx",
       "showTimer": true,
       "parameters": {
@@ -362,7 +362,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a list of people, how many friends each person has, and how many friends that pairs of people share together. \n\n ![demo](demo-drawing/assets/drawingTasks/networkTask.png) \n\n  Sketch a visualization that you believe best represents this data. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
+      "instruction": "Below is a list of people, how many friends each person has, and how many friends that pairs of people share together. \n\n ![demo](literacyExperts/assets/drawingTasks/networkTask.png) \n\n  Sketch a visualization that you believe best represents this data. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "showTimer": true,
       "parameters": {
@@ -384,7 +384,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instructionPath": "demo-drawing/assets/drawingTasks/bpmInstructions.md",
+      "instructionPath": "literacyExperts/assets/drawingTasks/bpmInstructions.md",
       "showTimer": true,
       "path": "demo-drawing/assets/Canvas.tsx",
       "parameters": {
@@ -406,7 +406,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a table showing rainfall in inches compared to the historical average from that month for various states. \n\n ![demo](demo-drawing/assets/drawingTasks/rainfallTask.png) \n\n Sketch a visualization that you believe best represents this data. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
+      "instruction": "Below is a table showing rainfall in inches compared to the historical average from that month for various states. \n\n ![demo](literacyExperts/assets/drawingTasks/rainfallTask.png) \n\n Sketch a visualization that you believe best represents this data. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "showTimer": true,
       "parameters": {
@@ -428,7 +428,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a table showing the rankings of the top five bundesliga football teams across the first six weeks of the season. \n\n ![demo](demo-drawing/assets/drawingTasks/rankingTask.png) \n\n Sketch a visualization that you believe best represents this data. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
+      "instruction": "Below is a table showing the rankings of the top five bundesliga football teams across the first six weeks of the season. \n\n ![demo](literacyExperts/assets/drawingTasks/rankingTask.png) \n\n Sketch a visualization that you believe best represents this data. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "showTimer": true,
       "parameters": {
@@ -451,7 +451,7 @@
       "nextButtonLocation": "sidebar",
       "showTimer": true,
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a small table showing the 100m sprint times and long jump distance of five athletes. \n\n ![demo](demo-drawing/assets/drawingTasks/100mTask.png) \n\n Sketch a visualization that you believe best represents this data. \n\n  While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
+      "instruction": "Below is a small table showing the 100m sprint times and long jump distance of five athletes. \n\n ![demo](literacyExperts/assets/drawingTasks/100mTask.png) \n\n Sketch a visualization that you believe best represents this data. \n\n  While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "parameters": {
         "responseId": "drawing100m"
