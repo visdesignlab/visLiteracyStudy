@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/revisit-studies/study/dev/src/parser/StudyConfigSchema.json",
   "studyMetadata": {
-    "title": "Literacy study intended for experts",
+    "title": "Literacy study for Prolific",
     "version": "pilot",
     "authors": ["The reVISit Team"],
     "date": "2023-04-14",
@@ -29,21 +29,22 @@
       "type": "markdown",
       "forceTouchScreen": false,
       "recordAudio": false,
-      "path": "literacyExperts/assets/introduction.md",
+      "path": "literacyProlific/assets/introduction.md",
       "response": [
         {
           "id": "prolificId",
-          "prompt": "Please enter your email. We will only use this email in order to send you payment after the study is complete.",
+          "prompt": "Please enter your Prolific ID",
           "location": "belowStimulus",
           "type": "shortText",
-          "placeholder": "Email"
+          "placeholder": "Prolific ID",
+          "paramCapture": "PROLIFIC_PID"
         }
       ]
     },
     "consent": {
       "type": "markdown",
       "recordAudio": false,
-      "path": "literacyExperts/assets/consent.md",
+      "path": "literacyProlific/assets/consent.md",
       "nextButtonText": "Agree",
       "response": [
         {
@@ -59,26 +60,26 @@
     "critiqueIntro": {
       "type": "markdown",
       "recordAudio": false,
-      "path": "literacyExperts/assets/critiqueIntro.md",
+      "path": "literacyProlific/assets/critiqueIntro.md",
       "response": []
     },
     "vlatIntro": {
       "type": "markdown",
       "recordAudio": false,
-      "path": "literacyExperts/assets/vlatIntro.md",
+      "path": "literacyProlific/assets/vlatIntro.md",
       "response": []
     },
     "drawingIntro": {
       "type": "markdown",
       "recordAudio": false,
-      "path": "literacyExperts/assets/drawingIntro.md",
+      "path": "literacyProlific/assets/drawingIntro.md",
       "response": []
     },
     "critiqueFollowup": {
       "type": "image",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "path": "literacyExperts/assets/critiqueTasks/T40.jpg",
+      "path": "literacyProlific/assets/critiqueTasks/T40.jpg",
       "response": [
         {
           "id": "response",
@@ -98,8 +99,8 @@
         "maxHeight": "100%"
       },
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "First, please <b>speak out loud</b> to describe what you are thinking as you look at the chart and make sense of it. \n\n While doing so, please apply your own knowledge and experiences to the chart in order to better understand it. \n\n  Next, Please critique the following visualization. \n\n Please discuss any aspects of the visualization you like or dislike, and describe your reasoning. Finally, provide and any suggestions you have for improvement.",
-      "path": "literacyExperts/assets/critiqueTasks/T40.jpg",
+      "instruction": "First, please speak out loud about what you are thinking as you look at the chart and make sense of it. \n\n  Next, Please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
+      "path": "literacyProlific/assets/critiqueTasks/T40.jpg",
       "response": [
         {
           "id": "drawing100m",
@@ -119,8 +120,8 @@
         "maxHeight": "100%"
       },
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "First, please <b>speak out loud</b> to describe what you are thinking as you look at the chart and make sense of it. \n\n While doing so, please apply your own knowledge and experiences to the chart in order to better understand it. \n\n  Next, Please critique the following visualization. \n\n Please discuss any aspects of the visualization you like or dislike, and describe your reasoning. Finally, provide and any suggestions you have for improvement.",
-      "path": "literacyExperts/assets/critiqueTasks/T2.png",
+      "instruction": "First, please <b>speak out loud</b> about what you are thinking as you look at the chart and make sense of it. \n\n  Next, please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
+      "path": "literacyProlific/assets/critiqueTasks/T2.png",
       "response": [
         {
           "id": "drawing100m",
@@ -139,11 +140,10 @@
       "style": {
         "maxHeight": "100%"
       },
-
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "First, please <b>speak out loud</b> to describe what you are thinking as you look at the chart and make sense of it. \n\n While doing so, please apply your own knowledge and experiences to the chart in order to better understand it. \n\n  Next, Please critique the following visualization. \n\n Please discuss any aspects of the visualization you like or dislike, and describe your reasoning. Finally, provide and any suggestions you have for improvement.",
-      "path": "literacyExperts/assets/critiqueTasks/untimelyDeath.png",
+      "instruction": "First, please speak out loud about what you are thinking as you look at the chart and make sense of it. \n\n Next, Please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
+      "path": "literacyProlific/assets/critiqueTasks/untimelyDeath.png",
       "response": [
         {
           "id": "drawing100m",
@@ -164,26 +164,8 @@
       },
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "First, please <b>speak out loud</b> to describe what you are thinking as you look at the chart and make sense of it. \n\n While doing so, please apply your own knowledge and experiences to the chart in order to better understand it. \n\n  Next, Please critique the following visualization. \n\n Please discuss any aspects of the visualization you like or dislike, and describe your reasoning. Finally, provide and any suggestions you have for improvement.",
-      "path": "literacyExperts/assets/critiqueTasks/sciArticles.png",
-      "response": [
-        {
-          "id": "drawing100m",
-          "type": "radio",
-          "location": "sidebar",
-          "required": true,
-          "prompt": "Have you finished critiquing the visualization?",
-          "options": ["Yes"],
-          "requiredValue": "Yes"
-        }
-      ]
-    },
-    "critiqueWealth": {
-      "type": "video",
-      "nextButtonLocation": "sidebar",
-      "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "First, please <b>speak out loud</b> to describe what you are thinking as you look at the chart and make sense of it. \n\n While doing so, please apply your own knowledge and experiences to the chart in order to better understand it. \n\n  Next, Please critique the following visualization. \n\n Please discuss any aspects of the visualization you like or dislike, and describe your reasoning. Finally, provide and any suggestions you have for improvement.",
-      "path": "literacyExperts/assets/critiqueTasks/nytWealthyFams.mov",
+      "instruction": "First, please speak out loud about what you are thinking as you look at the chart and make sense of it. \n\n  Next, Please critique the following visualization <b>by speaking out loud</b>. \n\n Feel free to discuss any aspects of the visualization you like or dislike, and any suggestions you have for improvement.",
+      "path": "literacyProlific/assets/critiqueTasks/sciArticles.png",
       "response": [
         {
           "id": "drawing100m",
@@ -320,7 +302,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instructionPath": "literacyExperts/assets/drawingTasks/treeInstructions.md",
+      "instructionPath": "literacyProlific/assets/drawingTasks/treeInstructions.md",
       "path": "demo-drawing/assets/Canvas.tsx",
       "showTimer": true,
       "parameters": {
@@ -362,7 +344,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a list of people, how many friends each person has, and how many friends that pairs of people share together. \n\n ![demo](literacyExperts/assets/drawingTasks/networkTask.png) \n\n  Sketch a visualization that you believe best represents this data. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
+      "instruction": "Below is a list of authors, how many papers each author has published, and how many papers author pairs have published together. \n\n ![demo](literacyProlific/assets/drawingTasks/networkTask.png) \n\n  Sketch a visualization that you believe best represents this data. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "showTimer": true,
       "parameters": {
@@ -384,7 +366,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instructionPath": "literacyExperts/assets/drawingTasks/bpmInstructions.md",
+      "instructionPath": "literacyProlific/assets/drawingTasks/bpmInstructions.md",
       "showTimer": true,
       "path": "demo-drawing/assets/Canvas.tsx",
       "parameters": {
@@ -406,7 +388,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a table showing rainfall in inches compared to the historical average from that month for various states. \n\n ![demo](literacyExperts/assets/drawingTasks/rainfallTask.png) \n\n Sketch a visualization that you believe best represents this data. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
+      "instruction": "Below is a table showing rainfall in inches compared to the historical average from that month for various states. \n\n ![demo](literacyProlific/assets/drawingTasks/rainfallTask.png) \n\n Sketch a visualization that you believe best represents this data. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "showTimer": true,
       "parameters": {
@@ -428,7 +410,7 @@
       "type": "react-component",
       "nextButtonLocation": "sidebar",
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a table showing the rankings of the top five bundesliga football teams across the first six weeks of the season. \n\n ![demo](literacyExperts/assets/drawingTasks/rankingTask.png) \n\n Sketch a visualization that you believe best represents this data. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
+      "instruction": "Below is a table showing the rankings of the top five bundesliga football teams across the first six weeks of the season. \n\n ![demo](literacyProlific/assets/drawingTasks/rankingTask.png) \n\n Sketch a visualization that you believe best represents this data. \n\n While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "showTimer": true,
       "parameters": {
@@ -451,7 +433,7 @@
       "nextButtonLocation": "sidebar",
       "showTimer": true,
       "description": "Question that asks users to count the number of bars that have a value greater than 1.",
-      "instruction": "Below is a small table showing the 100m sprint times and long jump distance of five athletes. \n\n ![demo](literacyExperts/assets/drawingTasks/100mTask.png) \n\n Sketch a visualization that you believe best represents this data. \n\n  While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
+      "instruction": "Below is a small table showing the 100m sprint times and long jump distance of five athletes. \n\n ![demo](literacyProlific/assets/drawingTasks/100mTask.png) \n\n Sketch a visualization that you believe best represents this data. \n\n  While doing so, <b>please speak out loud</b> to explain your thought process or any challenges you face. \n\n We suggest spending no more than 7 minutes on this task.",
       "path": "demo-drawing/assets/Canvas.tsx",
       "parameters": {
         "responseId": "drawing100m"
@@ -638,6 +620,34 @@
         }
       ]
     },
+    "preStudyExpertQuestions": {
+      "type": "questionnaire",
+      "recordAudio": false,
+      "description": "Check if experts",
+      "response": [
+        {
+          "id": "class",
+          "type": "radio",
+          "required": true,
+          "prompt": "Have you taken a graduate or undergraduate level data visualization course?",
+          "options": ["Yes", "No"]
+        },
+        {
+          "id": "phd",
+          "type": "radio",
+          "required": true,
+          "prompt": "Are you currently pursuing, or have you completed, a PhD in data visualization?",
+          "options": ["Yes", "No"]
+        },
+        {
+          "id": "review",
+          "type": "radio",
+          "required": true,
+          "prompt": "Have you or would you feel comfortable reviewing data visualization research for a conference or journal?",
+          "options": ["Yes", "No"]
+        }
+      ]
+    },
     "preStudyVisAbility": {
       "type": "questionnaire",
       "recordAudio": false,
@@ -669,34 +679,6 @@
           "prompt": "How confident are you in your ability to design and create charts, graphs, and other visualizations?",
           "leftLabel": "Not at all confident",
           "rightLabel": "Extremely confident"
-        }
-      ]
-    },
-    "preStudyExpertQuestions": {
-      "type": "questionnaire",
-      "recordAudio": false,
-      "description": "Check if experts",
-      "response": [
-        {
-          "id": "class",
-          "type": "radio",
-          "required": true,
-          "prompt": "Have you taken a graduate or undergraduate level data visualization course?",
-          "options": ["Yes", "No"]
-        },
-        {
-          "id": "phd",
-          "type": "radio",
-          "required": true,
-          "prompt": "Are you currently pursuing, or have you completed, a PhD in data visualization?",
-          "options": ["Yes", "No"]
-        },
-        {
-          "id": "review",
-          "type": "radio",
-          "required": true,
-          "prompt": "Have you or would you feel comfortable reviewing data visualization research for a conference or journal?",
-          "options": ["Yes", "No"]
         }
       ]
     }
