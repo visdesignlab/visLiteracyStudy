@@ -8,6 +8,8 @@ export class LocalStorageEngine extends StorageEngine {
     name: 'revisit',
   });
 
+  protected participantStore = this.studyDatabase;
+
   constructor(testing: boolean = false) {
     super('localStorage', testing);
   }
@@ -69,6 +71,28 @@ export class LocalStorageEngine extends StorageEngine {
     const sequenceAssignmentPath = `${this.collectionPrefix}${this.studyId}/sequenceAssignment`;
     const sequenceAssignments = await this.studyDatabase.getItem<Record<string, SequenceAssignment>>(sequenceAssignmentPath) || {};
     sequenceAssignments[participantId] = sequenceAssignment;
+    await this.studyDatabase.setItem(sequenceAssignmentPath, sequenceAssignments);
+  }
+
+  protected async _updateSequenceAssignmentFields(participantId: string, updatedFields: Partial<SequenceAssignment>) {
+    await this.verifyStudyDatabase();
+    if (this.studyId === undefined) {
+      throw new Error('Study ID is not set');
+    }
+    const sequenceAssignmentPath = `${this.collectionPrefix}${this.studyId}/sequenceAssignment`;
+    const sequenceAssignments = await this.studyDatabase.getItem<Record<string, SequenceAssignment>>(sequenceAssignmentPath) || {};
+    const existingAssignment = sequenceAssignments[participantId];
+    if (!existingAssignment) {
+      throw new Error(`Sequence assignment for participant ${participantId} not found`);
+    }
+    const updatedAssignment = {
+      ...existingAssignment,
+      ...updatedFields,
+    };
+    if (Object.hasOwn(updatedFields, 'conditions') && updatedFields.conditions === undefined) {
+      delete updatedAssignment.conditions;
+    }
+    sequenceAssignments[participantId] = updatedAssignment;
     await this.studyDatabase.setItem(sequenceAssignmentPath, sequenceAssignments);
   }
 
@@ -195,7 +219,7 @@ export class LocalStorageEngine extends StorageEngine {
 
     // Set the mode
     modes[mode] = value;
-    this.studyDatabase.setItem(key, modes);
+    await this.studyDatabase.setItem(key, modes);
   }
 
   protected async _setModesDocument(studyId: string, modesDocument: Record<string, unknown>): Promise<void> {

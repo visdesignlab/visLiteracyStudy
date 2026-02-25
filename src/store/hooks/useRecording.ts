@@ -28,6 +28,7 @@ export function useRecording() {
   const [isAudioCapturing, setIsAudioCapturing] = useState(false);
   const [isMediaCapturing, setIsMediaCapturing] = useState(false);
   const [isRejected, setIsRejected] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
 
   // currentMediaStream and recorder can be just screen, just audio, or screen and audio combined.
   const currentMediaStream = useRef<MediaStream>(null);
@@ -52,7 +53,12 @@ export function useRecording() {
     studyHasAudioRecording,
     currentComponentHasAudioRecording,
     currentComponentHasScreenRecording,
+    currentComponentHasClickToRecord,
   } = useRecordingConfig();
+
+  useEffect(() => {
+    setIsMuted(currentComponentHasClickToRecord);
+  }, [currentComponentHasClickToRecord]);
 
   // Screen capture starts once and stops at the end of the study.
   // At the beginning of each stimulus, recording starts by calling `startScreenRecording`.
@@ -121,6 +127,10 @@ export function useRecording() {
 
     const stream = currentMediaStream.current;
 
+    stream.getAudioTracks().forEach((track) => {
+      track.enabled = !isMuted;
+    });
+
     const mediaRecorder = new MediaRecorder(stream);
 
     currentMediaRecorder.current = mediaRecorder;
@@ -155,21 +165,27 @@ export function useRecording() {
         const { mimeType } = mediaRecorder;
 
         const blob = new Blob(chunks, { type: mimeType });
-        storageEngine?.saveScreenRecording(blob, trialName);
+        storageEngine?.saveScreenRecording(blob, trialName).catch((error) => {
+          console.error('Error saving screen recording:', error);
+        });
       });
 
       audioRecorder?.addEventListener('stop', () => {
         const { mimeType } = audioRecorder;
 
         const blob = new Blob(audioChunks, { type: mimeType });
-        storageEngine?.saveAudioRecording(blob, trialName);
+        storageEngine?.saveAudioRecording(blob, trialName).catch((error) => {
+          console.error('Error saving audio recording:', error);
+        });
       });
     } else {
       mediaRecorder.addEventListener('stop', () => {
         const { mimeType } = mediaRecorder;
 
         const blob = new Blob(chunks, { type: mimeType });
-        storageEngine?.saveAudioRecording(blob, trialName);
+        storageEngine?.saveAudioRecording(blob, trialName).catch((error) => {
+          console.error('Error saving audio recording:', error);
+        });
       });
     }
 
@@ -183,7 +199,7 @@ export function useRecording() {
 
     mediaRecorder.start(1000); // 1s chunks
     audioRecorder?.start(1000);
-  }, [currentComponentHasAudioRecording, currentComponentHasScreenRecording, storageEngine]);
+  }, [currentComponentHasAudioRecording, currentComponentHasScreenRecording, storageEngine, isMuted]);
 
   // Stop screen recording. This does not stop screen capture.
   const stopScreenRecording = useCallback(() => {
@@ -208,7 +224,7 @@ export function useRecording() {
   }, []);
 
   useEffect(() => {
-    if (currentComponent !== '$screen-recording.co.screenRecordingPermission' && currentComponent !== 'end' && screenCaptureStarted && !isScreenCapturing) {
+    if (currentComponent !== '$screen-recording.components.screenRecordingPermission' && currentComponent !== 'end' && screenCaptureStarted && !isScreenCapturing) {
       setIsRejected(true);
     }
   }, [currentComponent, isScreenCapturing, screenCaptureStarted]);
@@ -217,6 +233,13 @@ export function useRecording() {
     navigator.mediaDevices.getUserMedia({
       audio: true,
     }).then((s) => {
+      audioMediaStream.current = s;
+      currentMediaStream.current = s;
+
+      s.getAudioTracks().forEach((track) => {
+        track.enabled = !isMuted;
+      });
+
       const recorder = new MediaRecorder(s);
       audioMediaRecorder.current = recorder;
 
@@ -235,17 +258,26 @@ export function useRecording() {
       recorder.addEventListener('stop', () => {
         const { mimeType } = recorder;
         const blob = new Blob(chunks, { type: mimeType });
-        storageEngine?.saveAudioRecording(blob, trialName);
+        storageEngine?.saveAudioRecording(blob, trialName).catch((error) => {
+          console.error('Error saving audio recording:', error);
+        });
       });
 
       recorder.start();
     });
 
     setIsAudioRecording(true);
-  }, [storageEngine]);
+  }, [storageEngine, isMuted]);
 
   // For study with just audio recording
   useEffect(() => {
+    // Always stop recording when navigating to a trial without audio recording
+    if (!currentComponentHasAudioRecording && audioMediaRecorder.current) {
+      stopAudioRecording();
+      currentTrialName.current = null;
+      return;
+    }
+
     if (!studyConfig || studyHasScreenRecording || !studyHasAudioRecording || !storageEngine || (status && status.endTime > 0) || isAnalysis) {
       return;
     }
@@ -344,9 +376,17 @@ export function useRecording() {
     captureFn();
   }, [pageTitle, recordAudio, recordScreenFPS, stopScreenCapture, studyHasAudioRecording, studyHasScreenRecording]);
 
+  useEffect(() => {
+    audioMediaStream.current?.getAudioTracks().forEach((track) => {
+      track.enabled = !isMuted;
+    });
+  }, [isMuted]);
+
   return {
     recordVideoRef,
     studyHasScreenRecording,
+    isMuted,
+    setIsMuted,
     recordAudio,
     startScreenCapture,
     stopScreenCapture,
@@ -361,6 +401,7 @@ export function useRecording() {
     combinedMediaRecorder: currentMediaRecorder,
     audioMediaStream,
     screenWithAudioRecording,
+    clickToRecord: currentComponentHasClickToRecord,
     isRejected,
   };
 }

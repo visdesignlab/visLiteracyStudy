@@ -4,6 +4,7 @@ import {
   useEffect, useMemo, useRef,
   useState,
 } from 'react';
+import type { CSSProperties } from 'react';
 import debounce from 'lodash.debounce';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { AppAside } from './interface/AppAside';
@@ -11,6 +12,7 @@ import { AppHeader } from './interface/AppHeader';
 import { AppNavBar } from './interface/AppNavBar';
 import { HelpModal } from './interface/HelpModal';
 import { AlertModal } from './interface/AlertModal';
+import { ConfigVersionWarningModal } from './interface/ConfigVersionWarningModal';
 import { EventType } from '../store/types';
 import { useStudyConfig } from '../store/hooks/useStudyConfig';
 import { WindowEventsContext } from '../store/hooks/useWindowEvents';
@@ -25,6 +27,8 @@ import { RecordingContext, useRecording } from '../store/hooks/useRecording';
 import { ScreenRecordingRejection } from './interface/ScreenRecordingRejection';
 import { ReplayContext, useReplay } from '../store/hooks/useReplay';
 import { DeviceWarning } from './interface/DeviceWarning';
+
+const STUDY_BROWSER_WIDTH = 360;
 
 export function StepRenderer() {
   const windowEvents = useRef<EventType[]>([]);
@@ -135,6 +139,7 @@ export function StepRenderer() {
   const showTitleBar = useMemo(() => componentConfig.showTitleBar ?? studyConfig.uiConfig.showTitleBar ?? true, [componentConfig, studyConfig]);
 
   const asideOpen = useMemo(() => developmentModeEnabled && showStudyBrowser, [developmentModeEnabled, showStudyBrowser]);
+  const rowMaxWidth = useMemo(() => (asideOpen ? `max(0px, calc(100% - ${STUDY_BROWSER_WIDTH}px))` : '100%'), [asideOpen]);
 
   const [hasAudio, setHasAudio] = useState<boolean>();
 
@@ -149,8 +154,9 @@ export function StepRenderer() {
             navbar={{ width: sidebarWidth, breakpoint: 'sm', collapsed: { desktop: !sidebarOpen, mobile: !sidebarOpen } }}
             aside={{ width: 360, breakpoint: 'xs', collapsed: { desktop: !asideOpen, mobile: !asideOpen } }}
             footer={{ height: isAnalysis ? 125 + (hasAudio ? 55 : 0) : 0 }}
+            style={{ '--app-shell-aside-offset': '0rem' } as CSSProperties}
           >
-            <AppAside />
+            {asideOpen && <AppAside />}
             {showTitleBar && (
             <AppHeader developmentModeEnabled={developmentModeEnabled} dataCollectionEnabled={dataCollectionEnabled} />
             )}

@@ -3,17 +3,19 @@ import {
   Alert,
   AppShell,
   Button,
-  Group, Popover, SegmentedControl, Select, Stack, Text,
+  Center,
+  ColorSwatch,
+  Group, HoverCard, Popover, SegmentedControl, Select, Stack, Text,
   Tooltip,
 } from '@mantine/core';
-import { useSearchParams } from 'react-router';
+import { useLocation, useNavigate, useSearchParams } from 'react-router';
 import {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 import * as d3 from 'd3';
 
 import {
-  IconArrowLeft, IconArrowRight, IconDeviceDesktopDown, IconInfoCircle, IconMusicDown, IconPlayerPauseFilled, IconPlayerPlayFilled, IconRestore,
+  IconArrowLeft, IconArrowRight, IconDeviceDesktopDown, IconInfoCircle, IconMusicDown, IconPalette, IconPlayerPauseFilled, IconPlayerPlayFilled, IconRestore,
 } from '@tabler/icons-react';
 import { useAsync } from '../../../store/hooks/useAsync';
 import { useAuth } from '../../../store/hooks/useAuth';
@@ -23,13 +25,17 @@ import {
 import { AudioProvenanceVis } from '../../../components/audioAnalysis/AudioProvenanceVis';
 import { TranscriptSegmentsVis } from './TranscriptSegmentsVis';
 import { TagSelector } from './tags/TagSelector';
-import { getSequenceFlatMap } from '../../../utils/getSequenceFlatMap';
 import { encryptIndex } from '../../../utils/encryptDecryptIndex';
+import { parseTrialOrder } from '../../../utils/parseTrialOrder';
 import { PREFIX } from '../../../utils/Prefix';
 import { handleTaskAudio, handleTaskScreenRecording } from '../../../utils/handleDownloadFiles';
 import { ParticipantRejectModal } from '../ParticipantRejectModal';
 import { StorageEngine } from '../../../storage/engines/types';
 import { useReplayContext } from '../../../store/hooks/useReplay';
+import {
+  buildProvenanceLegendEntries,
+} from '../../../components/audioAnalysis/provenanceColors';
+import { revisitPageId, syncChannel } from '../../../utils/syncReplay';
 
 const margin = {
   left: 5, top: 0, right: 5, bottom: 0,
@@ -65,12 +71,14 @@ async function getTags(storageEngine: StorageEngine | undefined, type: 'particip
 
 export function ThinkAloudFooter({
   visibleParticipants, rawTranscript, currentShownTranscription, width, onTimeUpdate, isReplay, editedTranscript, currentTrial, saveProvenance, jumpedToLine = 0, studyId, setHasAudio, storageEngine,
-} : {
+}: {
   visibleParticipants: string[], rawTranscript: TranscribedAudio | null, currentShownTranscription: number | null, width: number, onTimeUpdate: (n: number) => void, isReplay: boolean, editedTranscript?: EditedText[], currentTrial: string, saveProvenance: (prov: unknown) => void, jumpedToLine?: number, studyId: string, setHasAudio: (b: boolean) => void, storageEngine: StorageEngine | undefined,
 }) {
   const auth = useAuth();
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const participantId = useMemo(() => searchParams.get('participantId') || '', [searchParams]);
 
@@ -154,13 +162,9 @@ export function ThinkAloudFooter({
     if (currentTrial.includes('__dynamicLoading')) {
       return '';
     }
-    // if we find ourselves with a wrong current trial, erase it
-    if (participant && !participant.answers[currentTrial]) {
-      setSearchParams({ participantId, currentTrial: Object.entries(participant.answers).find(([_, ans]) => +ans.trialOrder.split('_')[0] === 0)?.[0] || '' });
-    }
 
     return participant?.answers[currentTrial]?.componentName ?? '';
-  }, [currentTrial, participant, participantId, setSearchParams]);
+  }, [currentTrial, participant]);
 
   const xScale = useMemo(() => {
     if (!participant || !participant.answers[currentTrial]) {
@@ -177,7 +181,7 @@ export function ThinkAloudFooter({
   }, [participant, currentTrial, width]);
 
   useEffect(() => {
-    const lines:TranscriptLinesWithTimes[] = [];
+    const lines: TranscriptLinesWithTimes[] = [];
 
     if (!editedTranscript || editedTranscript.length === 0) {
       setTranscriptLines(null);
@@ -209,32 +213,95 @@ export function ThinkAloudFooter({
       index = visibleParticipants.length - 1;
     }
 
-    localStorage.setItem('participantId', visibleParticipants[index]);
-    setSearchParams({ participantId: visibleParticipants[index] || '' });
+    syncChannel.postMessage({
+      key: 'participantId',
+      value: visibleParticipants[index],
+    });
+
+    setSearchParams((params) => {
+      params.set('participantId', visibleParticipants[index] || '');
+      params.delete('currentTrial');
+      return params;
+    });
   }, [participantId, setSearchParams, visibleParticipants]);
 
-  const nextTaskCallback = useCallback((indexChange: number) => {
-    if (!participant || !currentTrial) {
+  const orderedAnswers = useMemo(() => {
+    if (!participant) {
+      return [];
+    }
+
+    const answers = Object.values(participant.answers);
+    answers.sort((answerA, answerB) => {
+      const a = parseTrialOrder(answerA.trialOrder);
+      const b = parseTrialOrder(answerB.trialOrder);
+
+      if (a.step !== b.step) {
+        return (a.step ?? Number.MAX_SAFE_INTEGER) - (b.step ?? Number.MAX_SAFE_INTEGER);
+      }
+
+      if (a.funcIndex !== b.funcIndex) {
+        return (a.funcIndex ?? -1) - (b.funcIndex ?? -1);
+      }
+
+      return answerA.identifier.localeCompare(answerB.identifier);
+    });
+
+    return answers;
+  }, [participant]);
+
+  const navigateToTask = useCallback((answerIdentifier: string) => {
+    if (!participant) {
       return;
     }
 
-    // This doesnt work for dynamic
-    let index = +participant.answers[currentTrial].trialOrder.split('_')[0] + indexChange;
-
-    if (index >= Object.values(participant.answers).length) {
-      index = 0;
-    } else if (index < 0) {
-      index = Object.values(participant.answers).length - 1;
+    const answer = participant.answers[answerIdentifier];
+    if (!answer) {
+      return;
     }
 
-    const newTrial = Object.values(participant.answers).find((ans) => +ans.trialOrder.split('_')[0] === index);
-    const newTrialName = newTrial ? `${newTrial.componentName}_${newTrial.trialOrder.split('_')[0]}` : '';
+    const { step, funcIndex } = parseTrialOrder(answer.trialOrder);
+    if (step === null) {
+      return;
+    }
 
-    localStorage.setItem('currentTrial', newTrialName);
+    const pathname = isReplay ? (funcIndex === null
+      ? `/${studyId}/${encryptIndex(step)}`
+      : `/${studyId}/${encryptIndex(step)}/${encryptIndex(funcIndex)}`) : `/analysis/stats/${studyId}/tagging/${encodeURIComponent(answerIdentifier)}`;
 
-    // This isnt actually doing anything without the other analysis tab open
-    setSearchParams({ participantId, currentTrial: newTrialName });
-  }, [currentTrial, participant, participantId, setSearchParams]);
+    navigate({
+      pathname,
+      search: location.search,
+    });
+
+    if (answer.trialOrder) {
+      syncChannel.postMessage({
+        key: 'trialOrder',
+        value: answer.trialOrder,
+      });
+    }
+  }, [isReplay, location.search, navigate, participant, studyId]);
+
+  const nextTaskCallback = useCallback((indexChange: number) => {
+    if (!currentTrial || orderedAnswers.length === 0) {
+      return;
+    }
+
+    const currentIndex = orderedAnswers.findIndex((answer) => answer.identifier === currentTrial);
+    if (currentIndex === -1) {
+      const fallbackIndex = indexChange >= 0 ? 0 : orderedAnswers.length - 1;
+      navigateToTask(orderedAnswers[fallbackIndex].identifier);
+      return;
+    }
+
+    let nextIndex = currentIndex + indexChange;
+    if (nextIndex >= orderedAnswers.length) {
+      nextIndex = 0;
+    } else if (nextIndex < 0) {
+      nextIndex = orderedAnswers.length - 1;
+    }
+
+    navigateToTask(orderedAnswers[nextIndex].identifier);
+  }, [currentTrial, navigateToTask, orderedAnswers]);
 
   const setTags = useCallback((_tags: Tag[], type: 'task' | 'participant') => {
     if (storageEngine) {
@@ -277,28 +344,53 @@ export function ThinkAloudFooter({
 
   const [timeString, setTimeString] = useState<string>('');
 
+  const provenanceLegendEntries = useMemo(() => {
+    const answer = participant?.answers[currentTrial];
+    if (!answer?.provenanceGraph) {
+      return new Map<string, { label: string; color: string }>();
+    }
+
+    return buildProvenanceLegendEntries(Object.values(answer.provenanceGraph));
+  }, [participant, currentTrial]);
+
+  const tasksList = useMemo(() => orderedAnswers.map((answer) => ({
+    label: answer.componentName,
+    value: answer.identifier,
+  })), [orderedAnswers]);
+
+  const transcriptHref = useMemo(() => `${PREFIX}analysis/stats/${studyId}/tagging${currentTrial ? `/${encodeURIComponent(currentTrial)}` : ''}?participantId=${participantId}&revisitPageId=${revisitPageId}`, [currentTrial, participantId, studyId]);
+
+  const replayHref = useMemo(() => {
+    const { step, funcIndex } = parseTrialOrder(participant?.answers[currentTrial]?.trialOrder);
+    const currentStep = step ?? 0;
+    const funcPath = funcIndex === null ? '' : `/${encryptIndex(funcIndex)}`;
+
+    return `${PREFIX}${studyId}/${encryptIndex(currentStep)}${funcPath}?participantId=${participantId}&revisitPageId=${revisitPageId}`;
+  }, [currentTrial, participant, participantId, studyId]);
+
   return (
     <AppShell.Footer zIndex={101} withBorder={false}>
       {currentTrial && participant && currentTrialClean === '' && (
-      <div style={{
-        position: 'absolute', top: -5, left: 5, transform: 'translateY(-100%)',
-      }}
-      >
-        <Alert variant="filled" color="red" title="Participant hasn&apos;t completed any tasks." icon={<IconInfoCircle />} />
-      </div>
+        <div style={{
+          position: 'absolute', top: -5, left: 5, transform: 'translateY(-100%)',
+        }}
+        >
+          <Alert variant="filled" color="red" title="Participant hasn&apos;t completed any tasks." icon={<IconInfoCircle />} />
+        </div>
       )}
       <Stack style={{ backgroundColor: 'var(--mantine-color-blue-1)', height: '100%' }} gap={5} justify="center">
 
+        {participant && currentTrial && (!participant.answers[currentTrial] || participant.answers[currentTrial].endTime === -1) ? <Center><Text c="dimmed">{`Participant ${participant.participantId} has not completed this task`}</Text></Center> : null}
         <AudioProvenanceVis setHasAudio={setHasAudio} saveProvenance={saveProvenance} setTime={onTimeUpdate} setTimeString={(_t) => setTimeString(_t)} answers={participant ? participant.answers : {}} taskName={currentTrial} context={isReplay ? 'provenanceVis' : 'audioAnalysis'} />
-        {xScale && transcriptLines ? <TranscriptSegmentsVis startTime={xScale.domain()[0]} xScale={xScale} transcriptLines={transcriptLines} currentShownTranscription={currentShownTranscription || 0} /> : null }
+        {xScale && transcriptLines ? <TranscriptSegmentsVis startTime={xScale.domain()[0]} xScale={xScale} transcriptLines={transcriptLines} currentShownTranscription={currentShownTranscription || 0} /> : null}
 
         <Group gap="xs" style={{ width: '100%' }} justify="center" wrap="nowrap">
           <Group wrap="nowrap">
             <Text ff="monospace" style={{ textAlign: 'right' }} mt="lg" c="dimmed">{timeString}</Text>
 
             <Tooltip label={hasEnded ? 'Restart' : isPlaying ? 'Pause' : 'Play'}>
-              <ActionIcon mt={25} size="xl" variant="light" onClick={() => { setIsPlaying(!isPlaying); }}>
-                {hasEnded ? <IconRestore /> : isPlaying ? <IconPlayerPauseFilled /> : <IconPlayerPlayFilled /> }
+              <ActionIcon mt={25} size="lg" variant="light" onClick={() => { setIsPlaying(!isPlaying); }}>
+                {hasEnded ? <IconRestore /> : isPlaying ? <IconPlayerPauseFilled /> : <IconPlayerPlayFilled />}
               </ActionIcon>
             </Tooltip>
 
@@ -315,7 +407,10 @@ export function ThinkAloudFooter({
                   value={speed.toString()}
                   onChange={(s) => {
                     setSpeed(+s);
-                    localStorage.setItem('currentSpeed', s);
+                    syncChannel.postMessage({
+                      key: 'currentSpeed',
+                      value: s,
+                    });
                   }}
                   orientation="vertical"
                   data={[
@@ -342,20 +437,27 @@ export function ThinkAloudFooter({
                     <IconArrowLeft />
                   </ActionIcon>
                 </Tooltip>
-                  )}
+              )}
               rightSection={(
                 <Tooltip label="Next Participant">
                   <ActionIcon size="sm" variant="light" onClick={() => nextParticipantCallback(1)} style={{ pointerEvents: 'all' }}>
                     <IconArrowRight />
                   </ActionIcon>
                 </Tooltip>
-                  )}
+              )}
               label="Participant Id"
               style={{ width: '200px' }}
               value={participantId}
               onChange={(e: string | null) => {
-                setSearchParams({ currentTrial, participantId: e || '' });
-                localStorage.setItem('participantId', e || '');
+                setSearchParams((params) => {
+                  params.set('participantId', e || '');
+                  params.delete('currentTrial');
+                  return params;
+                });
+                syncChannel.postMessage({
+                  key: 'participantId',
+                  value: e || '',
+                });
               }}
               data={visibleParticipants.map((part) => part).sort()}
               searchable
@@ -400,27 +502,24 @@ export function ThinkAloudFooter({
                     <IconArrowLeft />
                   </ActionIcon>
                 </Tooltip>
-                  )}
+              )}
               rightSection={(
                 <Tooltip label="Next Task">
                   <ActionIcon size="sm" variant="light" onClick={() => nextTaskCallback(1)} style={{ pointerEvents: 'all' }}>
                     <IconArrowRight />
                   </ActionIcon>
                 </Tooltip>
-                  )}
+              )}
               label="Task"
               style={{ width: '200px' }}
-              value={currentTrialClean}
-            // this needs to be in a helper or two which we dont currently have
+              value={currentTrial}
+              // this needs to be in a helper or two which we dont currently have
               onChange={(e: string | null) => {
-                if (participant && e) {
-                  const trial = Object.entries(participant.answers).find(([_key, ans]) => +ans.trialOrder.split('_')[0] === getSequenceFlatMap(participant?.sequence).indexOf(e))?.[0] || '';
-                  localStorage.setItem('currentTrial', trial);
-
-                  setSearchParams({ participantId, currentTrial: trial });
+                if (e) {
+                  navigateToTask(e);
                 }
               }}
-              data={participant ? getSequenceFlatMap(participant?.sequence) : []}
+              data={tasksList}
               searchable
             />
             <Stack gap="4">
@@ -455,28 +554,50 @@ export function ThinkAloudFooter({
                 selectedTags={localParticipantTags ? localParticipantTags.taskTags[currentTrial] || [] : []}
               />
             </Stack>
-
           </Group>
-          <Button mt="lg" variant="light" component="a" href={isReplay ? `${PREFIX}analysis/stats/${studyId}/tagging?participantId=${participantId}&currentTrial=${currentTrial}` : `${PREFIX}${studyId}/${encryptIndex(participant ? +(participant.answers[currentTrial]?.trialOrder.split('_')[0] || 0) : 0)}?participantId=${participantId}&currentTrial=${currentTrial}`} target="_blank">
+          <Button
+            mt="lg"
+            variant="light"
+            component="a"
+            href={isReplay ? transcriptHref : replayHref}
+            target="_blank"
+          >
             {isReplay ? 'Transcript' : 'Replay'}
           </Button>
           <Group mt="lg">
             {audioUrl && (
-            <Tooltip label="Download audio">
-              <ActionIcon variant="light" size={30} onClick={handleDownloadAudio}>
-                <IconMusicDown />
-              </ActionIcon>
-            </Tooltip>
+              <Tooltip label="Download audio">
+                <ActionIcon variant="light" size={30} onClick={handleDownloadAudio}>
+                  <IconMusicDown />
+                </ActionIcon>
+              </Tooltip>
             )}
             {screenRecordingUrl && (
-            <Tooltip label="Download screen recording">
-              <ActionIcon variant="filled" size={30} onClick={handleDownloadScreenRecording}>
-                <IconDeviceDesktopDown />
-              </ActionIcon>
-            </Tooltip>
+              <Tooltip label="Download screen recording">
+                <ActionIcon variant="filled" size={30} onClick={handleDownloadScreenRecording}>
+                  <IconDeviceDesktopDown />
+                </ActionIcon>
+              </Tooltip>
             )}
             <ParticipantRejectModal selectedParticipants={[]} footer />
           </Group>
+          {provenanceLegendEntries.size > 1 && (
+            <HoverCard width={160} position="top" withArrow shadow="md">
+              <HoverCard.Target>
+                <ActionIcon c="" size="lg" variant="light" mt="lg" style={{ cursor: 'default' }}><IconPalette /></ActionIcon>
+              </HoverCard.Target>
+              <HoverCard.Dropdown>
+                <Stack gap={6}>
+                  {Array.from(provenanceLegendEntries.entries()).map(([key, value]) => (
+                    <Group key={key} gap={8}>
+                      <ColorSwatch color={value.color} size={12} />
+                      <span style={{ fontSize: 12 }}>{value.label}</span>
+                    </Group>
+                  ))}
+                </Stack>
+              </HoverCard.Dropdown>
+            </HoverCard>
+          )}
         </Group>
       </Stack>
     </AppShell.Footer>

@@ -35,7 +35,7 @@ export interface GlobalConfig {
     "Jane Doe",
     "John Doe"
   ],
-  "date": "2024-04-01",
+  "date": "2026-02-23",
   "description": "This study is meant to test your ability.",
   "organizations": [
     "The reVISit Team",
@@ -281,7 +281,9 @@ export interface UIConfig {
   allowFailedTraining?: boolean;
   /** Whether or not we want to utilize think-aloud features. If true, will record audio on all components unless deactivated on individual components. Defaults to false. */
   recordAudio?: boolean;
-  /** Whether or not we want to utilize screen recording feature. If true, will record audio on all components unless deactivated on individual components. This must be set to true if you want to record audio on any component in your study. Defaults to false. It's also required that the library component, $screen-recording.co.screenRecordingPermission, be included in the study at some point before any component that you want to record the screen on to ensure permissions are granted and screen capture has started. */
+  /** Enables a click-and-hold microphone button instead of continuous recording. When true, audio is muted by default and is recorded only while the button is held. When false, recording starts immediately and can be paused/resumed via the microphone button. Defaults to false. */
+  clickToRecord?: boolean;
+  /** Whether or not we want to utilize screen recording feature. If true, will record audio on all components unless deactivated on individual components. This must be set to true if you want to record audio on any component in your study. Defaults to false. It's also required that the library component, $screen-recording.components.screenRecordingPermission, be included in the study at some point before any component that you want to record the screen on to ensure permissions are granted and screen capture has started. */
   recordScreen?: boolean;
   /** Desired fps for recording screen. If possible, this value will be used, but if it's not possible, the user agent will use the closest possible match. */
   recordScreenFPS?: number;
@@ -325,7 +327,14 @@ export interface NumberOption {
 export interface StringOption {
   /** The label displayed to participants. Markdown is supported. */
   label: string;
-  /** The value stored in the participant's data. */
+  /** The value stored in the participant's data. Defaults to label. */
+  value?: string;
+  /** The description that is displayed when the participant hovers over the option. This does not accept markdown. Applies to responses that use StringOption, including DropdownResponse, RadioResponse, CheckboxResponse, ButtonsResponse, RankingResponse, and MatrixResponse. */
+  infoText?: string;
+}
+
+/** StringOption normalized to always include a value. */
+export interface ParsedStringOption extends Omit<StringOption, 'value'> {
   value: string;
 }
 
@@ -523,9 +532,9 @@ Here's an example using custom columns (answerOptions):
 export interface MatrixResponse extends BaseResponse {
   type: 'matrix-radio' | 'matrix-checkbox';
   /** The answer options (columns). We provide some shortcuts for a likelihood scale (ranging from highly unlikely to highly likely) and a satisfaction scale (ranging from highly unsatisfied to highly satisfied) with either 5 or 7 options to choose from. */
-  answerOptions: string[] | `likely${5 | 7}` | `satisfaction${5 | 7}`;
+  answerOptions: (StringOption | string)[] | `likely${5 | 7}` | `satisfaction${5 | 7}`;
   /** The question options (rows) are the prompts for each response you'd like to record. */
-  questionOptions: string[];
+  questionOptions: (StringOption | string)[];
   /** The order in which the questions are displayed. Defaults to fixed. */
   questionOrder?: 'fixed' | 'random';
 }
@@ -599,7 +608,7 @@ export interface SliderResponse extends BaseResponse {
   snap?: boolean;
   /** The step value of the slider. If not provided (and snap not enabled), the step value is calculated as the range of the slider divided by 100. */
   step?: number;
-  /** The spacing between the ticks. If not provided, the spacing is calculated as the range of the slider divided by power of 10. */
+  /** The spacing between the ticks. If not provided, the spacing is the largest power of 10 smaller than the slider range. */
   spacing?: number;
   /** Whether to render the slider with a bar to the left. Defaults to true. */
   withBar?: boolean;
@@ -849,7 +858,7 @@ export type Response = NumericalResponse | ShortTextResponse | LongTextResponse 
       "location": "belowStimulus",
       "type": "numerical"
     }
-  ]
+  ],
   "correctAnswer": [{
     "id": "response1",
     "answer": 4
@@ -926,7 +935,7 @@ export interface BaseIndividualComponent {
   /** Whether to show the previous button. If present, will override the previous button setting in the uiConfig. */
   previousButton?: boolean;
   /** The text that is displayed on the previous button. If present, will override the previous button text setting in the uiConfig. */
-  previousButtonText?:string;
+  previousButtonText?: string;
   /** Controls whether the component should provide feedback to the participant, such as in a training trial. If present, will override the provide feedback setting in the uiConfig. */
   provideFeedback?: boolean;
   /** The number of training attempts allowed for the component. If present, will override the training attempts setting in the uiConfig. */
@@ -935,7 +944,9 @@ export interface BaseIndividualComponent {
   allowFailedTraining?: boolean;
   /** Whether or not we want to utilize think-aloud features. If present, will override the record audio setting in the uiConfig. */
   recordAudio?: boolean;
-  /** Whether or not we want to utilize screen recording feature. If present, will override the record screen setting in the uiConfig. If true, the uiConfig must have recordScreen set to true or the screen will not be captured. It's also required that the library component, $screen-recording.co.screenRecordingPermission, be included in the study at some point before this component to ensure permissions are granted and screen capture has started. */
+  /** Enables a click-and-hold microphone button instead of continuous recording. When true, audio is muted by default and is recorded only while the button is held. When false, recording starts immediately and can be paused/resumed via the microphone button. Defaults to false. */
+  clickToRecord?: boolean;
+  /** Whether or not we want to utilize screen recording feature. If present, will override the record screen setting in the uiConfig. If true, the uiConfig must have recordScreen set to true or the screen will not be captured. It's also required that the library component, $screen-recording.components.screenRecordingPermission, be included in the study at some point before this component to ensure permissions are granted and screen capture has started. */
   recordScreen?: boolean;
   /** Whether to prepend questions with their index (+ 1). This should only be used when all questions are in the same location, e.g. all are in the side bar. If present, will override the enumeration of questions setting in the uiConfig. */
   enumerateQuestions?: boolean;
@@ -990,11 +1001,11 @@ export interface MarkdownComponent extends BaseIndividualComponent {
  * So, for example, if I had the following ReactComponent in my config
 ```js
 {
-  type: 'react-component';
-  path: 'my_study/CoolComponent.tsx';
+  type: 'react-component',
+  path: 'my_study/CoolComponent.tsx',
   parameters: {
-    name: 'Zach';
-    age: 26;
+    name: 'Zach',
+    age: 26
   }
 }
 ```
@@ -1008,8 +1019,8 @@ export default function CoolComponent({ parameters, setAnswer }: StimulusParams<
 ```
  *
  * For in depth examples, see the following studies, and their associated codebases.
- * https://revisit.dev/study/demo-click-accuracy-test (https://github.com/revisit-studies/study/tree/v2.3.2/src/public/demo-click-accuracy-test/assets)
- * https://revisit.dev/study/example-brush-interactions (https://github.com/revisit-studies/study/tree/v2.3.2/src/public/example-brush-interactions/assets)
+ * https://revisit.dev/study/demo-react-trrack (https://github.com/revisit-studies/study/tree/v2.4.0/src/public/demo-react-trrack/assets)
+ * https://revisit.dev/study/example-brush-interactions (https://github.com/revisit-studies/study/tree/v2.4.0/src/public/example-brush-interactions/assets)
  */
 export interface ReactComponent extends BaseIndividualComponent {
   type: 'react-component';
@@ -1083,7 +1094,7 @@ export interface ImageComponent extends BaseIndividualComponent {
 </script>
 ```
 
-  * If the html website implements Trrack library for provenance tracking, you can send the provenance graph back to reVISit by calling `Revisit.postProvenanceGraph` as shown in the example below. You need to call this each time the Trrack state is updated so that reVISit is kept aware of the changes in the provenance graph.
+  * If the html website implements Trrack library for provenance tracking, you can send the provenance graph back to reVISit by calling `Revisit.postProvenance` as shown in the example below. You need to call this each time the Trrack state is updated so that reVISit is kept aware of the changes in the provenance graph.
 
 ```js
 const trrack = initializeTrrack({
@@ -1153,8 +1164,8 @@ If you are using Vega, you can use signals with `revisitAnswer` to send the user
     }
   ]
 }
-In this example, when a user clicks on a rectangle in the Vega chart, the `revisitAnswer` signal is updated with the responseId and response. This signal is then passed to reVISit as the participant's response.
 ```
+ In this example, when a user clicks on a rectangle in the Vega chart, the `revisitAnswer` signal is updated with the responseId and response. This signal is then passed to reVISit as the participant's response.
 */
 export interface VegaComponentPath extends BaseIndividualComponent {
   type: 'vega';
@@ -1190,8 +1201,8 @@ IIf you are using Vega, you can use signals with `revisitAnswer` to send the use
     }
   ]
 }
-In this example, when a user clicks on a rectangle in the Vega chart, the `revisitAnswer` signal is updated with the responseId and response.
 ```
+ In this example, when a user clicks on a rectangle in the Vega chart, the `revisitAnswer` signal is updated with the responseId and response.
 */
 export interface VegaComponentConfig extends BaseIndividualComponent {
   type: 'vega';
@@ -1527,6 +1538,8 @@ export interface DynamicBlock {
   functionPath: string;
   /** The parameters that are passed to the function. These can be used within your function to render different things. */
   parameters?: Record<string, unknown>;
+  /** The conditional property shows the block only when the URL condition matches its `id`. */
+  conditional?: boolean;
 }
 
 /** The ComponentBlock interface is used to define order properties within the sequence. This is used to define the order of components in a study and the skip logic. It supports random assignment of trials using a pure random assignment and a [latin square](https://en.wikipedia.org/wiki/Latin_square).
@@ -1646,6 +1659,8 @@ export interface ComponentBlock {
   interruptions?: InterruptionBlock[];
   /** The skip conditions for the block. */
   skip?: SkipConditions;
+  /** The conditional property shows the block only when the URL condition matches its `id`. */
+  conditional?: boolean;
 }
 
 /** An InheritedComponent is a component that inherits properties from a baseComponent. This is used to avoid repeating properties in components. This also means that components in the baseComponents object can be partially defined, while components in the components object can inherit from them and must be fully defined and include all properties (after potentially merging with a base component). */
@@ -1701,7 +1716,7 @@ export type BaseComponents = Record<string, Partial<IndividualComponent>>;
 
 ```js
 {
-  "$schema": "https://raw.githubusercontent.com/revisit-studies/study/v2.3.2/src/parser/StudyConfigSchema.json",
+  "$schema": "https://raw.githubusercontent.com/revisit-studies/study/v2.4.0/src/parser/StudyConfigSchema.json",
   "studyMetadata": {
     ...
   },
@@ -1749,7 +1764,7 @@ export interface StudyConfig {
  *
  * ```js
  * {
- *   "$schema": "https://raw.githubusercontent.com/revisit-studies/study/v2.3.2/src/parser/LibraryConfigSchema.json",
+ *   "$schema": "https://raw.githubusercontent.com/revisit-studies/study/v2.4.0/src/parser/LibraryConfigSchema.json",
  *   "baseComponents": {
  *     // BaseComponents here are defined exactly as is in the StudyConfig
  *   },
@@ -1783,14 +1798,17 @@ export interface LibraryConfig {
   baseComponents?: BaseComponents;
 }
 
+export type ErrorWarningCategory = 'invalid-config' | 'invalid-library-config' | 'undefined-library' | 'undefined-base-component' | 'undefined-component' | 'sequence-validation' | 'skip-validation' | 'unused-component' | 'disabled-sidebar';
+
 /**
  * @ignore
  * Helper error type to make reading the error messages easier
  */
 export type ParserErrorWarning = {
   instancePath: string;
-  message?: string;
+  message: string;
   params: object;
+  category: ErrorWarningCategory;
 }
 
 /**

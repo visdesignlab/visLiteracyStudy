@@ -1,7 +1,9 @@
 import {
   Box, Group, LoadingOverlay, Stack,
 } from '@mantine/core';
-import { useSearchParams, useNavigate } from 'react-router';
+import {
+  useLocation, useNavigate, useParams, useSearchParams,
+} from 'react-router';
 import {
   useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
@@ -20,8 +22,10 @@ import { youtubeReadableDuration } from '../../utils/humanReadableDuration';
 import { ResponseBlockLocation, StoredAnswer } from '../../parser/types';
 import { useEvent } from '../../store/hooks/useEvent';
 import { encryptIndex } from '../../utils/encryptDecryptIndex';
+import { parseTrialOrder } from '../../utils/parseTrialOrder';
 import { useUpdateProvenance } from './useUpdateProvenance';
 import { useReplayContext } from '../../store/hooks/useReplay';
+import { syncChannel, syncEmitter } from '../../utils/syncReplay';
 
 const margin = {
   left: 20, top: 0, right: 20, bottom: 0,
@@ -49,6 +53,8 @@ export function AudioProvenanceVis({
   setHasAudio: (b: boolean) => void;
 }) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const routerLocation = useLocation();
+  const { studyId } = useParams();
   const participantId = useMemo(() => searchParams.get('participantId') || '', [searchParams]);
 
   const {
@@ -115,45 +121,62 @@ export function AudioProvenanceVis({
 
   useEffect(() => {
     if (taskName) {
-      localStorage.setItem('currentTrial', taskName);
       if (answers[taskName]?.trialOrder) {
-        localStorage.setItem('trialOrder', answers[taskName].trialOrder);
+        syncChannel.postMessage({
+          key: 'trialOrder',
+          value: answers[taskName].trialOrder,
+        });
       }
     }
   }, [answers, taskName]);
 
   useEffect(() => {
-    const listener = (e: StorageEvent) => {
-      if (!e.newValue) {
+    const participantIdListener = (newId: string) => {
+      setSearchParams((params) => {
+        params.set('participantId', newId || '');
+        params.delete('currentTrial');
+        return params;
+      });
+    };
+
+    const trialOrderListener = (newValue: string) => {
+      const { step, funcIndex } = parseTrialOrder(newValue);
+      if (!studyId || step === null) {
         return;
       }
 
-      if (e.key === 'participantId') {
-        setSearchParams((params) => {
-          params.set('participantId', e.newValue || '');
+      const params = new URLSearchParams(routerLocation.search);
+      params.set('participantId', participantId || '');
+      params.delete('currentTrial');
+      const search = params.toString();
 
-          return params;
+      if (context === 'provenanceVis') {
+        navigate({
+          pathname: funcIndex === null ? `/${studyId}/${encryptIndex(step)}` : `/${studyId}/${encryptIndex(step)}/${encryptIndex(funcIndex)}`,
+          search: search ? `?${search}` : '',
         });
-      }
-      if (e.key === 'currentTrial') {
-        setSearchParams((params) => {
-          params.set('currentTrial', e.newValue || '');
-
-          return params;
-        });
+        return;
       }
 
-      if (e.key === 'trialOrder') {
-        if (context === 'provenanceVis') {
-          navigate(taskName ? `./../${encryptIndex(+e.newValue)}?participantId=${participantId}&currentTrial=${taskName}` : `./${e.newValue}?participantId=${participantId}&currentTrial=${taskName}`);
-        }
+      const matchingIdentifier = Object.entries(answers).find(([_identifier, answer]) => answer.trialOrder === newValue)?.[0];
+      if (!matchingIdentifier) {
+        return;
       }
+
+      navigate({
+        pathname: `/analysis/stats/${studyId}/tagging/${encodeURIComponent(matchingIdentifier)}`,
+        search: search ? `?${search}` : '',
+      });
     };
 
-    window.addEventListener('storage', listener);
+    syncEmitter.on('participantId', participantIdListener);
+    syncEmitter.on('trialOrder', trialOrderListener);
 
-    return () => window.removeEventListener('storage', listener);
-  }, [context, navigate, participantId, setSearchParams, taskName]);
+    return () => {
+      syncEmitter.off('participantId', participantIdListener);
+      syncEmitter.off('trialOrder', trialOrderListener);
+    };
+  }, [answers, context, navigate, participantId, routerLocation.search, setSearchParams, studyId]);
 
   useUpdateProvenance('aboveStimulus', playTime, answers[taskName]?.provenanceGraph.aboveStimulus, currentResponseNodes.aboveStimulus, _setCurrentResponseNodes, saveProvenance);
 
@@ -249,10 +272,6 @@ export function AudioProvenanceVis({
   const handleWSMount = useEvent(
     async (waveSurfer: WaveSurferType | null) => {
       wavesurfer.current = waveSurfer;
-
-      if (taskName.includes('__dynamicLoading')) {
-        return;
-      }
 
       audioRef.current = null;
       updateReplayRef();
