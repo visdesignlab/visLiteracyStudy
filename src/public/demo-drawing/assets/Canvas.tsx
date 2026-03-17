@@ -233,11 +233,10 @@ export default function Canvas({
               <IconArrowForwardUp />
             </ActionIcon>
           </Tooltip>
-
         </Group>
 
         <div style={{ height: window.innerHeight - 100, width }}>
-          <Tldraw persistenceKey={`${parameters.responseId} - ${answers.introduction_0.answer}`} hideUi initialState="" licenseKey="tldraw-2026-03-18/WyJlNm1fQTFpTiIsWyIqIl0sMTYsIjIwMjYtMDMtMTgiXQ.F1gp8Hb+4X6fiFeLt3VpyDgpLdqOpWzQ+BCDN9X6c/WiasoArZ2Uj7tUM0vqX1NYy4BebKY5BRJr92nuqwXuKA">
+          <Tldraw persistenceKey={`${parameters.responseId} - ${answers.introduction_0.answer}`} hideUi initialState="" licenseKey="tldraw-2026-06-25/WyI1bktYT3dGViIsWyIqIl0sMTYsIjIwMjYtMDYtMjUiXQ.UrWL3HlGLXoS7r3gjJr2PYToH/vHGO+Uk/ZsbRBcGkO9PeQ6srAgGu1G04zCHnuHZ0MZeXhNPRRP2276VyQFgg">
             <TlDrawEditor color={color} drawingTool={tool} size={penSize} onDraw={handleMouseMove} snapshot={provenanceState?.state || snapshot} />
           </Tldraw>
         </div>
