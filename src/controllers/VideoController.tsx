@@ -1,7 +1,7 @@
 import {
   forwardRef, RefObject, useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
-import { APITypes, PlyrProps, usePlyr } from 'plyr-react';
+import { APITypes, PlyrProps, PlyrOptions, PlyrSource, usePlyr } from 'plyr-react';
 import { VideoComponent } from '../parser/types';
 import { PREFIX } from '../utils/Prefix';
 import { getStaticAssetByPath } from '../utils/getStaticAsset';
@@ -127,7 +127,7 @@ export function VideoController({ currentConfig }: { currentConfig: VideoCompone
     };
   }, [provider, url, validExternalUrl]);
 
-  const sources = useMemo<Plyr.Source[]>(() => {
+  const sources = useMemo<PlyrSource['sources']>(() => {
     if (provider === 'youtube') {
       if (!validExternalUrl) return [];
       return [
@@ -153,9 +153,9 @@ export function VideoController({ currentConfig }: { currentConfig: VideoCompone
       },
     ];
   }, [provider, url, validExternalUrl]);
-  const playerSource = useMemo<Plyr.SourceInfo>(() => ({ type: 'video', sources }), [sources]);
+  const playerSource = useMemo<PlyrSource>(() => ({ type: 'video', sources }), [sources]);
 
-  const options = useMemo<Plyr.Options>(() => ({
+  const options = useMemo<PlyrOptions>(() => ({
     controls: [
       currentConfig.forceCompletion !== false ? 'play-large' : 'play',
       'current-time',

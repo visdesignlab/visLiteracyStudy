@@ -56,6 +56,15 @@ export default function Canvas({
 
   const [ref, { width }] = useResizeObserver();
 
+  // Clear any stale tldraw license cache so the current key is always used
+  useEffect(() => {
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('tl') || key.toLowerCase().includes('license')) {
+        localStorage.removeItem(key);
+      }
+    });
+  }, []);
+
   useEffect(() => {
     if (provenanceState) {
       setTool(provenanceState.tool || 'pen');

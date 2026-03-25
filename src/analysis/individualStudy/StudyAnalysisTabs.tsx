@@ -9,6 +9,7 @@ import {
   IconTags,
   IconDashboard,
   IconFileCode,
+  IconPhoto,
 } from '@tabler/icons-react';
 import {
   useCallback, useEffect, useMemo, useState,
@@ -34,6 +35,7 @@ import 'mantine-react-table/styles.css';
 import { ThinkAloudAnalysis } from './thinkAloud/ThinkAloudAnalysis';
 import { FirebaseStorageEngine } from '../../storage/engines/FirebaseStorageEngine';
 import { ConfigView } from './config/ConfigView';
+import { DrawingScreenshotsView } from './drawingScreenshots/DrawingScreenshotsView';
 
 const TABLE_HEADER_HEIGHT = 37; // Height of the tabs header
 
@@ -450,6 +452,7 @@ export function StudyAnalysisTabs({ globalConfig }: { globalConfig: GlobalConfig
                 {storageEngine?.getEngine() === 'firebase' && (
                   <Tabs.Tab value="live-monitor" leftSection={<IconDashboard size={16} />}>Live Monitor</Tabs.Tab>
                 )}
+                <Tabs.Tab value="drawing-screenshots" leftSection={<IconPhoto size={16} />}>Drawing Screenshots</Tabs.Tab>
                 <Tabs.Tab value="config" leftSection={<IconFileCode size={16} />}>Config</Tabs.Tab>
                 <Tabs.Tab value="manage" leftSection={<IconSettings size={16} />} disabled={!user.isAdmin}>Manage</Tabs.Tab>
               </Tabs.List>
@@ -470,6 +473,9 @@ export function StudyAnalysisTabs({ globalConfig }: { globalConfig: GlobalConfig
                   {studyConfig && <LiveMonitorView studyConfig={studyConfig} storageEngine={storageEngine} studyId={studyId} includedParticipants={includedParticipants} selectedStages={selectedStages} />}
                 </Tabs.Panel>
               )}
+              <Tabs.Panel style={{ height: `calc(100% - ${TABLE_HEADER_HEIGHT}px)` }} value="drawing-screenshots" pt="xs">
+                {studyConfig && <DrawingScreenshotsView visibleParticipants={visibleParticipants} studyConfig={studyConfig} />}
+              </Tabs.Panel>
               <Tabs.Panel style={{ overflow: 'auto' }} value="config" pt="xs">
                 {studyConfig && <ConfigView visibleParticipants={visibleParticipants} />}
               </Tabs.Panel>
