@@ -28,6 +28,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@emotion/react": "^11.0.0",
     "@emotion/styled": "^11.0.0",
+    "@excalidraw/excalidraw": "^0.18.1",
     "@mantine/core": "^7.10.1",
     "@mantine/dates": "^7.10.1",
     "@mantine/form": "^7.10.1",

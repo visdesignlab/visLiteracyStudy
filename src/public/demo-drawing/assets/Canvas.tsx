@@ -16,18 +16,17 @@ import {
   useEffect, useMemo, useState,
 } from 'react';
 
-import 'tldraw/tldraw.css';
-
 import throttle from 'lodash.throttle';
 import { useResizeObserver } from '@mantine/hooks';
 import { isStateNode } from '@trrack/core';
 import {
-  DefaultColorThemePalette, Tldraw, TLEditorSnapshot,
-} from 'tldraw';
+  DrawingSnapshot, DrawingState, ExcalidrawSnapshot, DRAWING_COLORS,
+} from '../../../utils/drawingState';
+import { useIsAnalysis } from '../../../store/hooks/useIsAnalysis';
 import { StimulusParams } from '../../../store/types';
 import { Registry } from './trrack-alpha/core/src/registry/reg';
 import { initializeTrrack } from './trrack-alpha/core/src/provenance/trrack';
-import TlDrawEditor from './trrack-alpha/TlDrawEditor';
+import ExcalidrawEditor from './ExcalidrawEditor';
 
 const COLORS = [
   'red', 'green', 'blue', 'orange', 'grey', 'black', 'violet',
@@ -35,12 +34,7 @@ const COLORS = [
 
 export type Lines = { tool: string; points: number[], width: number, color: string }[]
 
-export type TLDrawState = {
-  state: TLEditorSnapshot | null;
-  tool: 'pen' | 'eraser';
-  color: string;
-  penSize: string;
-};
+export type TLDrawState = DrawingState;
 
 export default function Canvas({
   parameters, provenanceState, setAnswer, answers,
@@ -48,22 +42,14 @@ export default function Canvas({
   const [tool, setTool] = useState('pen');
   const [penSize, setPenSize] = useState<string>('m');
   const [color, onColorChange] = useState('red');
-  const [snapshot, setSnapshot] = useState<null | undefined | TLEditorSnapshot>(null);
+  const [snapshot, setSnapshot] = useState<null | undefined | DrawingSnapshot>(null);
+  const isAnalysis = useIsAnalysis();
 
   const [canUndo, setCanUndo] = useState(false);
 
   const [undoStack, setUndoStack] = useState<string[]>([]);
 
   const [ref, { width }] = useResizeObserver();
-
-  // Clear any stale tldraw license cache so the current key is always used
-  useEffect(() => {
-    Object.keys(localStorage).forEach((key) => {
-      if (key.startsWith('tl') || key.toLowerCase().includes('license')) {
-        localStorage.removeItem(key);
-      }
-    });
-  }, []);
 
   useEffect(() => {
     if (provenanceState) {
@@ -145,22 +131,27 @@ export default function Canvas({
     };
   }, []);
 
-  const debouncedApply = useMemo(() => throttle((l: TLEditorSnapshot) => {
+  const debouncedApply = useMemo(() => throttle((l: ExcalidrawSnapshot) => {
     trrack.apply('drawing', actions.draw(l), { isEphemeral: false, makeCheckpoint: false });
-    setAnswer({
-      status: true,
-      provenanceGraph: trrack.graph.backend,
-      answers: {},
-    });
 
     setCanUndo(true);
 
     setUndoStack([]);
 
     setSnapshot(null);
-  }, 100), [actions, setAnswer, trrack]);
+  }, 100), [actions, trrack]);
 
-  const handleMouseMove = (e: TLEditorSnapshot) => {
+  useEffect(() => {
+    if (isAnalysis) return undefined;
+    const unsubscribe = trrack.currentChange(() => {
+      setAnswer({ status: true, provenanceGraph: trrack.graph.backend, answers: {} });
+    });
+    return () => { unsubscribe(); };
+  }, [isAnalysis, setAnswer, trrack]);
+
+  useEffect(() => () => { debouncedApply.flush(); debouncedApply.cancel(); }, [debouncedApply]);
+
+  const handleMouseMove = (e: ExcalidrawSnapshot) => {
     debouncedApply(e);
   };
 
@@ -172,50 +163,57 @@ export default function Canvas({
       }}
     >
       <Stack>
-        <Group>
+        <Group style={isAnalysis ? { pointerEvents: 'none', opacity: 0.7 } : undefined}>
           <SegmentedControl
             size="md"
+            value={tool}
+            disabled={isAnalysis}
             color={tool === 'eraser' ? 'lightpink' : color}
             data={[
               { label: <IconPencil size={16} stroke={2.5} color="black" />, value: 'pen' },
               { label: <IconEraser size={16} stroke={2.5} color="black" />, value: 'eraser' },
             ]}
-            onChange={(c) => { setTool(c); trrack.apply('Set Tool', actions.setTool(c)); }}
+            onChange={(c) => { debouncedApply.flush(); setTool(c); trrack.apply('Set Tool', actions.setTool(c)); }}
           />
           <SegmentedControl
             size="md"
+            value={penSize}
+            disabled={isAnalysis}
             color="lightgray"
             data={[
               { label: <IconCircleFilled size={8} color="black" />, value: 'm' },
               { label: <IconCircleFilled size={12} color="black" />, value: 'l' },
               { label: <IconCircleFilled size={16} color="black" />, value: 'xl' },
             ]}
-            onChange={(c) => { setPenSize(c); trrack.apply('Change Pen Size', actions.setPenSize(c)); }}
+            onChange={(c) => { debouncedApply.flush(); setPenSize(c); trrack.apply('Change Pen Size', actions.setPenSize(c)); }}
           />
           <Group gap={6}>
             {COLORS.map((c) => (
               <ColorSwatch
-                onClick={() => { onColorChange(c); trrack.apply('Change Color', actions.setColor(c)); }}
+                onClick={() => { debouncedApply.flush(); onColorChange(c); trrack.apply('Change Color', actions.setColor(c)); }}
                 key={c}
-                // @ts-ignore
-                color={DefaultColorThemePalette.lightMode[c as unknown].solid}
+                color={DRAWING_COLORS[c]}
                 style={{ cursor: 'pointer', outlineOffset: '1px', outline: c === color ? '2px solid black' : 'none' }}
               />
             ))}
           </Group>
 
-          <Button onClick={() => {
-            trrack.apply('clearing', actions.clear(null), { isEphemeral: false, makeCheckpoint: false });
-            setUndoStack([]);
-          }}
+          <Button
+            disabled={isAnalysis}
+            onClick={() => {
+              debouncedApply.flush();
+              trrack.apply('clearing', actions.clear(null), { isEphemeral: false, makeCheckpoint: false });
+              setUndoStack([]);
+            }}
           >
             Clear all
           </Button>
           <Tooltip label="Undo">
             <ActionIcon
               variant="light"
-              disabled={!canUndo}
+              disabled={isAnalysis || !canUndo}
               onClick={() => {
+                debouncedApply.flush();
                 const ephemeralNode = trrack.getLastNNonEphemeralNode(undoStack.length + 1);
                 const currentNode = trrack.current.id;
                 if (isStateNode(trrack.current)) {
@@ -231,8 +229,9 @@ export default function Canvas({
           <Tooltip label="Redo">
             <ActionIcon
               variant="light"
-              disabled={undoStack.length === 0}
+              disabled={isAnalysis || undoStack.length === 0}
               onClick={() => {
+                debouncedApply.flush();
                 const newState = trrack.getState(trrack.graph.backend.nodes[undoStack[undoStack.length - 1]]);
                 trrack.apply('redo', actions.redo(newState.state), { isEphemeral: true, makeCheckpoint: false });
                 setUndoStack(undoStack.slice(0, -1));
@@ -245,9 +244,16 @@ export default function Canvas({
         </Group>
 
         <div style={{ height: window.innerHeight - 100, width }}>
-          <Tldraw persistenceKey={`${parameters.responseId} - ${answers.introduction_0.answer}`} hideUi initialState="" licenseKey="tldraw-2026-06-25/WyI1bktYT3dGViIsWyIqIl0sMTYsIjIwMjYtMDYtMjUiXQ.UrWL3HlGLXoS7r3gjJr2PYToH/vHGO+Uk/ZsbRBcGkO9PeQ6srAgGu1G04zCHnuHZ0MZeXhNPRRP2276VyQFgg">
-            <TlDrawEditor color={color} drawingTool={tool} size={penSize} onDraw={handleMouseMove} snapshot={provenanceState?.state || snapshot} />
-          </Tldraw>
+          <ExcalidrawEditor
+            key={parameters.responseId}
+            persistenceKey={`excalidraw:${parameters.responseId}:${JSON.stringify(answers.introduction_0?.answer ?? {})}`}
+            color={color}
+            drawingTool={tool}
+            size={penSize}
+            onDraw={handleMouseMove}
+            readOnly={isAnalysis}
+            snapshot={isAnalysis ? provenanceState?.state ?? undefined : snapshot}
+          />
         </div>
       </Stack>
     </Box>

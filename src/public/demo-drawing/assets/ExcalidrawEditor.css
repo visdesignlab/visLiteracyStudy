@@ -1,0 +1,11 @@
+/* An empty MainMenu still renders a trigger in Excalidraw 0.18. Hide it
+   only within the study drawing canvas. */
+.revisit-drawing-canvas .excalidraw .main-menu-trigger {
+  display: none;
+}
+
+/* Use the study's drawing controls instead of Excalidraw's desktop/mobile
+   top bars, including its tool picker and selected-shape controls. */
+.revisit-drawing-canvas .excalidraw .FixedSideContainer_side_top {
+  display: none;
+}
